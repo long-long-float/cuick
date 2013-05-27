@@ -7,7 +7,7 @@ block埋め込んでいいんじゃね?←blockつき関数は複数箇所で呼
 一部C++11の機能を使っている
 
 - 非C++11に切り替えられるようにする？
-- 
+
 - 警告を出す
 
 #clightとは
@@ -48,11 +48,11 @@ if-else if-else, for, while, do-whileについてはC++と同じです。
 
 ifの否定
 
-##後置if, unless, for, while
+##後置if, unless, for, foreach, while
 
     ... xxx(expression)
 
-##foreach(for STL's container)
+##foreach
 
     foreach(var in container){
         ...
@@ -162,8 +162,8 @@ inline, __cdeclをはじめとしたC++のものに加えて、extendがあり�
 
 は以下と等価です
 
-    std::map<int> fact_memo;
     int fact(int n){
+        static std::map<int> fact_memo;
         int idx = n;
         std::map<int>::iterator itr = fact_memo.find(idx);
         if(itr != fact_memo.end()) return *itr;
@@ -232,10 +232,18 @@ inline, __cdeclをはじめとしたC++のものに加えて、extendがあり�
         void say(){
             puts 'I'm ' + @name
         }
-    
+        
+        //プロパティ
+        prop int age
+        get{
+            //鯖を読む
+            @age_ - 5
+        }
+        set(val) { @age_ = val }
+        
     private:
         string name
-        int age
+        int age_
     }
     
 は以下と等価です
@@ -247,6 +255,19 @@ inline, __cdeclをはじめとしたC++のものに加えて、extendがあり�
         void say(){
             puts("I'm " + this->name);
         }
+        
+        friend class PropName{
+        prrivate:
+            Person &parent;
+        public:
+            PropName(Person &parent_) : parent(parent_){}
+            operator int() const {
+                return parent.age_ - 5;
+            }
+            const int& operator=(const int& val){
+                return parent.age_ = val;
+            }
+        };
     private:
         string name;
         int age;

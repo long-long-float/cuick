@@ -11,6 +11,7 @@ block埋め込んでいいんじゃね?←blockつき関数は複数箇所で呼
 - 警告を出す
 
 #clightとは
+
 一言でいうと、軽量スクリプト(風)言語です。主に、競技などの比較的小規模なプログラムを想定しています。
 
 #特徴
@@ -227,7 +228,7 @@ inline, __cdeclをはじめとしたC++のものに加えて、extendがあり�
 
         //コンストラクタ
         //引数に@を付けると自動で代入してくれます
-        this(@name, @age){}
+        this(@name, @age_){}
     
         void say(){
             puts 'I'm ' + @name
@@ -291,6 +292,57 @@ inline, __cdeclをはじめとしたC++のものに加えて、extendがあり�
     ss << "a + b = " << a + b;
     puts(ss.str());
 
-##配列リテラル
+##array, vector, map, tupleリテラル
 
-[要素…]
+- array
+
+    ary(<型>)[要素, ...]
+
+- vector
+
+    (vec)(<型>)[要素, ...]
+
+- map
+
+    (map)(<keyの型, valの型>)[key : val, ...]
+
+- tuple
+
+    (tuple)(<型, ...>)<要素, ...>
+
+型を省略した場合、1番目の要素をdecltypeします(tupleの場合は全部の要素)
+
+##rangeリテラル
+
+範囲を指定できるところでのみ使うことができます
+
+a..bは[a, b]、a...bは[a, b)です
+
+# #命令
+
+C++のプリプロセッサに加えて、
+
+- input_map
+
+定義を書くだけで、標準入力から読み取ることができます
+
+    int n, a[10000];
+    #input_map{
+        n
+        a[0...n]
+    }
+    var sum = 0
+    foreach(i in 0...n) sum += i
+    print sum
+
+- with(object)
+
+このブロック内のレシーバーを省略できます
+
+    Person p
+    #with(p){
+        .age = 10
+        .name = 'John'
+    }
+
+

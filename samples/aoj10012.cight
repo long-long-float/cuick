@@ -1,0 +1,14 @@
+while(true){
+    int H, W
+    #input{
+        H W
+        if(!H && !W) break
+    }
+    H.times{
+        W.times{
+            print '#'
+        }
+        puts
+    }
+    puts
+}

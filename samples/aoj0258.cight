@@ -1,0 +1,20 @@
+#while(true)
+
+int n
+vector<int> h(100)
+#input{
+    n
+    if(!n) break
+    h[0...n]
+}
+outer : foreach(i in h){
+    var h2 = h
+    h2.erace(itr(i))
+    int d = h2[1] - h2[0]
+    foreach(j in 1...h2.size()){
+        break if h2[j + 1] - h2[j] != d
+    } last {
+        puts i
+        break outer
+    }
+}

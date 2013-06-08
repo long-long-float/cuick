@@ -1,0 +1,19 @@
+extend void int.times(){
+    foreach(i in 0...this) yield(i)
+}
+
+$T gets{
+    $T ret
+    cin >> ret
+    ret
+}
+
+vector<$T> gets(int n){
+    vector<$T> ret(n)
+    n.times{ cin >> ret[it] }
+    ret
+}
+
+extend $CONT.sort(){
+    sort(this.begin(), this.end())
+}

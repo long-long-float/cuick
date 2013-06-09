@@ -1,0 +1,15 @@
+#while(true)
+
+map<char, char> dic
+var n = gets<int>
+if(!n) break
+
+n.times{
+    dic[gets<string>[0]] = gets<string>[0]
+}
+gets<int>.times{
+    var c = gets<char>
+    var itr = dic.find(c)
+    print (itr != dic.end())? *itr : c
+}
+puts

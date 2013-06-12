@@ -66,7 +66,7 @@ C++のSTLのコンテナを反復処理します。
     ary.push_back(3);
     auto sum = 0;
     for(vector<int>::iterator e = ary.begin() ; e != ary.end() ; e++){
-        sum += *e;
+        sum += * e;
     }
 
 containerにrangeリテラルを指定すると、varをカウンターとしたfor文になります
@@ -81,7 +81,7 @@ containerにrangeリテラルを指定すると、varをカウンターとした
 
     int[] ary = raw[1, 2, 3]
     for(e : ary:0..1){
-        e **= 2
+        e ** = 2
     }
 
 は以下と等価です
@@ -120,7 +120,7 @@ containerにrangeリテラルを指定すると、varをカウンターとした
 
 - 指定子
 
-inline, __cdeclをはじめとしたC++のものに加えて、
+inline, __ cdeclをはじめとしたC++のものに加えて、
 
 - extend
 
@@ -160,7 +160,7 @@ inline, __cdeclをはじめとしたC++のものに加えて、
         static std::map<int> fact_memo;
         int idx = n;
         std::map<int>::iterator itr = fact_memo.find(idx);
-        if(itr != fact_memo.end()) return *itr;
+        if(itr != fact_memo.end()) return * itr;
         return fact_memo[idx] = (n <= 1 ? 1 : n * fact(idx));
     }
 
@@ -309,7 +309,7 @@ inline, __cdeclをはじめとしたC++のものに加えて、
 
 - vector
 
-    (vec)(<型>)[要素, ...]
+    (vec)(<型>)[要素, ...] 
 
 - map
 
@@ -362,7 +362,7 @@ C++のプリプロセッサに加えて、
 
     var ary = [1, 3, 4, 10, 12]
     ary[1..3] //=>3, 4, 10
- 
+
 ##print, prints
 
 これらはstd::coutに変換されます。printsは、要素ごとにスペースが入ります

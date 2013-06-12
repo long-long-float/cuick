@@ -1,0 +1,29 @@
+int n, m, k[50]
+@input{
+    n m
+    k[0...n]
+}
+
+bool f = false
+
+n.times{ a ->
+    n.times{ b ->
+        n.times{ c ->
+            n.times{ d->
+                if(k[a] + k[b] + k[c] + k[d] == m) {
+                    f = true
+                }
+            }
+        }
+    }
+}
+
+/*
+[0...n].permutation(4){ *x ->
+    if(x.sum == m){
+        f = true
+    }
+}
+*/
+
+puts f ? 'Yes' : 'No'

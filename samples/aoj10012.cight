@@ -1,6 +1,6 @@
 while(true){
     int H, W
-    #input{
+    @input{
         H W
         if(!H && !W) break
     }

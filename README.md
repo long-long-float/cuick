@@ -1,4 +1,4 @@
-cight
+﻿cight
 =====
 
 #メモ
@@ -20,8 +20,6 @@ cight
 
 - クロージャ、ブロック
 
-- ? 自動delete
-
 - vector, map, tuple, range, 正規表現リテラル
 
 - 拡張メソッド
@@ -36,13 +34,7 @@ cight
 
 //, /**/はコメントです
 
-#変数
-
-C++と同じように_型名+変数名_とできますが、初期化できる場合には型名をvarとすることで型推論が利用できます
-
 #基本の制御構造
-
-if-else if-else, for, while, do-whileについてはC++と同じです。
 
 ##unless
 
@@ -54,21 +46,21 @@ ifの否定
 
 ##foreach
 
-    foreach(var in container){
+    for(var : container){
         ...
     }
 
 C++のSTLのコンテナを反復処理します。
     
-    var ary = [1, 2, 3]
-    var sum = 0
-    foreach(e in ary){
+    vector<int> ary = [1, 2, 3]
+    int sum = 0
+    for(e : ary){
         sum += e
     }
 
 は以下と等価です
 
-    vector<int> ary;
+    vector<int> ary(3);
     ary.push_back(1);
     ary.push_back(2);
     ary.push_back(3);
@@ -81,14 +73,14 @@ containerにrangeリテラルを指定すると、varをカウンターとした
 
 ##foreach(for native array)
 
-    foreach(var in array:range){
+    for(var : array:range){
         ...
     }
 
 生配列を反復処理します。rangeを省略すると、0...sizeof(array) / sizeof(array[0])とします
 
-    var ary = raw[1, 2, 3]
-    foreach(e in ary:){
+    int[] ary = raw[1, 2, 3]
+    for(e : ary:0..1){
         e **= 2
     }
 
@@ -101,11 +93,11 @@ containerにrangeリテラルを指定すると、varをカウンターとした
 
 #関数
 
-##call
+##呼び出し
 
 関数呼び出しについては、C++と同じです。ただし、関数の後ろのカッコは省略可能です?_←関数ポインタとの区別がつかない_
 
-##define
+##定義
 
 基本はC++と同じですが、
 
@@ -128,7 +120,7 @@ containerにrangeリテラルを指定すると、varをカウンターとした
 
 - 指定子
 
-inline, __cdeclをはじめとしたC++のものに加えて、extendがあります
+inline, __cdeclをはじめとしたC++のものに加えて、
 
 - extend
 
@@ -331,20 +323,20 @@ inline, __cdeclをはじめとしたC++のものに加えて、extendがあり�
 
 ##rangeリテラル
 
-範囲を指定できるところでのみ使うことができます
+範囲を指定できるところでのみ使うことができます←変数として使えるようにする？
 
 a..bは[a, b]、a...bは[a, b)です
 
-# #命令
+# @命令
 
 C++のプリプロセッサに加えて、
 
-- input_map
+- input
 
 定義を書くだけで、標準入力から読み取ることができます
 
     int n, a[10000];
-    #input_map{
+    @input{
         n
         a[0...n]
     }
@@ -357,7 +349,7 @@ C++のプリプロセッサに加えて、
 このブロック内のレシーバーを省略できます
 
     Person p
-    #with(p){
+    @with(p){
         .age = 10
         .name = 'John'
     }

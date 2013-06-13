@@ -1,0 +1,15 @@
+int n, a[100]
+@input{
+    n
+    a[0...n]
+}
+a.sort_reverse
+ans = 0
+for(i : (a.size - 1)...2){
+    x, y, z = a[i], a[i - 1], a[i - 2]
+    if(x > y + z){
+        ans = x + y + z
+        break
+    }
+}
+puts ans

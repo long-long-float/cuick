@@ -19,7 +19,7 @@ n.times{ a ->
 }
 
 /*
-[0...n].permutation(4){ *x ->
+[*0...n].repeated_permutation(4){ *x ->
     if(x.sum == m){
         f = true
     }

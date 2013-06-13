@@ -1,0 +1,8 @@
+int n, a[20], k
+@input{n a[0...n] k}
+
+memo(i, sum) bool dfs(int i, int sum){
+    (i != n) && ((sum == k) || dfs(i + 1, sum) || dfs(i + 1, sum + a[i]))
+}
+
+puts dfs(0, 0) ? 'Yes' : 'No'

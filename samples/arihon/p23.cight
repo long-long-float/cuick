@@ -1,0 +1,8 @@
+int L, n
+@input{L, n}
+int mi = int.max, ma = -1
+n.times{
+    x = gets<int>
+    mi, ma = minmax(mi, ma, x, L - x)
+}
+puts mi, ma

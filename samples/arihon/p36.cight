@@ -1,0 +1,21 @@
+int N, M
+char field[100][100 + 1]
+@input{N, M, field[0...N][0...M] }
+
+void dfs(int x, int y){
+    field[x][y] = '.' //ここどうする
+    
+    for(dx, dy : -1..1, -1..1){
+        int nx = x + dx, ny = y + dy
+        dfs(nx, ny) if x in 0...N && y in 0...M && field[nx][ny] == 'W'
+    }
+}
+
+int res = 0
+for(x, y : 0...N, 0...M){
+    if field[x][y] == 'W' {
+        dfs(x, y)
+        res++
+    }
+}
+puts res

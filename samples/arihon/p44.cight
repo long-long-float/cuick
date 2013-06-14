@@ -1,0 +1,16 @@
+const int MAX_N = 100000
+
+int N = get<int>
+tuple<int, int> itv[MAX_N]
+
+N.times{ itv[1], itv[0] = get<int>(2) }
+itv.sort
+
+int ans = 0, t = 0
+for(s, f : itv){
+    if(t < f){
+        ans++
+        t = s
+    }
+}
+puts ans

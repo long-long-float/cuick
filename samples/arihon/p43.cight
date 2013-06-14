@@ -1,0 +1,12 @@
+int coins = [1, 5, 10, 50, 100, 500]
+
+int C[6], A
+@input{ C[0...6], A }
+
+int ans = 0
+for(i : coins.size..0){
+    int t = min(A / coins[i], C[i])
+    A -= t * coins[i]
+    ans += t
+}
+puts ans

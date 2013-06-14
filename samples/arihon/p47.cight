@@ -1,0 +1,12 @@
+int N
+char S[2001]
+@input{ N S[N] }
+
+int a = 0, b = N - 1
+while(a <= b){
+    puts for(int i = 0; a + i <= b ; i++){
+        if(S[a + i] < S[b - i]) break true
+        if(S[a + i] > S[b - i]) break false
+    } ? S[a++] : S[b--]
+}
+puts

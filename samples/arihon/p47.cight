@@ -4,9 +4,24 @@ char S[2001]
 
 int a = 0, b = N - 1
 while(a <= b){
-    puts for(int i = 0; a + i <= b ; i++){
+    puts (bool : false)for(int i = 0 ; a + i <= b ; i++){
         if(S[a + i] < S[b - i]) break true
         if(S[a + i] > S[b - i]) break false
     } ? S[a++] : S[b--]
+    
+    /*
+    bool val = false;
+    for(int i = 0 ; cond = (a + i <= b) ; i++){
+    	if(S[a + i] < S[b - i]){
+    		val = true;
+    		break;
+    	}
+        if(S[a + i] > S[b - i]){
+    		val = false;
+    		break;
+    	}
+    }
+    cout << val ? S[a++] : S[b--] << endl;
+    */
 }
 puts

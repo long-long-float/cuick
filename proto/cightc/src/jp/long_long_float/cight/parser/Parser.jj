@@ -26,7 +26,7 @@ TOKEN: {
   | <CONST : "const">
   | <CONST_CAST : "const_cast">
   | <CONTINUE : "continue">
-  | <DEFAULT : "default">
+  | <DEFAULT_ : "default">
   | <DELETE : "delete">
   | <DO : "do">
   | <DOUBLE : "double">
@@ -44,6 +44,8 @@ TOKEN: {
   | <IF : "if">
   | <INLINE : "inline">
   | <INT : "int">
+  //!
+  | <LAST : "last">
   | <LONG : "long">
   | <MUTABLE : "mutable">
   | <NAMESPACE : "namespace">
@@ -84,6 +86,7 @@ TOKEN: {
 	<IDENTIFIER: ["a"-"z", "A"-"Z", "_"](["a"-"z", "A"-"Z", "_", "0"-"9"])*>
 }
 
+//数値
 TOKEN: {
 	<INTEGER: ["1"-"9"](["0"-"9"])* ("U")? ("L")?
 		| "0" ["x", "X"](["0"-"9", "a"-"f", "A"-"F"])+ ("U")? ("L")?
@@ -114,4 +117,427 @@ MORE: { <"`"> : IN_BUILT_IN_CODE }
     | <"\\`" >
 }
 <IN_BUILT_IN_CODE> TOKEN: { <BUILT_IN_CODE: "`"> : DEFAULT }
+
+
+
+//文法
+
+//ソース全体
+comlilation_unit(): {}
+{
+    (
+    /*
+        static int abs(int x){}
+    */
+        //LOOKAHEAD(typeref() [typeref() "."] <IDENTIFIER> "(")
+        deffun()
+    /*
+        int a;
+    */
+    |   defvars()
+    |   typedef()
+    |   at_command()
+    |   stmt()
+    )*
+}
+
+defvars(): {}
+{
+    //storage(staticなど)は無し
+    type() name() ["=" expr()] ("," name() ["=" expr())* [";"]
+}
+
+deffun(): {}
+{
+    functyperef() [functyperef() "."] name() "(" params() ")" block()
+}
+
+params(): {}
+{
+    fixedparams()
+}
+
+fixedparams(): {}
+{
+    param() ("," param())*
+}
+
+param(): {}
+{
+    functyperef() name()
+}
+
+block(): {}
+{
+    "{"
+    (
+        defvars()
+    |   stmt()
+    )*
+    "}"
+}
+
+typedef(): {}
+{
+    <TYPEDEF> typeref() <IDENTIFIER> [";"]
+}
+
+type(): {}
+{
+    typeref()
+}
+
+typeref(): {}
+{
+    typeref_base() ["<" type() ("," type())+ ">"] ["*"+ | "&"]
+}
+
+functyperef(): {}
+{
+    ["$"] typeref()
+}
+
+typeref_base(): {}
+{
+        <VOID>
+    |   <CHAR>
+    |   <SHORT>
+    |   <INT>
+    |   <LONG>
+    |   LOOKAHEAD(2) <UNSIGNED> <CHAR>
+    |   LOOKAHEAD(2) <UNSIGNED> <SHORT>
+    |   LOOKAHEAD(2) <UNSIGNED> <INT>
+    |   <UNSIGNED> <LONG>
+    |   <IDENTIFIER>
+}
+
+stmt(): {}
+{
+    (
+        ";"
+    |   expr() [";"]
+    |   multiplex_assign()
+    |   block()
+    |   if_stmt()
+    |   while_stmt()
+    |   dowhile_stmt()
+    |   for_stmt()
+    |   switch_stmt()
+    |   break_stmt()
+    |   continue_stmt()
+    |   return_stmt()
+    )
+}
+
+if_stmt(): {}
+{
+    <IF> "(" expr() ")" stmt() [ LOOKAHEAD(1) <ELSE> stmt() ]
+}
+
+while_stmt(): {}
+{
+    <WHILE> "(" expr() ")" stmt()
+}
+
+dowhile_stmt(): {}
+{
+    <DO> stmt() <WHILE> "(" expr() ")" [";"]
+}
+
+for_stmt(): {}
+{
+    <FOR>
+    (
+        //普通のfor
+        "(" [expr()] ";" [expr()] ";" [expr()] ")" stmt()
+        //foreach
+    |   "(" ([type()] name())+ ":" [for_direction()] enumerable()+ ")" stmt() [ LOOKAHEAD(1) <LAST> stmt() ]
+    )
+}
+
+for_direction(): {}
+{
+    ["<" | ">"]
+}
+
+enumerable(): {}
+{
+    //ポインタ
+    LOOKAHEAD(expr() ":") expr() ":" range()
+    //変数の集合
+    |   LOOKAHEAD(expr() ",") expr() ("," expr())+
+    //配列 range tuple 整数 std::map container
+    |   expr()
+}
+    
+
+switch_stmt(): {}
+{
+    <SWITCH> "(" expr() ")" "{" case_clauses() "}"
+}
+
+case_clauses(): {}
+{
+    case_clause()*
+    [default_clause()]
+}
+
+case_clause(): {}
+{
+    cases case_body()
+}
+
+default_clause(): {}
+{
+    <DEFAULT_> ":" case_body()
+}
+
+case_body(): {}
+{
+    stmt()+
+}
+
+break_stmt(): {}
+{
+    <BREAK> [";"]
+}
+
+continue_stmt(): {}
+{
+    <CONTINUE> [";"]
+}
+
+return_stmt(): {}
+{
+    LOOKAHEAD(2) <RETURN> [";"]
+    |   <RETURN> expr() [";"]
+}
+
+multiplex_assign(): {}
+{
+    LOOKAHEAD(term() ",") term() ("," term())+ "=" term() ("," term())* [";"]
+}
+
+expr(): {}
+{
+    //a = b
+    LOOKAHEAD(term() "=") term() "=" expr()
+    //a += b
+    |   LOOKAHEAD(term() opassign_op()) term() opassign_op() expr()
+    |   expr10()
+}
+
+String opassign_op(): {}
+{
+    ( "+="  { return "+"; }
+    | "-="  { return "-"; }
+    | "*="  { return "*"; }
+    | "/="  { return "/"; }
+    | "%="  { return "%"; }
+    | "&="  { return "&"; }
+    | "|="  { return "|"; }
+    | "^="  { return "^"; }
+    | "<<=" { return "<<"; }
+    | ">>=" { return ">>"; }
+    | "**=" { return "**"; }
+    )
+}
+
+expr10(): {}
+{
+    expr9() ["?" expr10() ":" expr10()]
+}
+
+expr9(): {}
+{
+    expr8() ("||" expr8())*
+}
+
+expr8(): {}
+{
+    expr7() ("&&" expr7())*
+}
+
+ExprNode expr7():
+{ ExprNode l, r; }
+{
+    l=expr6() ( ">"  r=expr6() { l = new BinaryOpNode(l, ">", r); }
+              | "<"  r=expr6() { l = new BinaryOpNode(l, "<", r); }
+              | ">=" r=expr6() { l = new BinaryOpNode(l, ">=", r); }
+              | "<=" r=expr6() { l = new BinaryOpNode(l, "<=", r); }
+              | "==" r=expr6() { l = new BinaryOpNode(l, "==", r); }
+              | "!=" r=expr6() { l = new BinaryOpNode(l, "!=", r); } )*
+        {
+            return l;
+        }
+}
+
+ExprNode expr6():
+{ ExprNode l, r; }
+{
+    l=expr5() ("|" r=expr5() { l = new BinaryOpNode(l, "|", r); })*
+        {
+            return l;
+        }
+}
+    
+ExprNode expr5():
+{ ExprNode l, r; }
+{
+    l=expr4() ("^" r=expr4() { l = new BinaryOpNode(l, "^", r); })*
+        {
+            return l;
+        }
+}
+
+ExprNode expr4():
+{ ExprNode l, r; }
+{
+    l=expr3() ("&" r=expr3() { l = new BinaryOpNode(l, "&", r); })*
+        {
+            return l;
+        }
+}
+
+ExprNode expr3():
+{ ExprNode l, r; }
+{
+    l=expr2() ( ">>" r=expr2() { l = new BinaryOpNode(l, ">>", r); }
+              | "<<" r=expr2() { l = new BinaryOpNode(l, "<<", r); }
+              )*
+        {
+            return l;
+        }
+}
+
+ExprNode expr2():
+{ ExprNode l, r; }
+{
+    l=expr1() ( "+" r=expr1() { l = new BinaryOpNode(l, "+", r); }
+              | "-" r=expr1() { l = new BinaryOpNode(l, "-", r); }
+              )*
+        {
+            return l;
+        }
+}
+
+ExprNode expr1():
+{ ExprNode l, r; }
+{
+    l=term() ( "*" r=term() { l = new BinaryOpNode(l, "*", r); }
+             | "/" r=term() { l = new BinaryOpNode(l, "/", r); }
+             | "%" r=term() { l = new BinaryOpNode(l, "%", r); }
+             )*
+        {
+            return l;
+        }
+}
+
+term(): {}
+{
+    LOOKAHEAD("(" type()) "(" type() ")" term()
+    |   unary()
+}
+
+ExprNode unary():
+{
+    ExprNode n;
+    TypeNode t;
+}
+{
+      "++" n=unary()    { return new PrefixOpNode("++", n); }
+    | "--" n=unary()    { return new PrefixOpNode("--", n); }
+    | "+" n=term()      { return new UnaryOpNode("+", n); }
+    | "-" n=term()      { return new UnaryOpNode("-", n); }
+    | "!" n=term()      { return new UnaryOpNode("!", n); }
+    | "~" n=term()      { return new UnaryOpNode("~", n); }
+    | "*" n=term()      { return new DereferenceNode(n); }
+    | "&" n=term()      { return new AddressNode(n); }
+    | LOOKAHEAD(3) <SIZEOF> "(" t=type() ")"
+        {
+            return new SizeofTypeNode(t, size_t());
+        }
+    | <SIZEOF> n=unary()
+        {
+            return new SizeofExprNode(n, size_t());
+        }
+    | n=postfix()       { return n; }
+}
+
+ExprNode postfix():
+{
+    ExprNode expr, idx;
+    String memb;
+    List<ExprNode> args;
+}
+{
+    expr=primary()
+    ( "++"                  { expr = new SuffixOpNode("++", expr); }
+    | "--"                  { expr = new SuffixOpNode("--", expr); }
+    | "[" idx=expr() "]"    { expr = new ArefNode(expr, idx); }
+    | "." memb=name()       { expr = new MemberNode(expr, memb); }
+    | "->" memb=name()      { expr = new PtrMemberNode(expr, memb); }
+    | ["<" type() ("," type())+ ">"] ["("] args=args() [")"]   { expr = new FuncallNode(expr, args); }
+    )*
+        {
+            return expr;
+        }
+}
+
+name(): {}
+{
+    <IDENTIFIER>
+}
+
+args(): {}
+{
+    [ expr() ("," expr())* ]
+}
+
+primary(): {}
+{
+    <INTEGER>
+    |   <CHARACTER>
+    |   <STRING>
+    |   range()
+    |   <IDENTIFIER>
+    |   "(" expr() ")"
+}
+
+range(): {}
+{
+    expr() (".." | "...") expr()
+}
+
+//@命令
+
+at_command(): {}
+{
+    at_input()
+    |   at_memo()
+    |   at_while()
+}
+
+at_input(): {}
+{
+    "{"
+        (
+        name()
+        |   name() "[" (range() | expr()) "]"
+        |   name() "!"
+        )*
+    "}"
+}
+
+at_memo(): {}
+{
+    "@memo" "(" expr() ["," expr()] ")" deffun()
+}
+
+at_while(): {}
+{
+    "@while" "(" expr() ")"
+}
+
+
 

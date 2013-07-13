@@ -128,12 +128,12 @@ MORE: { <"`"> : IN_BUILT_IN_CODE }
 //文法
 
 //ソース全体
-AST comlilation_unit(): 
+AST comlilation_unit():
 {
     Token t;
-    
+
     Declarations decls = new Declarations();
-    
+
     DefinedFunction deffun;
     List<DefinedVariable> defvars;
     TypedefNode typedef;
@@ -148,7 +148,7 @@ AST comlilation_unit():
     /*
         static int abs(int x){}
     */
-        //LOOKAHEAD(typeref() [typeref() "."] <IDENTIFIER> "(")
+        LOOKAHEAD(typeref() [typeref() "."] <IDENTIFIER> "(")
         deffun=deffun() { decls.addDeffun(deffun); }
     /*
         int a;
@@ -182,7 +182,7 @@ List<DefinedVariable> defvars():
             defs.add(new DefinedVariable(type, name, init));
             init = null;
         }
-    )* [";"]
+    )* //
         {
             return defs;
         }
@@ -262,7 +262,7 @@ TypedefNode typedef():
     Token newname;
 }
 {
-    t=<TYPEDEF> ref=typeref() newname=<IDENTIFIER> [";"]
+    t=<TYPEDEF> ref=typeref() newname=<IDENTIFIER> 
         {
             addType(newname.image);
             return new TypedefNode(location(t), ref, newname.image);
@@ -337,9 +337,9 @@ StmtNode stmt():
 }
 {
     (
-        ";"
-    |   LOOKAHEAD(term() ",") n=multiplex_assign()
-    |   e=expr() [";"] { n = new ExprStmtNode(e.location(), e); }
+        ";" //null statement
+        LOOKAHEAD(term() ",") n=multiplex_assign()
+    |   e=expr()  { n = new ExprStmtNode(e.location(), e); }
     |   n=block()
     |   n=if_stmt()
     |   n=while_stmt()
@@ -390,7 +390,7 @@ DoWhileNode dowhile_stmt():
     StmtNode body;
 }
 {
-    t=<DO> body=stmt() <WHILE> "(" cond=expr() ")" [";"]
+    t=<DO> body=stmt() <WHILE> "(" cond=expr() ")" 
         {
             return new DoWhileNode(location(t), body, cond);
         }
@@ -412,16 +412,16 @@ ForNode for_stmt():
 ForEachNode foreach_stmt():
 {
     Token t;
-    
+
     TypeRef var_type;
     String var_name;
     ForEachVars foreVars = new ForEachVars();
-    
+
     String dire = "<";
-    
+
     Enumerable enume;
     ForEachEnumes foreEnumes = new ForEachEnumes();
-    
+
     StmtNode body, lastBody = null;
 }
 {
@@ -439,9 +439,9 @@ ForEachNode foreach_stmt():
 Enumerable enumerable():
 {
     Enumerable e;
-    
+
     ExprNode expr, range;
-    
+
     EnumerableVariableSet evs = new EnumerableVariableSet();
 }
 {
@@ -579,7 +579,7 @@ MultiplexAssignNode multiplex_assign():
     expr=term(){ lhses.add(expr); }
         ("," expr=term(){ lhses.add(expr); } )+
         "=" expr=term(){ rhses.add(expr); }
-        ("," expr=term(){ rhses.add(expr); })* [";"]
+        ("," expr=term(){ rhses.add(expr); })* 
         {
             return new MultiplexAssignNode(location(t), lhses, rhses);
         }
@@ -673,7 +673,7 @@ ExprNode expr6():
             return l;
         }
 }
-    
+
 ExprNode expr5():
 { ExprNode l, r; }
 {
@@ -817,7 +817,7 @@ List<ExprNode> args():
             }
 }
 
-ExprNode primary(): 
+ExprNode primary():
 {
     Token t;
     ExprNode n;
@@ -830,7 +830,7 @@ ExprNode primary():
         }
     |   t=<CHARACTER>
         {
-            return new IntegerLiteralNode(location(t), 
+            return new IntegerLiteralNode(location(t),
                                     IntegerTypeRef.charRef(),
                                     characterCode(t.image));
         }

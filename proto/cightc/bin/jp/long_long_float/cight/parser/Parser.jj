@@ -163,6 +163,7 @@ AST comlilation_unit():
     }
 }
 
+//変数宣言
 List<DefinedVariable> defvars():
 {
     List<DefinedVariable> defs = new ArrayList<DefinedVariable>();
@@ -172,17 +173,17 @@ List<DefinedVariable> defvars():
 }
 {
     //storage(staticなど)は無し
-    type=type() name=name() ["=" init=expr()]
+    type=type() ["&"] ("*")* name=name() ["[" [expr()] "]"] ["=" init=expr()]
         {
             defs.add(new DefinedVariable(type, name, init));
             init = null;
         }
-    ("," name() ["=" expr()]
+    (","  ["&"] ("*")* name=name() ["[" [expr()] "]"] ["=" init=expr()]
         {
             defs.add(new DefinedVariable(type, name, init));
             init = null;
         }
-    )* //
+    )* //";"
         {
             return defs;
         }
@@ -262,7 +263,7 @@ TypedefNode typedef():
     Token newname;
 }
 {
-    t=<TYPEDEF> ref=typeref() newname=<IDENTIFIER> 
+    t=<TYPEDEF> ref=typeref() newname=<IDENTIFIER> ";"
         {
             addType(newname.image);
             return new TypedefNode(location(t), ref, newname.image);
@@ -286,7 +287,7 @@ TypeRef typeref():
 {
     ref=typeref_base() [types=templ_types()]
         [("*" { ref = new PointerTypeRef(ref); })+
-        |    "&" { ref = new ReferenceTypeRef(ref); }]
+        |    ]"&" { ref = new ReferenceTypeRef(ref); }
         {
             return ref;
         }
@@ -338,8 +339,8 @@ StmtNode stmt():
 {
     (
         ";" //null statement
-        LOOKAHEAD(term() ",") n=multiplex_assign()
-    |   e=expr()  { n = new ExprStmtNode(e.location(), e); }
+    |   LOOKAHEAD(term() ",") n=multiplex_assign()
+    |   e=expr() ";" { n = new ExprStmtNode(e.location(), e); }
     |   n=block()
     |   n=if_stmt()
     |   n=while_stmt()
@@ -390,7 +391,7 @@ DoWhileNode dowhile_stmt():
     StmtNode body;
 }
 {
-    t=<DO> body=stmt() <WHILE> "(" cond=expr() ")" 
+    t=<DO> body=stmt() <WHILE> "(" cond=expr() ")" ";"
         {
             return new DoWhileNode(location(t), body, cond);
         }
@@ -579,7 +580,7 @@ MultiplexAssignNode multiplex_assign():
     expr=term(){ lhses.add(expr); }
         ("," expr=term(){ lhses.add(expr); } )+
         "=" expr=term(){ rhses.add(expr); }
-        ("," expr=term(){ rhses.add(expr); })* 
+        ("," expr=term(){ rhses.add(expr); })*
         {
             return new MultiplexAssignNode(location(t), lhses, rhses);
         }
@@ -686,7 +687,7 @@ ExprNode expr5():
 ExprNode expr4():
 { ExprNode l, r; }
 {
-    l=expr3() ("&" r=expr3() { l = new BinaryOpNode(l, "&", r); })*
+    l=expr3() ("&" r=expr3() { l = new BinaryOpNode(l, "&", r); })//*
         {
             return l;
         }
@@ -706,8 +707,8 @@ ExprNode expr3():
 ExprNode expr2():
 { ExprNode l, r; }
 {
-    l=expr1() ( "+" r=expr1() { l = new BinaryOpNode(l, "+", r); }
-              | "-" r=expr1() { l = new BinaryOpNode(l, "-", r); }
+    l=expr1() ( "???" r=expr1() { l = new BinaryOpNode(l, "+", r); }
+              | "`*`" r=expr1() { l = new BinaryOpNode(l, "-", r); }
               )*
         {
             return l;

@@ -198,7 +198,7 @@ DefinedFunction deffun():
     BlockNode body;
 }
 {
-    ret=functyperef() [obj=functyperef() "."] n=name() "(" ps=params() ")" body=block()
+    ret=functype_with_suffix_ref() [obj=functype_with_suffix_ref() "."] n=name() "(" ps=params() ")" body=block()
         {
             if(obj) ps.addObjParam(obj);
             FuncTypeRef t = new FunctionTypeRef(ret, ps.parametersTypeRef());
@@ -207,14 +207,6 @@ DefinedFunction deffun():
 }
 
 Params params():
-{
-    Params params;
-}
-{
-    params=fixedparams() { return params; }
-}
-
-Params fixedparams():
 {
     List<Parameter> params = new ArrayList<Parameter>();
     Parameter param, param1;
@@ -233,7 +225,7 @@ Parameter param():
     String n;
 }
 {
-    t=functyperef() n=name() { return new Parameter(t, n); }
+    t=functyperef() ["&"] ("*")* n=name() { return new Parameter(t, n); }
 }
 
 BlockNode block():
@@ -263,7 +255,7 @@ TypedefNode typedef():
     Token newname;
 }
 {
-    t=<TYPEDEF> ref=typeref() newname=<IDENTIFIER> ";"
+    t=<TYPEDEF> ref=typeref() ["&"] ("*")* newname=<IDENTIFIER> ["[" [expr()] "]"]  //";"
         {
             addType(newname.image);
             return new TypedefNode(location(t), ref, newname.image);
@@ -293,21 +285,34 @@ TypeRef typeref():
         }
 }
 
+TypeRef functype_with_suffix_ref()
+{
+  TypeNode type;
+  String name;
+  ExprNode default_value = null;
+}
+{  type=type() ["&"] ("*")* name=name() ["[" [expr()] "]"] ["=" default_value=expr()]
+}
+
 TypeRef functyperef():
 {
-    boolean isTempl = false;
+    String name;
     TypeRef ref;
 }
 {
-    ["$" { isTempl = true; }] ref=typeref()
-        {
-            return isTempl ? new TemplateTypeRef(ref) : ref;
-        }
+    "$" name=name()
+    {      return new TemplateTypeRef(ref);
+    }
+    | ref=typeref()
+    {
+      return ref;
+    }
 }
 
 TypeRef typeref_base():
 {
     Token t, name;
+    TypeRef templ_type;
 }
 {
       t=<VOID>          { return new VoidTypeRef(location(t)); }
@@ -327,7 +332,9 @@ TypeRef typeref_base():
         { return new StructTypeRef(location(t), name.image); }
     | t=<UNION> name=<IDENTIFIER>
         { return new UnionTypeRef(location(t), name.image); }
-    | LOOKAHEAD({isType(getToken(1).image)}) name=<IDENTIFIER>
+    | LOOKAHEAD(<IDENTIFIER> "<") name=<IDENTIFIER> "<" templ_type=type_with_suffix() ">"
+        { return new UserTemplateType(location(name), name.image, templ_type); }
+    | /*LOOKAHEAD({isType(getToken(1).image)})*/ name=<IDENTIFIER>
         { return new UserTypeRef(location(name), name.image); }
 }
 
@@ -734,7 +741,7 @@ ExprNode term():
 }
 {
       LOOKAHEAD("(" type())
-      "(" t=type() ")" n=term()     { return new CastNode(t, n); }
+      "(" t=type() ("*")* ")" n=term()     { return new CastNode(t, n); }
     | n=unary()                     { return n; }
 }
 

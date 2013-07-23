@@ -85,6 +85,7 @@ TOKEN: {
   | <VOLATILE : "volatile">
   | <WCHAR_T : "wchar_t">
   | <WHILE : "while">
+  | <DOLLAR : "$">
 }
 
 TOKEN: {
@@ -148,7 +149,7 @@ AST comlilation_unit():
     /*
         static int abs(int x){}
     */
-        LOOKAHEAD(typeref() [typeref() "."] <IDENTIFIER> "(")
+        LOOKAHEAD(type() [type() "."] <IDENTIFIER> "(")
         deffun=deffun() { decls.addDeffun(deffun); }
     /*
         int a;
@@ -191,17 +192,17 @@ List<DefinedVariable> defvars():
 
 DefinedFunction deffun():
 {
-    FuncTypeRef ret;
-    FuncTypeRef obj = null;
+    FuncType ret;
+    FuncType receiver = null;
     String n;
     Params ps;
     BlockNode body;
 }
 {
-    ret=functype_with_suffix_ref() [obj=functype_with_suffix_ref() "."] n=name() "(" ps=params() ")" body=block()
+    ret=functype_with_suffix() [receiver=functype_with_suffix() "."] n=name() "(" ps=params() ")" body=block()
         {
-            if(obj) ps.addObjParam(obj);
-            FuncTypeRef t = new FunctionTypeRef(ret, ps.parametersTypeRef());
+            if(receiver) ps.addParamFront(receiver);
+            FuncType t = new FunctionType(ret, ps.parametersType());
             return new DefinedFunction(new TypeNode(t), n, ps, body);
         }
 }
@@ -225,7 +226,7 @@ Parameter param():
     String n;
 }
 {
-    t=functyperef() ["&"] ("*")* n=name() { return new Parameter(t, n); }
+    t=functype() ["&"] ("*")* n=name() ["[" [expr()] "]"] { return new Parameter(t, n); }
 }
 
 BlockNode block():
@@ -251,65 +252,82 @@ BlockNode block():
 TypedefNode typedef():
 {
     Token t;
-    TypeRef ref;
+    TypeNode oldname;
     Token newname;
 }
 {
-    t=<TYPEDEF> ref=typeref() ["&"] ("*")* newname=<IDENTIFIER> ["[" [expr()] "]"]  //";"
+    t=<TYPEDEF> oldname=type() ["&"] ("*")* newname=<IDENTIFIER> ["[" [expr()] "]"]  //";"
         {
             addType(newname.image);
             return new TypedefNode(location(t), ref, newname.image);
         }
 }
 
+/*
+何もついてない素の型
+int
+vector<int, int>
+*/
 TypeNode type():
 {
-    TypeRef ref;
+    TypeNode type;
+    List<TypeNode> templ_types = null;
+    //ParamTypeRefs params;
 }
 {
-    ref=typeref() { return new TypeNode(ref); }
-}
-
-TypeRef typeref():
-{
-    TypeRef ref;
-    List<TypeNode> types = null;
-    ParamTypeRefs params;
-}
-{
-    ref=typeref_base() [types=templ_types()]
-        [("*" { ref = new PointerTypeRef(ref); })+
-        |    ]"&" { ref = new ReferenceTypeRef(ref); }
-        {
-            return ref;
-        }
+    type=type_base() [types=templ_types()]
 }
 
-TypeRef functype_with_suffix_ref()
+/*
+*や&が付いた型
+int*
+int&
+*/
+TypeNode type_with_suffix():
 {
+  TypeNode type;
+}
+{
+  type=type() ["&"] ("*")*
+}
+
+/*
+type + "$"
+*/
+TypeNode functype():
+{
+  TypeNode type;
+}
+{
+  t=<DOLLAR> name=name()
+  {
+    return new TemplateType(location(t), name);
+  }
+  | type=type_base() [types=templ_functypes()]
+  {
+    return type;
+  }
+}
+
+/*
+type_with_suffix + "$"
+*/
+TypeNode functype_with_suffix():
+{
+  Token t;
   TypeNode type;
   String name;
   ExprNode default_value = null;
 }
-{  type=type() ["&"] ("*")* name=name() ["[" [expr()] "]"] ["=" default_value=expr()]
+{
+  t=<DOLLAR> name=name()
+  {    return new TemplateType(location(t), name);
+  }  | type=type_with_suffix()
+  {    return type;
+  }
 }
 
-TypeRef functyperef():
-{
-    String name;
-    TypeRef ref;
-}
-{
-    "$" name=name()
-    {      return new TemplateTypeRef(ref);
-    }
-    | ref=typeref()
-    {
-      return ref;
-    }
-}
-
-TypeRef typeref_base():
+TypeRef type_base():
 {
     Token t, name;
     TypeRef templ_type;
@@ -797,8 +815,8 @@ List<TypeNode> templ_types():
     TypeNode type;
 }
 {
-    "<" type=type() { types.add(type); }
-        ("," type=type(){ types.add(type); } )+ ">"
+    "<" type=type_with_suffix() { types.add(type); }
+        ("," type=type_with_suffix(){ types.add(type); } )+ ">"
         {
             return types;
         }

@@ -192,17 +192,17 @@ List<DefinedVariable> defvars():
 
 DefinedFunction deffun():
 {
-    FuncType ret;
-    FuncType receiver = null;
+    TypeNode ret;
+    TypeNode receiver = null;
     String n;
     Params ps;
     BlockNode body;
 }
 {
-    ret=functype_with_suffix() [receiver=functype_with_suffix() "."] n=name() "(" ps=params() ")" body=block()
+    ret=type_with_suffix() [receiver=type_with_suffix() "."] n=name() "(" ps=params() ")" body=block()
         {
             if(receiver) ps.addParamFront(receiver);
-            FuncType t = new FunctionType(ret, ps.parametersType());
+            TypeNode t = new FunctionType(ret, ps.parametersType());
             return new DefinedFunction(new TypeNode(t), n, ps, body);
         }
 }
@@ -226,7 +226,7 @@ Parameter param():
     String n;
 }
 {
-    t=functype() ["&"] ("*")* n=name() ["[" [expr()] "]"] { return new Parameter(t, n); }
+    t=type() ["&"] ("*")* n=name() ["[" [expr()] "]"] { return new Parameter(t, n); }
 }
 
 BlockNode block():
@@ -267,21 +267,33 @@ TypedefNode typedef():
 何もついてない素の型
 int
 vector<int, int>
+$T
 */
 TypeNode type():
 {
+    Token t;
+	String name;
+	
     TypeNode type;
     List<TypeNode> templ_types = null;
     //ParamTypeRefs params;
 }
 {
-    type=type_base() [types=templ_types()]
+    t=<DOLLAR> name=name()
+  {
+    return new TemplateType(location(t), name);
+  }
+  | type=type_base() [types=templ_types()]
+  {
+    return type;
+  }
 }
 
 /*
 *や&が付いた型
 int*
 int&
+$T*
 */
 TypeNode type_with_suffix():
 {
@@ -291,69 +303,31 @@ TypeNode type_with_suffix():
   type=type() ["&"] ("*")*
 }
 
-/*
-type + "$"
-*/
-TypeNode functype():
-{
-  TypeNode type;
-}
-{
-  t=<DOLLAR> name=name()
-  {
-    return new TemplateType(location(t), name);
-  }
-  | type=type_base() [types=templ_functypes()]
-  {
-    return type;
-  }
-}
-
-/*
-type_with_suffix + "$"
-*/
-TypeNode functype_with_suffix():
-{
-  Token t;
-  TypeNode type;
-  String name;
-  ExprNode default_value = null;
-}
-{
-  t=<DOLLAR> name=name()
-  {    return new TemplateType(location(t), name);
-  }  | type=type_with_suffix()
-  {    return type;
-  }
-}
-
-TypeRef type_base():
+TypeNode type_base():
 {
     Token t, name;
-    TypeRef templ_type;
+    TypeNode templ_type;
 }
 {
-      t=<VOID>          { return new VoidTypeRef(location(t)); }
-    | t=<CHAR>          { return IntegerTypeRef.charRef(location(t)); }
-    | t=<SHORT>         { return IntegerTypeRef.shortRef(location(t)); }
-    | t=<INT>           { return IntegerTypeRef.intRef(location(t)); }
-    | t=<LONG>          { return IntegerTypeRef.longRef(location(t)); }
+      t=<VOID>          { return new VoidType(location(t)); }
+    | t=<CHAR>          { return IntegerType.char(location(t)); }
+    | t=<SHORT>         { return IntegerType.short(location(t)); }
+    | t=<INT>           { return IntegerType.int(location(t)); }
+    | t=<LONG>          { return IntegerType.long(location(t)); }
     | LOOKAHEAD(2) t=<UNSIGNED> <CHAR>
-        { return IntegerTypeRef.ucharRef(location(t)); }
+        { return IntegerType.uchar(location(t)); }
     | LOOKAHEAD(2) t=<UNSIGNED> <SHORT>
-        { return IntegerTypeRef.ushortRef(location(t)); }
+        { return IntegerType.ushort(location(t)); }
     | LOOKAHEAD(2) t=<UNSIGNED> <INT>
-        { return IntegerTypeRef.uintRef(location(t)); }
+        { return IntegerType.uint(location(t)); }
     | t=<UNSIGNED> <LONG>
-        { return IntegerTypeRef.ulongRef(location(t)); }
+        { return IntegerType.ulong(location(t)); }
     | t=<STRUCT> name=<IDENTIFIER>
-        { return new StructTypeRef(location(t), name.image); }
+        { return new StructType(location(t), name.image); }
     | t=<UNION> name=<IDENTIFIER>
-        { return new UnionTypeRef(location(t), name.image); }
-    | LOOKAHEAD(<IDENTIFIER> "<") name=<IDENTIFIER> "<" templ_type=type_with_suffix() ">"
-        { return new UserTemplateType(location(name), name.image, templ_type); }
+        { return new UnionType(location(t), name.image); }
     | /*LOOKAHEAD({isType(getToken(1).image)})*/ name=<IDENTIFIER>
-        { return new UserTypeRef(location(name), name.image); }
+        { return new UserType(location(nameType.image); }
 }
 
 StmtNode stmt():
@@ -439,7 +413,7 @@ ForEachNode foreach_stmt():
 {
     Token t;
 
-    TypeRef var_type;
+    Type var_type;
     String var_name;
     ForEachVars foreVars = new ForEachVars();
 
@@ -857,13 +831,13 @@ ExprNode primary():
     |   t=<CHARACTER>
         {
             return new IntegerLiteralNode(location(t),
-                                    IntegerTypeRef.charRef(),
+                                    IntegerType.charRef(),
                                     characterCode(t.image));
         }
     |   t=<STRING>
         {
             return new StringLiteralNode(location(t),
-                                    new PointerTypeRef(IntegerTypeRef.charRef()),
+                                    new PointerType(IntegerType.charRef()),
                                     stringValue(t.image));
         }
     /*|   r=range()

@@ -86,6 +86,7 @@ TOKEN: {
   | <WCHAR_T : "wchar_t">
   | <WHILE : "while">
   | <DOLLAR : "$">
+  | <EXTEND : "extend">
 }
 
 TOKEN: {
@@ -146,15 +147,10 @@ AST comlilation_unit():
         t = getToken(1);
     }
     (
-    /*
-        static int abs(int x){}
-    */
-        LOOKAHEAD(type() [type() "."] <IDENTIFIER> "(")
+        LOOKAHEAD(type_with_suffix() [type_with_suffix() "."] name() "(")
         deffun=deffun() { decls.addDeffun(deffun); }
-    /*
-        int a;
-    */
-    |   defvars=defvars() { decls.addDefvars(defvars); }
+    |   deffun = def_extendfun() { decls.addDeffun(deffun); }
+    |   LOOKAHEAD(type()) defvars=defvars() { decls.addDefvars(defvars); }
     |   typedef=typedef() { decls.addTypedef(typedef); }
     //|   at_command=at_command() { decls.addAtCommand(at_command); }
     |   stmt=stmt() { decls.addStmt(stmt); }
@@ -199,7 +195,24 @@ DefinedFunction deffun():
     BlockNode body;
 }
 {
-    ret=type_with_suffix() [receiver=type_with_suffix() "."] n=name() "(" ps=params() ")" body=block()
+    ret=type_with_suffix() n=name() "(" ps=params() ")" body=block()
+        {
+            TypeNode t = new FunctionType(ret, ps.parametersType());
+            return new DefinedFunction(new TypeNode(t), n, ps, body);
+        }
+}
+
+DefinedFunction def_extendfun():
+{
+    Token t;
+    TypeNode ret;
+    TypeNode receiver = null;
+    String n;
+    Params ps;
+    BlockNode body;
+}
+{
+    t=<EXTEND> ret=type_with_suffix() receiver=type_with_suffix() "." n=name() "(" ps=params() ")" body=block()
         {
             if(receiver) ps.addParamFront(receiver);
             TypeNode t = new FunctionType(ret, ps.parametersType());
@@ -240,7 +253,7 @@ BlockNode block():
 {
     "{"
     (
-        var=defvars() { vars.add(var); }
+        LOOKAHEAD(type()) var=defvars() { vars.add(var); }
     |   stmt=stmt() { stmts.add(stmt); }
     )*
         {
@@ -310,24 +323,24 @@ TypeNode type_base():
 }
 {
       t=<VOID>          { return new VoidType(location(t)); }
-    | t=<CHAR>          { return IntegerType.char(location(t)); }
-    | t=<SHORT>         { return IntegerType.short(location(t)); }
-    | t=<INT>           { return IntegerType.int(location(t)); }
-    | t=<LONG>          { return IntegerType.long(location(t)); }
+    | t=<CHAR>          { return IntegerType.charType(location(t)); }
+    | t=<SHORT>         { return IntegerType.shortType(location(t)); }
+    | t=<INT>           { return IntegerType.intType(location(t)); }
+    | t=<LONG>          { return IntegerType.longType(location(t)); }
     | LOOKAHEAD(2) t=<UNSIGNED> <CHAR>
-        { return IntegerType.uchar(location(t)); }
+        { return IntegerType.ucharType(location(t)); }
     | LOOKAHEAD(2) t=<UNSIGNED> <SHORT>
-        { return IntegerType.ushort(location(t)); }
+        { return IntegerType.ushortType(location(t)); }
     | LOOKAHEAD(2) t=<UNSIGNED> <INT>
-        { return IntegerType.uint(location(t)); }
+        { return IntegerType.uintType(location(t)); }
     | t=<UNSIGNED> <LONG>
-        { return IntegerType.ulong(location(t)); }
+        { return IntegerType.ulongType(location(t)); }
     | t=<STRUCT> name=<IDENTIFIER>
         { return new StructType(location(t), name.image); }
     | t=<UNION> name=<IDENTIFIER>
         { return new UnionType(location(t), name.image); }
     | /*LOOKAHEAD({isType(getToken(1).image)})*/ name=<IDENTIFIER>
-        { return new UserType(location(nameType.image); }
+        { return new UserType(location(nameType.image)); }
 }
 
 StmtNode stmt():
@@ -426,10 +439,11 @@ ForEachNode foreach_stmt():
 }
 {
     t=<FOR> "("
-        [var_type=type()] var_name=name() { foreVars.add(var_type, var_name); }
-        ("," [var_type=type()] var_name=name() { foreVars.add(var_type, var_name); })*
+        var_type=type() var_name=name() { foreVars.add(var_type, var_name); }
+        ("," var_type=type() var_name=name() { foreVars.add(var_type, var_name); })*
         ":" ["<" | ">" { dire = ">"; }]
-        (enume=enumerable() { foreEnumes.add(enumerable); } )+ ")" body=stmt()
+        enume=enumerable() { foreEnumes.add(enumerable); }
+        ")" body=stmt()
         [ LOOKAHEAD(1) <LAST> lastBody=stmt() ]
         {
             return new ForEachNode(foreVars, dire, foreEnumes, body, lastBody);

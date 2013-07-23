@@ -180,7 +180,7 @@ List<DefinedVariable> defvars():
             defs.add(new DefinedVariable(type, name, init));
             init = null;
         }
-    )* //";"
+    )* ";"
         {
             return defs;
         }
@@ -269,7 +269,7 @@ TypedefNode typedef():
     Token newname;
 }
 {
-    t=<TYPEDEF> oldname=type() ["&"] ("*")* newname=<IDENTIFIER> ["[" [expr()] "]"]  //";"
+    t=<TYPEDEF> oldname=type() ["&"] ("*")* newname=<IDENTIFIER> ["[" [expr()] "]"]  ";"
         {
             addType(newname.image);
             return new TypedefNode(location(t), ref, newname.image);
@@ -593,7 +593,7 @@ MultiplexAssignNode multiplex_assign():
     expr=term(){ lhses.add(expr); }
         ("," expr=term(){ lhses.add(expr); } )+
         "=" expr=term(){ rhses.add(expr); }
-        ("," expr=term(){ rhses.add(expr); })*
+        ("," expr=term(){ rhses.add(expr); })* ";"
         {
             return new MultiplexAssignNode(location(t), lhses, rhses);
         }
@@ -720,8 +720,8 @@ ExprNode expr3():
 ExprNode expr2():
 { ExprNode l, r; }
 {
-    l=expr1() ( "???" r=expr1() { l = new BinaryOpNode(l, "+", r); }
-              | "`*`" r=expr1() { l = new BinaryOpNode(l, "-", r); }
+    l=expr1() ( "+" r=expr1() { l = new BinaryOpNode(l, "+", r); }
+              | "-" r=expr1() { l = new BinaryOpNode(l, "-", r); }
               )*
         {
             return l;
@@ -790,7 +790,7 @@ ExprNode postfix():
     | "[" idx=expr() "]"    { expr = new ArefNode(expr, idx); }
     | "." memb=name()       { expr = new MemberNode(expr, memb); }
     | "->" memb=name()      { expr = new PtrMemberNode(expr, memb); }
-    | [templ_types=templ_types()] "(" args=args() ")"   { expr = new FuncallNode(expr, templ_types, args); }
+    | templ_types=templ_types() "(" args=args() ")"   { expr = new FuncallNode(expr, templ_types, args); }
     )*
         {
             return expr;

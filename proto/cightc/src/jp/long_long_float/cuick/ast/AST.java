@@ -1,4 +1,4 @@
-package jp.long_long_float.cight.ast;
+package jp.long_long_float.cuick.ast;
 
 public class AST extends Node{
     protected Location source;
@@ -6,7 +6,7 @@ public class AST extends Node{
     
     public AST(Location source, Declarations declarations) {
         super();
-        this.source = souce;
+        this.source = source;
         this.declarations = declarations;
     }
     

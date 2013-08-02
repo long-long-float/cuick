@@ -1,6 +1,6 @@
-package jp.long_long_float.cight.ast;
+package jp.long_long_float.cuick.ast;
 
-import jp.long_long_float.cight.parser.Token;
+import jp.long_long_float.cuick.parser.Token;
 
 public class Location {
     protected String sourceName;

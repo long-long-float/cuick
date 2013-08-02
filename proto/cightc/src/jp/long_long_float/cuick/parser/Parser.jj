@@ -147,9 +147,10 @@ AST comlilation_unit():
         t = getToken(1);
     }
     (
-        LOOKAHEAD(type_with_suffix() [type_with_suffix() "."] name() "(")
+        LOOKAHEAD([name()] type_with_suffix() name() "(")
         deffun=deffun() { decls.addDeffun(deffun); }
-    |   deffun = def_extendfun() { decls.addDeffun(deffun); }
+    |   LOOKAHEAD([name()] type_with_suffix() type_with_suffix() ".")
+        deffun=def_extendfun() { decls.addDeffun(deffun); }
     |   LOOKAHEAD(type()) defvars=defvars() { decls.addDefvars(defvars); }
     |   typedef=typedef() { decls.addTypedef(typedef); }
     //|   at_command=at_command() { decls.addAtCommand(at_command); }
@@ -188,8 +189,8 @@ List<DefinedVariable> defvars():
 
 DefinedFunction deffun():
 {
+    String modif = null;
     TypeNode ret;
-    TypeNode receiver = null;
     String n;
     Params ps;
     BlockNode body;
@@ -206,7 +207,7 @@ DefinedFunction def_extendfun():
 {
     Token t;
     TypeNode ret;
-    TypeNode receiver = null;
+    TypeNode receiver;
     String n;
     Params ps;
     BlockNode body;
@@ -790,7 +791,7 @@ ExprNode postfix():
     | "[" idx=expr() "]"    { expr = new ArefNode(expr, idx); }
     | "." memb=name()       { expr = new MemberNode(expr, memb); }
     | "->" memb=name()      { expr = new PtrMemberNode(expr, memb); }
-    | templ_types=templ_types() "(" args=args() ")"   { expr = new FuncallNode(expr, templ_types, args); }
+    | [templ_types=templ_types()] "(" args=args() ")"   { expr = new FuncallNode(expr, templ_types, args); }
     )*
         {
             return expr;
@@ -803,8 +804,8 @@ List<TypeNode> templ_types():
     TypeNode type;
 }
 {
-    "<" type=type_with_suffix() { types.add(type); }
-        ("," type=type_with_suffix(){ types.add(type); } )+ ">"
+    "[[" type=type_with_suffix() { types.add(type); }
+        ("," type=type_with_suffix(){ types.add(type); } )+ "]]"
         {
             return types;
         }

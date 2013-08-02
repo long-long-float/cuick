@@ -1,4 +1,4 @@
-package jp.long_long_float.cight.ast;
+package jp.long_long_float.cuick.ast;
 import java.io.PrintStream;
 
 abstract public class Node implements Dumpable{

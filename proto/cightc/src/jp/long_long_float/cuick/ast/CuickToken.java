@@ -1,11 +1,11 @@
-package jp.long_long_float.cight.ast;
+package jp.long_long_float.cuick.ast;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import jp.long_long_float.cight.parser.ParserConstants;
-import jp.long_long_float.cight.parser.Token;
+import jp.long_long_float.cuick.parser.ParserConstants;
+import jp.long_long_float.cuick.parser.Token;
 
 public class CuickToken implements Iterable<CuickToken>{
     protected Token token;

@@ -11,6 +11,10 @@ public class TypeNode extends Node {
         this.type = type;
     }
     
+    public Type type() {
+        return type;
+    }
+
     @Override
     public Location location() {
         return null;

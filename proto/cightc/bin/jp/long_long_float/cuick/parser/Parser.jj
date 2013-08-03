@@ -6,6 +6,8 @@ options {
 
 PARSER_BEGIN(Parser)
 public class Parser {
+  protected Location location(Token t) {    return new Location(sourceName, t);
+  }
 }
 PARSER_END(Parser)
 
@@ -136,8 +138,8 @@ AST comlilation_unit():
 
     Declarations decls = new Declarations();
 
-    DefinedFunction deffun;
-    List<DefinedVariable> defvars;
+    Function func;
+    List<Variable> vars;
     TypedefNode typedef;
     AtCommand at_command;
     StmtNode stmt;
@@ -148,13 +150,13 @@ AST comlilation_unit():
     }
     (
         LOOKAHEAD([name()] type_with_suffix() name() "(")
-        deffun=deffun() { decls.addDeffun(deffun); }
+        func=deffun() { decls.funcs.add(func); }
     |   LOOKAHEAD([name()] type_with_suffix() type_with_suffix() ".")
-        deffun=def_extendfun() { decls.addDeffun(deffun); }
-    |   LOOKAHEAD(type()) defvars=defvars() { decls.addDefvars(defvars); }
-    |   typedef=typedef() { decls.addTypedef(typedef); }
+        func=def_extendfun() { decls.funcs.add(func); }
+    |   LOOKAHEAD(type()) vars=defvars() { decls.vars.add(vars); }
+    |   typedef=typedef() { decls.typedefs.add(typedef); }
     //|   at_command=at_command() { decls.addAtCommand(at_command); }
-    |   stmt=stmt() { decls.addStmt(stmt); }
+    |   stmt=stmt() { decls.stmts.add(stmt); }
     )* <EOF>
     {
         return new AST(location(t), decls);
@@ -162,9 +164,9 @@ AST comlilation_unit():
 }
 
 //変数宣言
-List<DefinedVariable> defvars():
+List<Variable> defvars():
 {
-    List<DefinedVariable> defs = new ArrayList<DefinedVariable>();
+    List<Variable> defs = new ArrayList<Variable>();
     TypeNode type;
     String name;
     ExprNode init = null;
@@ -173,12 +175,12 @@ List<DefinedVariable> defvars():
     //storage(staticなど)は無し
     type=type() ["&"] ("*")* name=name() ["[" [expr()] "]"] ["=" init=expr()]
         {
-            defs.add(new DefinedVariable(type, name, init));
+            defs.add(new Variable(type, name, init));
             init = null;
         }
     (","  ["&"] ("*")* name=name() ["[" [expr()] "]"] ["=" init=expr()]
         {
-            defs.add(new DefinedVariable(type, name, init));
+            defs.add(new Variable(type, name, init));
             init = null;
         }
     )* ";"
@@ -187,7 +189,7 @@ List<DefinedVariable> defvars():
         }
 }
 
-DefinedFunction deffun():
+Function deffun():
 {
     String modif = null;
     TypeNode ret;
@@ -198,12 +200,12 @@ DefinedFunction deffun():
 {
     ret=type_with_suffix() n=name() "(" ps=params() ")" body=block()
         {
-            TypeNode t = new FunctionType(ret, ps.parametersType());
-            return new DefinedFunction(new TypeNode(t), n, ps, body);
+            Type t = new FunctionType(ret.type(), ps.parametersType());
+            return new Function(new TypeNode(t), n, ps, body);
         }
 }
 
-DefinedFunction def_extendfun():
+Function def_extendfun():
 {
     Token t;
     TypeNode ret;
@@ -215,9 +217,9 @@ DefinedFunction def_extendfun():
 {
     t=<EXTEND> ret=type_with_suffix() receiver=type_with_suffix() "." n=name() "(" ps=params() ")" body=block()
         {
-            if(receiver) ps.addParamFront(receiver);
-            TypeNode t = new FunctionType(ret, ps.parametersType());
-            return new DefinedFunction(new TypeNode(t), n, ps, body);
+            ps.addParamFront(new Parameter(receiver, "this"));
+            Type type = new FunctionType(ret.type(), ps.parametersType());
+            return new Function(location(t), new TypeNode(type), n, ps, body);
         }
 }
 
@@ -246,19 +248,18 @@ Parameter param():
 BlockNode block():
 {
     Token t;
-    DefinedVariable var;
-    List<DefinedVariable> vars;
+    List<Variable> vars, varsAll;
     StmtNode stmt;
-    List<StmtNode> stmts;
+    List<StmtNode> stmts, stmtsAll;
 }
 {
     "{"
     (
-        LOOKAHEAD(type()) var=defvars() { vars.add(var); }
-    |   stmt=stmt() { stmts.add(stmt); }
+        LOOKAHEAD(type()) vars=defvars() { varsAll.addAll(vars); }
+    |   stmt=stmt() { stmtsAll.addAll(stmts); }
     )*
         {
-            return new BlockNode(location(t), vars, stmts);
+            return new BlockNode(location(t), varsAll, stmtsAll);
         }
     "}"
 }
@@ -266,14 +267,13 @@ BlockNode block():
 TypedefNode typedef():
 {
     Token t;
-    TypeNode oldname;
-    Token newname;
+    String realname, newname;
 }
 {
-    t=<TYPEDEF> oldname=type() ["&"] ("*")* newname=<IDENTIFIER> ["[" [expr()] "]"]  ";"
+    t=<TYPEDEF> realname=name() ["&"] ("*")* newname=name() ["[" [expr()] "]"]  ";"
         {
-            addType(newname.image);
-            return new TypedefNode(location(t), ref, newname.image);
+            //addType(newname.image);
+            return new TypedefNode(location(t), realname, newname);
         }
 }
 
@@ -297,7 +297,7 @@ TypeNode type():
   {
     return new TemplateType(location(t), name);
   }
-  | type=type_base() [types=templ_types()]
+  | type=type_base() [templ_types=templ_types()]
   {
     return type;
   }
@@ -319,11 +319,11 @@ TypeNode type_with_suffix():
 
 TypeNode type_base():
 {
-    Token t, name;
-    TypeNode templ_type;
+    Token t, t1, t2;
+    String typename;
 }
 {
-      t=<VOID>          { return new VoidType(location(t)); }
+/*      t=<VOID>          { return new VoidType(location(t)); }
     | t=<CHAR>          { return IntegerType.charType(location(t)); }
     | t=<SHORT>         { return IntegerType.shortType(location(t)); }
     | t=<INT>           { return IntegerType.intType(location(t)); }
@@ -340,9 +340,18 @@ TypeNode type_base():
         { return new StructType(location(t), name.image); }
     | t=<UNION> name=<IDENTIFIER>
         { return new UnionType(location(t), name.image); }
-    | /*LOOKAHEAD({isType(getToken(1).image)})*/ name=<IDENTIFIER>
-        { return new UserType(location(nameType.image)); }
+    |  LOOKAHEAD({isType(getToken(1).image)}) name=<IDENTIFIER>
+        { return new UserType(location(nameType.image)); }*/
+    t1=basic_type() { typename = t1.image; } ( t2=basic_type() { typename += " " + t2.image; } )*
+        { return new TypeNode(new NamedType(typename, location(t1))); }
+    | t=<IDENTIFIER>        { return new TypeNode(new NamedType(t.image, location(t))); }
 }
+
+Token basic_type():{
+  Token t;}
+{
+  (t=<CHAR> | t=< SHORT > | t=< INT > | t=< LONG >)  {    return t;
+  }}
 
 StmtNode stmt():
 {
@@ -554,7 +563,7 @@ BlockNode case_body():
             }
                 */
             return new BlockNode(stmts.get(0).location(),
-                                 new ArrayList<DefinedVariable>(),
+                                 new ArrayList<Variable>(),
                                  stmts);
         }
 }
@@ -821,7 +830,7 @@ String name():
 
 List<ExprNode> args():
 {
-    List<ExprNode> args = new ArratList<ExprNode>();
+    List<ExprNode> args = new ArrayList<ExprNode>();
     ExprNode arg;
 }
 {

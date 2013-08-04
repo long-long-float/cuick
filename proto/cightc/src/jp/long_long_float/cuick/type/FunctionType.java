@@ -5,6 +5,7 @@ public class FunctionType extends Type{
     protected ParamTypes paramTypes;
     
     public FunctionType(Type ret, ParamTypes paramTypes) {
+        super(ret.location());
         this.returnType = ret;
         this.paramTypes = paramTypes;
     }

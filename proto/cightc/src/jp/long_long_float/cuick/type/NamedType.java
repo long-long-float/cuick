@@ -4,10 +4,9 @@ import jp.long_long_float.cuick.ast.Location;
 
 public class NamedType extends Type {
     protected String name;
-    protected Location location;
     
     public NamedType(String name, Location loc) {
+        super(loc);
         this.name = name;
-        this.location = loc;
     }
 }

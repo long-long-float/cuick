@@ -4,8 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import jp.long_long_float.cuick.entity.Function;
-
-import com.sun.org.apache.xpath.internal.operations.Variable;
+import jp.long_long_float.cuick.entity.Variable;
 
 public class Declarations {
     public Set<Variable> vars = new LinkedHashSet<Variable>();

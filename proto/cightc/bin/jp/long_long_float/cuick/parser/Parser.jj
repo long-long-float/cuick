@@ -153,7 +153,7 @@ AST comlilation_unit():
         func=deffun() { decls.funcs.add(func); }
     |   LOOKAHEAD([name()] type_with_suffix() type_with_suffix() ".")
         func=def_extendfun() { decls.funcs.add(func); }
-    |   LOOKAHEAD(type()) vars=defvars() { decls.vars.add(vars); }
+    |   LOOKAHEAD(type()) vars=defvars() { decls.vars.addAll(vars); }
     |   typedef=typedef() { decls.typedefs.add(typedef); }
     //|   at_command=at_command() { decls.addAtCommand(at_command); }
     |   stmt=stmt() { decls.stmts.add(stmt); }
@@ -167,7 +167,7 @@ AST comlilation_unit():
 List<Variable> defvars():
 {
     List<Variable> defs = new ArrayList<Variable>();
-    TypeNode type;
+    Type type;
     String name;
     ExprNode init = null;
 }
@@ -175,12 +175,12 @@ List<Variable> defvars():
     //storage(staticなど)は無し
     type=type() ["&"] ("*")* name=name() ["[" [expr()] "]"] ["=" init=expr()]
         {
-            defs.add(new Variable(type, name, init));
+            defs.add(new Variable(new TypeNode(type), name, init));
             init = null;
         }
     (","  ["&"] ("*")* name=name() ["[" [expr()] "]"] ["=" init=expr()]
         {
-            defs.add(new Variable(type, name, init));
+            defs.add(new Variable(new TypeNode(type), name, init));
             init = null;
         }
     )* ";"
@@ -192,7 +192,7 @@ List<Variable> defvars():
 Function deffun():
 {
     String modif = null;
-    TypeNode ret;
+    Type ret;
     String n;
     Params ps;
     BlockNode body;
@@ -200,16 +200,16 @@ Function deffun():
 {
     ret=type_with_suffix() n=name() "(" ps=params() ")" body=block()
         {
-            Type t = new FunctionType(ret.type(), ps.parametersType());
-            return new Function(new TypeNode(t), n, ps, body);
+            Type type = new FunctionType(ret, ps.parametersType());
+            return new Function(new TypeNode(type), n, ps, body);
         }
 }
 
 Function def_extendfun():
 {
     Token t;
-    TypeNode ret;
-    TypeNode receiver;
+    Type ret;
+    Type receiver;
     String n;
     Params ps;
     BlockNode body;
@@ -217,8 +217,8 @@ Function def_extendfun():
 {
     t=<EXTEND> ret=type_with_suffix() receiver=type_with_suffix() "." n=name() "(" ps=params() ")" body=block()
         {
-            ps.addParamFront(new Parameter(receiver, "this"));
-            Type type = new FunctionType(ret.type(), ps.parametersType());
+            ps.addParamFront(new Parameter(new TypeNode(receiver), "this"));
+            Type type = new FunctionType(ret, ps.parametersType());
             return new Function(location(t), new TypeNode(type), n, ps, body);
         }
 }
@@ -238,28 +238,28 @@ Params params():
 
 Parameter param():
 {
-    TypeNode t;
+    Type t;
     String n;
 }
 {
-    t=type() ["&"] ("*")* n=name() ["[" [expr()] "]"] { return new Parameter(t, n); }
+    t=type() ["&"] ("*")* n=name() ["[" [expr()] "]"] { return new Parameter(new TypeNode(t), n); }
 }
 
 BlockNode block():
 {
     Token t;
-    List<Variable> vars, varsAll;
+    List<Variable> vars, varsAll = new ArrayList<Variable>();
     StmtNode stmt;
-    List<StmtNode> stmts, stmtsAll;
+    List<StmtNode> stmts = new ArrayList<StmtNode>();
 }
 {
-    "{"
+    t="{"
     (
         LOOKAHEAD(type()) vars=defvars() { varsAll.addAll(vars); }
-    |   stmt=stmt() { stmtsAll.addAll(stmts); }
+    |   stmt=stmt() { stmts.add(stmt); }
     )*
         {
-            return new BlockNode(location(t), varsAll, stmtsAll);
+            return new BlockNode(location(t), varsAll, stmts);
         }
     "}"
 }
@@ -268,12 +268,15 @@ TypedefNode typedef():
 {
     Token t;
     String realname, newname;
+    ExprNode expr = null;
 }
 {
-    t=<TYPEDEF> realname=name() ["&"] ("*")* newname=name() ["[" [expr()] "]"]  ";"
+    t=<TYPEDEF>
+        realname=name() ("*" { realname += '*'; })* ["&" { realname += '&'; }]
+        newname=name() ["[" expr=expr() "]"] ";"
         {
             //addType(newname.image);
-            return new TypedefNode(location(t), realname, newname);
+            return new TypedefNode(location(t), realname, newname, expr);
         }
 }
 
@@ -283,23 +286,23 @@ int
 vector<int, int>
 $T
 */
-TypeNode type():
+Type type():
 {
     Token t;
 	String name;
 	
-    TypeNode type;
-    List<TypeNode> templ_types = null;
+    Type type;
+    List<Type> templ_types = null;
     //ParamTypeRefs params;
 }
 {
     t=<DOLLAR> name=name()
   {
-    return new TemplateType(location(t), name);
+    return new FunctionTemplateType(name, location(t));
   }
   | type=type_base() [templ_types=templ_types()]
   {
-    return type;
+    return new TemplateType(templ_types, type);
   }
 }
 
@@ -309,15 +312,18 @@ int*
 int&
 $T*
 */
-TypeNode type_with_suffix():
+Type type_with_suffix():
 {
-  TypeNode type;
+  Type type;
 }
 {
-  type=type() ["&"] ("*")*
+  type=type() ("*" { type = new PointerType(type); })*
+    ["&" { type = new ReferenceType(type); }]
+  {    return type;
+  }
 }
 
-TypeNode type_base():
+Type type_base():
 {
     Token t, t1, t2;
     String typename;
@@ -343,14 +349,14 @@ TypeNode type_base():
     |  LOOKAHEAD({isType(getToken(1).image)}) name=<IDENTIFIER>
         { return new UserType(location(nameType.image)); }*/
     t1=basic_type() { typename = t1.image; } ( t2=basic_type() { typename += " " + t2.image; } )*
-        { return new TypeNode(new NamedType(typename, location(t1))); }
-    | t=<IDENTIFIER>        { return new TypeNode(new NamedType(t.image, location(t))); }
+        { return new NamedType(typename, location(t1)); }
+    | t=<IDENTIFIER>        { return new NamedType(t.image, location(t)); }
 }
 
 Token basic_type():{
   Token t;}
 {
-  (t=<CHAR> | t=< SHORT > | t=< INT > | t=< LONG >)  {    return t;
+  (t=<CHAR> | t=<SHORT> | t=<INT> | t=<LONG> | t=<UNSIGNED> | t=<FLOAT> | t=<DOUBLE>)  {    return t;
   }}
 
 StmtNode stmt():
@@ -807,10 +813,10 @@ ExprNode postfix():
         }
 }
 
-List<TypeNode> templ_types():
+List<Type> templ_types():
 {
-    List<TypeNode> types = new ArrayList<TypeNode>();
-    TypeNode type;
+    List<Type> types = new ArrayList<Type>();
+    Type type;
 }
 {
     "[[" type=type_with_suffix() { types.add(type); }

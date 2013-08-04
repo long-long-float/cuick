@@ -6,8 +6,8 @@ options {
 
 PARSER_BEGIN(Parser)
 public class Parser {
-  protected Location location(Token t) {    return new Location(sourceName, t);
-  }
+	protected Location location(Token t) {	   return new Location(sourceName, t);
+	}
 }
 PARSER_END(Parser)
 
@@ -191,7 +191,7 @@ List<Variable> defvars():
 
 Function deffun():
 {
-    String modif = null;
+    //String modif = null;
     Type ret;
     String n;
     Params ps;
@@ -326,6 +326,7 @@ Type type_with_suffix():
 Type type_base():
 {
     Token t, t1, t2;
+    List<String> types = new ArrayList<String>();
     String typename;
 }
 {
@@ -348,8 +349,8 @@ Type type_base():
         { return new UnionType(location(t), name.image); }
     |  LOOKAHEAD({isType(getToken(1).image)}) name=<IDENTIFIER>
         { return new UserType(location(nameType.image)); }*/
-    t1=basic_type() { typename = t1.image; } ( t2=basic_type() { typename += " " + t2.image; } )*
-        { return new NamedType(typename, location(t1)); }
+    t1=basic_type() { types.add(t1.image); } ( t2=basic_type() { types.add(t2.image); } )*
+        { return new BasicType(types, location(t1)); }
     | t=<IDENTIFIER>        { return new NamedType(t.image, location(t)); }
 }
 
@@ -444,51 +445,45 @@ ForEachNode foreach_stmt():
 
     Type var_type;
     String var_name;
-    ForEachVars foreVars = new ForEachVars();
+    List<Pair<Type, String>> vars = new ArrayList<Pair<Type, String>>();
 
-    String dire = "<";
+    boolean fore = true;
 
     Enumerable enume;
-    ForEachEnumes foreEnumes = new ForEachEnumes();
+    List<Enumerable> enumes = new ArrayList<Enumerable>();
 
     StmtNode body, lastBody = null;
 }
 {
     t=<FOR> "("
-        var_type=type() var_name=name() { foreVars.add(var_type, var_name); }
-        ("," var_type=type() var_name=name() { foreVars.add(var_type, var_name); })*
-        ":" ["<" | ">" { dire = ">"; }]
-        enume=enumerable() { foreEnumes.add(enumerable); }
+        var_type=type() var_name=name() { vars.add(new Pair<Type, String>(var_type, var_name)); }
+        ("," var_type=type() var_name=name() { vars.add(new Pair<Type, String>(var_type, var_name)); })*
+        ":" [">" | "<" { fore = true; }]
+        enume=enumerable() { enumes.add(enume); }
         ")" body=stmt()
         [ LOOKAHEAD(1) <LAST> lastBody=stmt() ]
         {
-            return new ForEachNode(foreVars, dire, foreEnumes, body, lastBody);
+            return new ForEachNode(location(t), vars, fore, enumes, body, lastBody);
         }
 }
 
 Enumerable enumerable():
 {
-    Enumerable e;
+    ExprNode expr;
+    RangeNode range;
 
-    ExprNode expr, range;
-
-    EnumerableVariableSet evs = new EnumerableVariableSet();
+    List<ExprNode> exprs = new ArrayList<ExprNode>();   
 }
 {
-    //ポインタ
-    LOOKAHEAD(expr() ":") expr=expr() ":" range=range()
+    //range
+    LOOKAHEAD(expr() (".." | "...")) range=range()
         {
-            return new PointerEnumerable(expr, range);
+            return new RangeEnumerable(range);
         }
-    //変数の集合
-    |   LOOKAHEAD(expr() ",") expr=expr() { evs.add(expr); } ("," expr=expr() { evs.add(expr); })+
+    //変数(ポインタ、配列 tuple 整数 std::map container込み)の集合
+    |  expr=expr() { exprs.add(expr); } ("," expr=expr() { exprs.add(expr); })*
         {
-            return new VariableSetEnumerable(evs);
-        }
-    //配列 range tuple 整数 std::map container
-    |   expr=expr()
-        {
-            return new VariableEnumerable(expr);
+            return new VariableSetEnumerable(exprs);
         }
 }
 
@@ -666,7 +661,7 @@ ExprNode expr10():
 ExprNode expr9():
 { ExprNode l, r; }
 {
-    l=expr8() ("||" r=expr8() { l = new LogicalOrNode(l, r); })*
+    l=expr8() ("||" r=expr8() { l = new BinaryOpNode(l, "||", r); })*
         {
             return l;
         }
@@ -675,7 +670,7 @@ ExprNode expr9():
 ExprNode expr8():
 { ExprNode l, r; }
 {
-    l=expr7() ("&&" r=expr7() { l = new LogicalAndNode(l, r); })*
+    l=expr7() ("&&" r=expr7() { l = new BinaryOpNode(l, "&&", r); })*
         {
             return l;
         }
@@ -758,7 +753,7 @@ ExprNode expr1():
 
 ExprNode term():
 {
-    TypeNode t;
+    Type t;
     ExprNode n;
 }
 {
@@ -770,7 +765,7 @@ ExprNode term():
 ExprNode unary():
 {
     ExprNode n;
-    TypeNode t;
+    Type t;
 }
 {
       "++" n=unary()    { return new PrefixOpNode("++", n); }
@@ -779,15 +774,15 @@ ExprNode unary():
     | "-" n=term()      { return new UnaryOpNode("-", n); }
     | "!" n=term()      { return new UnaryOpNode("!", n); }
     | "~" n=term()      { return new UnaryOpNode("~", n); }
-    | "*" n=term()      { return new DereferenceNode(n); }
-    | "&" n=term()      { return new AddressNode(n); }
+    | "*" n=term()      { return new UnaryOpNode("*", n); }//{ return new DereferenceNode(n); }
+    | "&" n=term()      { return new UnaryOpNode("&", n); }//{ return new AddressNode(n); }
     | LOOKAHEAD(3) <SIZEOF> "(" t=type() ")"
         {
-            return new SizeofTypeNode(t, size_t());
+            return new SizeofTypeNode(new TypeNode(t)/*, size_t()*/);
         }
     | <SIZEOF> n=unary()
         {
-            return new SizeofExprNode(n, size_t());
+            return new SizeofExprNode(n/*, size_t()*/);
         }
     | n=postfix()       { return n; }
 }
@@ -796,8 +791,9 @@ ExprNode postfix():
 {
     ExprNode expr, idx;
     String memb;
-    List<TypeNode> types = null;
+    //List<TypeNode> types = null;
     List<ExprNode> args;
+    List<Type> templ_types = null;
 }
 {
     expr=primary()
@@ -805,6 +801,7 @@ ExprNode postfix():
     | "--"                  { expr = new SuffixOpNode("--", expr); }
     | "[" idx=expr() "]"    { expr = new ArefNode(expr, idx); }
     | "." memb=name()       { expr = new MemberNode(expr, memb); }
+    | "::" memb=name()      { expr = new StaticMemberNode(expr, memb); }
     | "->" memb=name()      { expr = new PtrMemberNode(expr, memb); }
     | [templ_types=templ_types()] "(" args=args() ")"   { expr = new FuncallNode(expr, templ_types, args); }
     )*
@@ -851,24 +848,22 @@ ExprNode primary():
 {
     Token t;
     ExprNode n;
-    RangeNode r;
 }
 {
     t=<INTEGER>
         {
-            return integerNode(location(t), t.image);
+            //return integerNode(location(t), t.image);
+            return new LiteralNode(location(t), new BasicType("int", location(t)), t.image); //TODO int以外のも作る
         }
     |   t=<CHARACTER>
         {
-            return new IntegerLiteralNode(location(t),
-                                    IntegerType.charRef(),
-                                    characterCode(t.image));
+            //return new IntegerLiteralNode(location(t), IntegerType.charRef(), characterCode(t.image));
+            return new LiteralNode(location(t), new BasicType("char", location(t)), t.image);
         }
     |   t=<STRING>
         {
-            return new StringLiteralNode(location(t),
-                                    new PointerType(IntegerType.charRef()),
-                                    stringValue(t.image));
+            //return new StringLiteralNode(location(t), new PointerType(IntegerType.charRef()), stringValue(t.image));
+            return new LiteralNode(location(t), new PointerType(new BasicType("char", location(t))), t.image);
         }
     /*|   r=range()
         {

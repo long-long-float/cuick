@@ -368,7 +368,6 @@ StmtNode stmt():
 {
     (
         ";" //null statement
-    |   LOOKAHEAD(term() ",") n=multiplex_assign()
     |   e=expr() ";" { n = new ExprStmtNode(e.location(), e); }
     |   n=block()
     |   n=if_stmt()
@@ -592,21 +591,17 @@ ReturnNode return_stmt():
 
 MultiplexAssignNode multiplex_assign():
 {
-    Token t;
     ExprNode expr;
     List<ExprNode> lhses = new ArrayList<ExprNode>();
     List<ExprNode> rhses = new ArrayList<ExprNode>();
 }
 {
-    {
-        t = getToken(1);
-    }
     expr=term(){ lhses.add(expr); }
         ("," expr=term(){ lhses.add(expr); } )+
         "=" expr=term(){ rhses.add(expr); }
         ("," expr=term(){ rhses.add(expr); })* ";"
         {
-            return new MultiplexAssignNode(location(t), lhses, rhses);
+            return new MultiplexAssignNode(lhses, rhses);
         }
 }
 
@@ -614,12 +609,16 @@ ExprNode expr():
 {
     ExprNode lhs, rhs, expr;
     String op;
+    ExprNode n;
 }
 {
       LOOKAHEAD(term() "=")
       lhs=term() "=" rhs=expr()
         {
             return new AssignNode(lhs, rhs);
+        }
+    | LOOKAHEAD(term() ",") n=multiplex_assign()
+        {            return n;
         }
     | LOOKAHEAD(term() opassign_op())
       lhs=term() op=opassign_op() rhs=expr()

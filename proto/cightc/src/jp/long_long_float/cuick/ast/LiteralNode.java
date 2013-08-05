@@ -16,14 +16,12 @@ public class LiteralNode extends ExprNode {
     
     @Override
     public Location location() {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+        return location;
     }
 
     @Override
     protected void _dump(Dumper d) {
-        // TODO 自動生成されたメソッド・スタブ
-
+        d.printMember("value", value);
     }
 
 }

@@ -127,7 +127,9 @@ MORE: { <"`"> : IN_BUILT_IN_CODE }
 }
 <IN_BUILT_IN_CODE> TOKEN: { <BUILT_IN_CODE: "`"> : DEFAULT }
 
-
+TOKEN: {
+    <ONE_LINE: ("\n" | "\r\n" | "\r") (~["\n", "\r"])* ("\n" | "\r\n" | "\r")>
+}
 
 //文法
 
@@ -141,7 +143,7 @@ AST comlilation_unit():
     Function func;
     List<Variable> vars;
     TypedefNode typedef;
-    AtCommand at_command;
+    AtCommandNode at_command;
     StmtNode stmt;
 }
 {
@@ -155,7 +157,7 @@ AST comlilation_unit():
         func=def_extendfun() { decls.funcs.add(func); }
     |   LOOKAHEAD(type()) vars=defvars() { decls.vars.addAll(vars); }
     |   typedef=typedef() { decls.typedefs.add(typedef); }
-    //|   at_command=at_command() { decls.addAtCommand(at_command); }
+    |   at_command=at_command() { decls.atCommands.add(at_command); }
     |   stmt=stmt() { decls.stmts.add(stmt); }
     )* <EOF>
     {
@@ -892,34 +894,93 @@ RangeNode range():
 
 //@命令
 //TODO
-/*
-at_command(): {}
+AtCommandNode at_command():
 {
-    at_input()
-    |   at_memo()
-    |   at_while()
+    AtCommandNode atCommand;
+}
+{
+    atCommand = at_input()
+    |   atCommand = at_debug()
+    |   atCommand = at_memo()
+    |   atCommand = at_while()
+    |   atCommand = at_test()
+    {        return atCommand;
+    }
 }
 
-at_input(): {}
+AtInputNode at_input():
 {
-    "{"
+    Token t, name;
+    List<AtInputAbstractVariableNode> vars = new ArrayList<AtInputAbstractVariableNode>();
+    RangeNode range;
+    ExprNode expr;
+}
+{
+    t="@input" "{"
         (
-        name()
-        |   name() "[" (range() | expr()) "]"
-        |   name() "!"
+	        LOOKAHEAD(<IDENTIFIER> "[") name=<IDENTIFIER> "["
+	            (LOOKAHEAD(expr() ("..." | "..")) range=range() { vars.add(new AtInputArrayVariableNode(location(name), name.image, range)); }
+	                | expr=expr() { vars.add(new AtInputArrayVariableNode(location(name), name.image, expr)); }
+	            ) "]"
+	    |   LOOKAHEAD(<IDENTIFIER> "!")
+	        name=<IDENTIFIER> "!" { vars.add(new AtInputVariableNode(location(name), name.image, true)); }
+        |   name=<IDENTIFIER> { vars.add(new AtInputVariableNode(location(name), name.image, false)); }
         )*
     "}"
+    {        return new AtInputNode(location(t), vars);
+    }
 }
 
-at_memo(): {}
+AtDebugNode at_debug():
+{    Token t;
+}
+{    t="@debug"
+    {        return new AtDebugNode(location(t));
+    }
+}
+
+AtMemoNode at_memo():
 {
-    "@memo" "(" expr() ["," expr()] ")" deffun()
+    Token t;
+    ExprNode hash, max = null;
+    Function func;
 }
-
-at_while(): {}
 {
-    "@while" "(" expr() ")"
+    t="@memo" "(" hash=expr() ["," max=expr()] ")" func=deffun()
+    {        return new AtMemoNode(location(t), hash, max, func);
+    }
 }
-*/
 
+AtWhileNode at_while():
+{
+    Token t;
+    ExprNode cond;
+}
+{
+    t="@while" "(" cond=expr() ")"
+    {        return new AtWhileNode(location(t), cond);
+    }
+}
 
+AtTestNode at_test():
+{    Token t, t2, line;
+    List<Token> lines = new ArrayList<Token>();
+    List<AtTestCase> inCases = new ArrayList<AtTestCase>();
+    List<AtTestCase> outCases = new ArrayList<AtTestCase>();
+}
+{    t="@test" "{"
+	    (
+	        t2="in:" ( line=<ONE_LINE> { lines.add(line); } )+
+	        {	           inCases.add(new AtTestCase(location(t2), lines));
+	           lines = new ArrayList<Token>();
+	        }
+	        | t2="out:"  ( line=<ONE_LINE> { lines.add(line); } )+
+            {
+               outCases.add(new AtTestCase(location(t2), lines));
+               lines = new ArrayList<Token>();
+            }
+         )
+    "}"
+    {        return new AtTestNode(location(t), inCases, outCases);
+    }
+}

@@ -1,8 +1,5 @@
-package jp.long_long_float.cuick.parser;
+package jp.long_long_float.cuick.ast;
 
-import jp.long_long_float.cuick.ast.Dumper;
-import jp.long_long_float.cuick.ast.ExprNode;
-import jp.long_long_float.cuick.ast.Location;
 import jp.long_long_float.cuick.type.Type;
 
 public class BinaryOpNode extends ExprNode {

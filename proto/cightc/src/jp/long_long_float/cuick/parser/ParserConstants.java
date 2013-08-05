@@ -156,6 +156,8 @@ public interface ParserConstants {
   int STRING = 83;
   /** RegularExpression Id. */
   int BUILT_IN_CODE = 87;
+  /** RegularExpression Id. */
+  int ONE_LINE = 88;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -260,6 +262,7 @@ public interface ParserConstants {
     "<token of kind 85>",
     "\"\\\\`\"",
     "\"`\"",
+    "<ONE_LINE>",
     "\"(\"",
     "\".\"",
     "\"&\"",
@@ -311,6 +314,13 @@ public interface ParserConstants {
     "\"->\"",
     "\"[[\"",
     "\"]]\"",
+    "\"@input\"",
+    "\"@debug\"",
+    "\"@memo\"",
+    "\"@while\"",
+    "\"@test\"",
+    "\"in:\"",
+    "\"out:\"",
   };
 
 }

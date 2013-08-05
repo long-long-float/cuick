@@ -11,6 +11,7 @@ public class Declarations {
     public Set<Function> funcs = new LinkedHashSet<Function>();
     public Set<TypedefNode> typedefs = new LinkedHashSet<TypedefNode>();
     public Set<StmtNode> stmts = new LinkedHashSet<StmtNode>();
+    public Set<AtCommandNode> atCommands = new LinkedHashSet<AtCommandNode>();
     
     public void add(Declarations decls) {
         vars.addAll(decls.vars);

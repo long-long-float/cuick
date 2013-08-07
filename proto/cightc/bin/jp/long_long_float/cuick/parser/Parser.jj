@@ -6,7 +6,46 @@ options {
 
 PARSER_BEGIN(Parser)
 public class Parser {
-	protected Location location(Token t) {	   return new Location(sourceName, t);
+	private String sourceName;
+    private ErrorHandler errorHandler;
+
+    public Parser(Reader s, String name, ErrorHandler errorHandler) {
+        this(s);
+        this.sourceName = name;
+        this.errorHandler = errorHandler;
+    }
+
+    static public AST parseFile(File file, ErrorHandler errorHandler) throws SyntaxException, FileException {
+        return newFileParser(file, errorHandler).parse();
+    }
+
+    static public Parser newFileParser(File file, ErrorHandler errorHandler) throws FileException {
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            BufferedReader r = new BufferedReader(new InputStreamReader(fis, TextUtils.detectEncoding(fis)));
+            return new Parser(r, file.getPath(), errorHandler);
+        }
+        catch(FileNotFoundException ex) {
+            throw new FileException(ex.getMessage());
+        }
+        catch(UnsupportedEncodingException ex) {
+            throw new Error("Encode is not supported : " + ex.getMessage());
+        }
+    }
+    
+    public AST parse() throws SyntaxException {
+        try {
+            return comlilation_unit();
+        }
+        catch(TokenMgrError ex) {
+            throw new SyntaxException(ex.getMessage());
+        }
+        catch(ParseException ex) {
+            throw new SyntaxException(ex.getMessage());
+        }
+    }
+
+	protected Location location(Token t) {        return new Location(sourceName, t);
 	}
 }
 PARSER_END(Parser)
@@ -175,12 +214,12 @@ List<Variable> defvars():
 }
 {
     //storage(staticなど)は無し
-    type=type() ["&"] ("*")* name=name() ["[" [expr()] "]"] ["=" init=expr()]
+    type=type() ["&"] ("*")* name=name() ["[" [expr()] "]"] ["=" ( "{" expr() ("," expr())* "}" | init=expr() ) ]
         {
             defs.add(new Variable(new TypeNode(type), name, init));
             init = null;
         }
-    (","  ["&"] ("*")* name=name() ["[" [expr()] "]"] ["=" init=expr()]
+    (","  ["&"] ("*")* name=name() ["[" [expr()] "]"] ["=" ( "{" expr() ("," expr())* "}" | init=expr() ) ]
         {
             defs.add(new Variable(new TypeNode(type), name, init));
             init = null;
@@ -446,25 +485,26 @@ ForEachNode foreach_stmt():
 
     Type var_type;
     String var_name;
-    List<Pair<Type, String>> vars = new ArrayList<Pair<Type, String>>();
-
+    //List<Pair<Type, String>> vars = new ArrayList<Pair<Type, String>>();
+    Pair<Type, String> var;
+    
     boolean fore = true;
 
     Enumerable enume;
-    List<Enumerable> enumes = new ArrayList<Enumerable>();
+    //List<Enumerable> enumes = new ArrayList<Enumerable>();
 
     StmtNode body, lastBody = null;
 }
 {
     t=<FOR> "("
-        var_type=type() var_name=name() { vars.add(new Pair<Type, String>(var_type, var_name)); }
-        ("," var_type=type() var_name=name() { vars.add(new Pair<Type, String>(var_type, var_name)); })*
+        [var_type=type()] var_name=name() { var = new Pair<Type, String>(var_type, var_name); }
+        //("," [var_type=type()] var_name=name() { vars.add(new Pair<Type, String>(var_type, var_name)); })*
         ":" [">" | "<" { fore = true; }]
-        enume=enumerable() { enumes.add(enume); }
+        enume=enumerable() //{ enumes.add(enume); }
         ")" body=stmt()
         [ LOOKAHEAD(1) <LAST> lastBody=stmt() ]
         {
-            return new ForEachNode(location(t), vars, fore, enumes, body, lastBody);
+            return new ForEachNode(location(t), var, fore, enume, body, lastBody);
         }
 }
 
@@ -481,7 +521,9 @@ Enumerable enumerable():
         {
             return new RangeEnumerable(range);
         }
-    //変数(ポインタ、配列 tuple 整数 std::map container込み)の集合
+    //ポインタ
+    |  LOOKAHEAD(expr() ":") expr=expr() ":" range=range()
+    //変数(配列 tuple 整数 std::map container込み)の集合
     |  expr=expr() { exprs.add(expr); } ("," expr=expr() { exprs.add(expr); })*
         {
             return new VariableSetEnumerable(exprs);
@@ -804,7 +846,8 @@ ExprNode postfix():
     | "." memb=name()       { expr = new MemberNode(expr, memb); }
     | "::" memb=name()      { expr = new StaticMemberNode(expr, memb); }
     | "->" memb=name()      { expr = new PtrMemberNode(expr, memb); }
-    | [templ_types=templ_types()] "(" args=args() ")"   { expr = new FuncallNode(expr, templ_types, args); }
+    //| LOOKAHEAD([templ_types()] "(" ")") [templ_types=templ_types()] "(" ")" { expr = new FuncallNode(expr, templ_types, args); }
+    | [templ_types=templ_types()] "(" args=args() ")" { expr = new FuncallNode(expr, templ_types, args); }
     )*
         {
             return expr;
@@ -844,6 +887,19 @@ List<ExprNode> args():
                 return args;
             }
 }
+
+List<ExprNode> args_at_least_one():
+{    List<ExprNode> args = new ArrayList<ExprNode>();
+    ExprNode arg;
+}
+{
+    arg=expr() { args.add(arg); }
+        ("," arg=expr() { args.add(arg); })*
+            {
+                return args;
+            }
+}
+
 
 ExprNode primary():
 {

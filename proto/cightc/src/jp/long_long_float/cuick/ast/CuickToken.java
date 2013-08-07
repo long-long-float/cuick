@@ -6,6 +6,7 @@ import java.util.List;
 
 import jp.long_long_float.cuick.parser.ParserConstants;
 import jp.long_long_float.cuick.parser.Token;
+import jp.long_long_float.cuick.utility.TextUtils;
 
 public class CuickToken implements Iterable<CuickToken>{
     protected Token token;

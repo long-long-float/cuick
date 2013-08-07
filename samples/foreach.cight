@@ -1,0 +1,5 @@
+int data[] = {1, 2, 3};
+int *ary = data;
+for(i, j : data : 2, 2) {
+    puts i;
+}

@@ -61,7 +61,6 @@ public class TextUtils {
             while((nread = fis.read(buf)) > 0 && !detector.isDone()) {
                 detector.handleData(buf, 0, nread);
             }
-            fis.reset();
         }
         catch (IOException ex) {
             throw new FileException(ex.getMessage());
@@ -69,7 +68,7 @@ public class TextUtils {
         detector.dataEnd();
         
         String encoding = detector.getDetectedCharset();
-        if(encoding == null) throw new FileException("No encoding detected!");
+        if(encoding == null) return "UTF-8";
         
         detector.reset();
         

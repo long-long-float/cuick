@@ -15,8 +15,9 @@ public class Variable extends Entity {
     
     @Override
     protected void _dump(Dumper d) {
-        // TODO 自動生成されたメソッド・スタブ
-
+        d.printMember("type", type());
+        d.printMember("name", name);
+        d.printMember("initializer", initializer);
     }
 
 }

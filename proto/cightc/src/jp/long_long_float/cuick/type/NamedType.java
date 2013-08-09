@@ -9,4 +9,8 @@ public class NamedType extends Type {
         super(loc);
         this.name = name;
     }
+    
+    public String toString() {
+        return name;
+    }
 }

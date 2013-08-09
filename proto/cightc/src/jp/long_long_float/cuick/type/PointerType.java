@@ -7,4 +7,8 @@ public class PointerType extends Type {
         super(baseType.location());
         this.baseType = baseType;
     }
+    
+    public String toString() {
+        return baseType.toString() + "*";
+    }
 }

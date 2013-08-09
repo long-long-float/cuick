@@ -16,6 +16,9 @@ public class AST extends Node{
 
     @Override
     protected void _dump(Dumper d) {
-        
+        d.printNodeList("vars", declarations.vars());
+        d.printNodeList("funcs", declarations.funcs());
+        d.printNodeList("stmts", declarations.stmts());
+        d.printNodeList("atCommands", declarations.atCommands());
     }
 }

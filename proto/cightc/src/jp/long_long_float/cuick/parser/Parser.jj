@@ -5,6 +5,89 @@ options {
 }
 
 PARSER_BEGIN(Parser)
+
+package jp.long_long_float.cuick.parser;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import jp.long_long_float.cuick.ast.AST;
+import jp.long_long_float.cuick.ast.ArefNode;
+import jp.long_long_float.cuick.ast.AssignNode;
+import jp.long_long_float.cuick.ast.AtCommandNode;
+import jp.long_long_float.cuick.ast.AtDebugNode;
+import jp.long_long_float.cuick.ast.AtInputAbstractVariableNode;
+import jp.long_long_float.cuick.ast.AtInputArrayVariableNode;
+import jp.long_long_float.cuick.ast.AtInputNode;
+import jp.long_long_float.cuick.ast.AtInputVariableNode;
+import jp.long_long_float.cuick.ast.AtMemoNode;
+import jp.long_long_float.cuick.ast.AtTestCase;
+import jp.long_long_float.cuick.ast.AtTestNode;
+import jp.long_long_float.cuick.ast.AtWhileNode;
+import jp.long_long_float.cuick.ast.BinaryOpNode;
+import jp.long_long_float.cuick.ast.BlockNode;
+import jp.long_long_float.cuick.ast.BreakNode;
+import jp.long_long_float.cuick.ast.CaseNode;
+import jp.long_long_float.cuick.ast.CastNode;
+import jp.long_long_float.cuick.ast.CondExprNode;
+import jp.long_long_float.cuick.ast.ContinueNode;
+import jp.long_long_float.cuick.ast.Declarations;
+import jp.long_long_float.cuick.ast.DoWhileNode;
+import jp.long_long_float.cuick.ast.ExprNode;
+import jp.long_long_float.cuick.ast.ExprStmtNode;
+import jp.long_long_float.cuick.ast.ForEachNode;
+import jp.long_long_float.cuick.ast.ForNode;
+import jp.long_long_float.cuick.ast.FuncallNode;
+import jp.long_long_float.cuick.ast.IfNode;
+import jp.long_long_float.cuick.ast.LiteralNode;
+import jp.long_long_float.cuick.ast.Location;
+import jp.long_long_float.cuick.ast.MemberNode;
+import jp.long_long_float.cuick.ast.MultiplexAssignNode;
+import jp.long_long_float.cuick.ast.OpAssignNode;
+import jp.long_long_float.cuick.ast.PrefixOpNode;
+import jp.long_long_float.cuick.ast.PtrMemberNode;
+import jp.long_long_float.cuick.ast.RangeNode;
+import jp.long_long_float.cuick.ast.ReturnNode;
+import jp.long_long_float.cuick.ast.SizeofExprNode;
+import jp.long_long_float.cuick.ast.SizeofTypeNode;
+import jp.long_long_float.cuick.ast.StaticMemberNode;
+import jp.long_long_float.cuick.ast.StmtNode;
+import jp.long_long_float.cuick.ast.SuffixOpNode;
+import jp.long_long_float.cuick.ast.SwitchNode;
+import jp.long_long_float.cuick.ast.TypeNode;
+import jp.long_long_float.cuick.ast.TypedefNode;
+import jp.long_long_float.cuick.ast.UnaryOpNode;
+import jp.long_long_float.cuick.ast.VariableNode;
+import jp.long_long_float.cuick.ast.WhileNode;
+import jp.long_long_float.cuick.entity.Function;
+import jp.long_long_float.cuick.entity.Parameter;
+import jp.long_long_float.cuick.entity.Params;
+import jp.long_long_float.cuick.entity.Variable;
+import jp.long_long_float.cuick.exception.FileException;
+import jp.long_long_float.cuick.exception.SyntaxException;
+import jp.long_long_float.cuick.foreach.Enumerable;
+import jp.long_long_float.cuick.foreach.RangeEnumerable;
+import jp.long_long_float.cuick.foreach.VariableSetEnumerable;
+import jp.long_long_float.cuick.type.BasicType;
+import jp.long_long_float.cuick.type.FunctionTemplateType;
+import jp.long_long_float.cuick.type.FunctionType;
+import jp.long_long_float.cuick.type.NamedType;
+import jp.long_long_float.cuick.type.PointerType;
+import jp.long_long_float.cuick.type.ReferenceType;
+import jp.long_long_float.cuick.type.TemplateType;
+import jp.long_long_float.cuick.type.Type;
+import jp.long_long_float.cuick.utility.ErrorHandler;
+import jp.long_long_float.cuick.utility.Pair;
+import jp.long_long_float.cuick.utility.TextUtils;
+
 public class Parser {
 	private String sourceName;
     private ErrorHandler errorHandler;
@@ -22,7 +105,8 @@ public class Parser {
     static public Parser newFileParser(File file, ErrorHandler errorHandler) throws FileException {
         try {
             FileInputStream fis = new FileInputStream(file);
-            BufferedReader r = new BufferedReader(new InputStreamReader(fis, TextUtils.detectEncoding(fis)));
+            FileInputStream fis2 = new FileInputStream(file);
+            BufferedReader r = new BufferedReader(new InputStreamReader(fis, TextUtils.detectEncoding(fis2)));
             return new Parser(r, file.getPath(), errorHandler);
         }
         catch(FileNotFoundException ex) {
@@ -35,7 +119,7 @@ public class Parser {
     
     public AST parse() throws SyntaxException {
         try {
-            return comlilation_unit();
+            return compilation_unit();
         }
         catch(TokenMgrError ex) {
             throw new SyntaxException(ex.getMessage());
@@ -166,14 +250,14 @@ MORE: { <"`"> : IN_BUILT_IN_CODE }
 }
 <IN_BUILT_IN_CODE> TOKEN: { <BUILT_IN_CODE: "`"> : DEFAULT }
 
-TOKEN: {
+/*TOKEN: {
     <ONE_LINE: ("\n" | "\r\n" | "\r") (~["\n", "\r"])* ("\n" | "\r\n" | "\r")>
-}
+}*/
 
 //文法
 
 //ソース全体
-AST comlilation_unit():
+AST compilation_unit():
 {
     Token t;
 
@@ -195,7 +279,6 @@ AST comlilation_unit():
     |   LOOKAHEAD([name()] type_with_suffix() type_with_suffix() ".")
         func=def_extendfun() { decls.funcs.add(func); }
     |   LOOKAHEAD(type()) vars=defvars() { decls.vars.addAll(vars); }
-    |   typedef=typedef() { decls.typedefs.add(typedef); }
     |   at_command=at_command() { decls.atCommands.add(at_command); }
     |   stmt=stmt() { decls.stmts.add(stmt); }
     )* <EOF>
@@ -208,20 +291,23 @@ AST comlilation_unit():
 List<Variable> defvars():
 {
     List<Variable> defs = new ArrayList<Variable>();
+    Type baseType;
     Type type;
     String name;
     ExprNode init = null;
 }
 {
     //storage(staticなど)は無し
-    type=type() ["&"] ("*")* name=name() ["[" [expr()] "]"] ["=" ( "{" expr() ("," expr())* "}" | init=expr() ) ]
+    type=type() { baseType = type; } ["&" { type = new ReferenceType(type); }] ("*" { type = new PointerType(type); })* name=name() ["[" [expr()] "]"] ["=" ( "{" expr() ("," expr())* "}" | init=expr() ) ]
         {
             defs.add(new Variable(new TypeNode(type), name, init));
+            type = baseType;
             init = null;
         }
-    (","  ["&"] ("*")* name=name() ["[" [expr()] "]"] ["=" ( "{" expr() ("," expr())* "}" | init=expr() ) ]
+    (","  { baseType = type; } ["&" { type = new ReferenceType(type); }] ("*" { type = new PointerType(type); })* name=name() ["[" [expr()] "]"] ["=" ( "{" expr() ("," expr())* "}" | init=expr() ) ]
         {
             defs.add(new Variable(new TypeNode(type), name, init));
+            type = baseType;
             init = null;
         }
     )* ";"
@@ -235,13 +321,13 @@ Function deffun():
     //String modif = null;
     Type ret;
     String n;
-    Params ps;
+    Params ps = null;
     BlockNode body;
 }
 {
-    ret=type_with_suffix() n=name() "(" ps=params() ")" body=block()
+    ret=type_with_suffix() n=name() "(" [ ps=params() ] ")" body=block()
         {
-            Type type = new FunctionType(ret, ps.parametersType());
+            Type type = new FunctionType(ret, ps != null ? ps.parametersType() : null);
             return new Function(new TypeNode(type), n, ps, body);
         }
 }
@@ -258,7 +344,7 @@ Function def_extendfun():
 {
     t=<EXTEND> ret=type_with_suffix() receiver=type_with_suffix() "." n=name() "(" ps=params() ")" body=block()
         {
-            ps.addParamFront(new Parameter(new TypeNode(receiver), "this"));
+            ps.addParamFront(new Parameter(new TypeNode(receiver), "this_"));
             Type type = new FunctionType(ret, ps.parametersType());
             return new Function(location(t), new TypeNode(type), n, ps, body);
         }
@@ -270,8 +356,8 @@ Params params():
     Parameter param, param1;
 }
 {
-    param1=param() { params.add(param1); }
-    ("," param=param() { params.add(param); } )*
+    param1=param() { params.add(param1); } 
+    ( "," param=param() { params.add(param); } )*
         {
             return new Params(param1.location(), params);
         }
@@ -298,26 +384,9 @@ BlockNode block():
     (
         LOOKAHEAD(type()) vars=defvars() { varsAll.addAll(vars); }
     |   stmt=stmt() { stmts.add(stmt); }
-    )*
+    )* "}"
         {
             return new BlockNode(location(t), varsAll, stmts);
-        }
-    "}"
-}
-
-TypedefNode typedef():
-{
-    Token t;
-    String realname, newname;
-    ExprNode expr = null;
-}
-{
-    t=<TYPEDEF>
-        realname=name() ("*" { realname += '*'; })* ["&" { realname += '&'; }]
-        newname=name() ["[" expr=expr() "]"] ";"
-        {
-            //addType(newname.image);
-            return new TypedefNode(location(t), realname, newname, expr);
         }
 }
 
@@ -409,17 +478,19 @@ StmtNode stmt():
 {
     (
         ";" //null statement
-    |   e=expr() ";" { n = new ExprStmtNode(e.location(), e); }
+    |   e=expr() ";"
+        { n = new ExprStmtNode(e.location(), e); }
     |   n=block()
     |   n=if_stmt()
     |   n=while_stmt()
     |   n=dowhile_stmt()
-    |   LOOKAHEAD(<FOR> expr() ";") n=for_stmt()
+    |   LOOKAHEAD(<FOR> "(" expr() ";") n=for_stmt()
     |   n=foreach_stmt()
     |   n=switch_stmt()
     |   n=break_stmt()
     |   n=continue_stmt()
     |   n=return_stmt()
+    |   n=typedef_stmt()
     )
         {
             return n;
@@ -483,7 +554,7 @@ ForEachNode foreach_stmt():
 {
     Token t;
 
-    Type var_type;
+    Type var_type = null;
     String var_name;
     //List<Pair<Type, String>> vars = new ArrayList<Pair<Type, String>>();
     Pair<Type, String> var;
@@ -517,7 +588,7 @@ Enumerable enumerable():
 }
 {
     //range
-    LOOKAHEAD(expr() (".." | "...")) range=range()
+    LOOKAHEAD(expr() "...") range=range()
         {
             return new RangeEnumerable(range);
         }
@@ -633,6 +704,22 @@ ReturnNode return_stmt():
     | t=<RETURN> expr=expr() ";"  { return new ReturnNode(location(t), expr); }
 }
 
+TypedefNode typedef_stmt():
+{
+    Token t;
+    String realname, newname;
+    ExprNode expr = null;
+}
+{
+    t=<TYPEDEF>
+        realname=name() ("*" { realname += '*'; })* ["&" { realname += '&'; }]
+        newname=name() ["[" expr=expr() "]"] ";"
+        {
+            //addType(newname.image);
+            return new TypedefNode(location(t), realname, newname, expr);
+        }
+}
+
 MultiplexAssignNode multiplex_assign():
 {
     ExprNode expr;
@@ -643,7 +730,7 @@ MultiplexAssignNode multiplex_assign():
     expr=term(){ lhses.add(expr); }
         ("," expr=term(){ lhses.add(expr); } )+
         "=" expr=term(){ rhses.add(expr); }
-        ("," expr=term(){ rhses.add(expr); })* ";"
+        ("," expr=term(){ rhses.add(expr); })*
         {
             return new MultiplexAssignNode(lhses, rhses);
         }
@@ -948,20 +1035,16 @@ RangeNode range():
         }
 }
 
-//@命令
-//TODO
 AtCommandNode at_command():
 {
     AtCommandNode atCommand;
 }
 {
-    atCommand = at_input()
-    |   atCommand = at_debug()
-    |   atCommand = at_memo()
-    |   atCommand = at_while()
-    |   atCommand = at_test()
-    {        return atCommand;
-    }
+    atCommand = at_input() { return atCommand; }
+    |   atCommand = at_debug() { return atCommand; }
+    |   atCommand = at_memo() { return atCommand; }
+    |   atCommand = at_while() { return atCommand; }
+    |   atCommand = at_test() { return atCommand; }
 }
 
 AtInputNode at_input():
@@ -1026,11 +1109,11 @@ AtTestNode at_test():
 }
 {    t="@test" "{"
 	    (
-	        t2="in:" ( line=<ONE_LINE> { lines.add(line); } )+
+	        t2="in:"// ( line=<ONE_LINE> { lines.add(line); } )+
 	        {	           inCases.add(new AtTestCase(location(t2), lines));
 	           lines = new ArrayList<Token>();
 	        }
-	        | t2="out:"  ( line=<ONE_LINE> { lines.add(line); } )+
+	        | t2="out:"//  ( line=<ONE_LINE> { lines.add(line); } )+
             {
                outCases.add(new AtTestCase(location(t2), lines));
                lines = new ArrayList<Token>();

@@ -5,6 +5,8 @@ import java.util.List;
 
 import jp.long_long_float.cuick.ast.Location;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class BasicType extends Type {
     protected List<String> basicTypes;
     
@@ -16,5 +18,9 @@ public class BasicType extends Type {
     public BasicType(String basicType, Location loc) {
         this(new ArrayList<String>(), loc);
         this.basicTypes.add(basicType);
+    }
+    
+    public String toString() {
+        return StringUtils.join(basicTypes, " ");
     }
 }

@@ -2,18 +2,14 @@ package jp.long_long_float.cuick.ast;
 
 import java.util.List;
 
-public class MultiplexAssignNode extends ExprNode {
+public class MultiplexAssignNode extends StmtNode {
 
     protected List<ExprNode> lhses, rhses;
     
     public MultiplexAssignNode(List<ExprNode> lhses, List<ExprNode> rhses) {
+        super(lhses.get(0).location());
         this.lhses = lhses;
         this.rhses = rhses;
-    }
-    
-    @Override
-    public Location location() {
-        return lhses.get(0).location();
     }
 
     @Override

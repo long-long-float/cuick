@@ -8,11 +8,13 @@ public class FuncallNode extends ExprNode {
     protected ExprNode expr;
     protected List<Type> templTypes;
     protected List<ExprNode> args;
+    protected BlockNode block;
     
-    public FuncallNode(ExprNode expr, List<Type> templTypes, List<ExprNode> args) {
+    public FuncallNode(ExprNode expr, List<Type> templTypes, List<ExprNode> args, BlockNode block) {
         this.expr = expr;
         this.templTypes = templTypes;
         this.args = args;
+        this.block = block;
     }
     
     @Override

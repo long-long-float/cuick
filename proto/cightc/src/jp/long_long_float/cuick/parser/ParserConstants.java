@@ -115,49 +115,47 @@ public interface ParserConstants {
   /** RegularExpression Id. */
   int TEMPLATE = 54;
   /** RegularExpression Id. */
-  int THIS = 55;
+  int THROW = 55;
   /** RegularExpression Id. */
-  int THROW = 56;
+  int TRUE = 56;
   /** RegularExpression Id. */
-  int TRUE = 57;
+  int TRY = 57;
   /** RegularExpression Id. */
-  int TRY = 58;
+  int TYPEDEF = 58;
   /** RegularExpression Id. */
-  int TYPEDEF = 59;
+  int TYPEID = 59;
   /** RegularExpression Id. */
-  int TYPEID = 60;
+  int TYPENAME = 60;
   /** RegularExpression Id. */
-  int TYPENAME = 61;
+  int UNION = 61;
   /** RegularExpression Id. */
-  int UNION = 62;
+  int UNSIGNED = 62;
   /** RegularExpression Id. */
-  int UNSIGNED = 63;
+  int USING = 63;
   /** RegularExpression Id. */
-  int USING = 64;
+  int VIRTUAL = 64;
   /** RegularExpression Id. */
-  int VIRTUAL = 65;
+  int VOID = 65;
   /** RegularExpression Id. */
-  int VOID = 66;
+  int VOLATILE = 66;
   /** RegularExpression Id. */
-  int VOLATILE = 67;
+  int WCHAR_T = 67;
   /** RegularExpression Id. */
-  int WCHAR_T = 68;
+  int WHILE = 68;
   /** RegularExpression Id. */
-  int WHILE = 69;
+  int DOLLAR = 69;
   /** RegularExpression Id. */
-  int DOLLAR = 70;
+  int EXTEND = 70;
   /** RegularExpression Id. */
-  int EXTEND = 71;
+  int IDENTIFIER = 71;
   /** RegularExpression Id. */
-  int IDENTIFIER = 72;
+  int INTEGER = 72;
   /** RegularExpression Id. */
-  int INTEGER = 73;
+  int CHARACTER = 77;
   /** RegularExpression Id. */
-  int CHARACTER = 78;
+  int STRING = 82;
   /** RegularExpression Id. */
-  int STRING = 83;
-  /** RegularExpression Id. */
-  int BUILT_IN_CODE = 87;
+  int BUILT_IN_CODE = 86;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -229,7 +227,6 @@ public interface ParserConstants {
     "\"struct\"",
     "\"switch\"",
     "\"template\"",
-    "\"this\"",
     "\"throw\"",
     "\"true\"",
     "\"try\"",
@@ -249,21 +246,20 @@ public interface ParserConstants {
     "<IDENTIFIER>",
     "<INTEGER>",
     "\"\\\'\"",
+    "<token of kind 74>",
     "<token of kind 75>",
     "<token of kind 76>",
-    "<token of kind 77>",
     "\"\\\'\"",
     "\"\\\"\"",
+    "<token of kind 79>",
     "<token of kind 80>",
     "<token of kind 81>",
-    "<token of kind 82>",
     "\"\\\"\"",
     "\"`\"",
-    "<token of kind 85>",
+    "<token of kind 84>",
     "\"\\\\`\"",
     "\"`\"",
     "\"(\"",
-    "\".\"",
     "\"&\"",
     "\"*\"",
     "\"[\"",
@@ -274,6 +270,8 @@ public interface ParserConstants {
     "\"}\"",
     "\";\"",
     "\")\"",
+    "\".\"",
+    "\"-\"",
     "\":\"",
     "\">\"",
     "\"<\"",
@@ -301,7 +299,6 @@ public interface ParserConstants {
     "\">>\"",
     "\"<<\"",
     "\"+\"",
-    "\"-\"",
     "\"/\"",
     "\"%\"",
     "\"++\"",

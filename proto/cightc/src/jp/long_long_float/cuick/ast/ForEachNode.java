@@ -23,9 +23,10 @@ public class ForEachNode extends StmtNode {
     
     @Override
     protected void _dump(Dumper d) {
-        d.printMember("vars", var);
+        d.printMember("var type", var.getFirst());
+        d.printMember("var name", var.getSecond());
         d.printMember("isFore", isFore);
-        d.printMember("enumerables", enumerable);
+        d.printMember("enumerable", enumerable);
         d.printMember("body", body);
         d.printMember("lastBody", lastBody);
     }

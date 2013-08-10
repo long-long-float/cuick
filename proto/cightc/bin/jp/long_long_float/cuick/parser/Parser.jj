@@ -35,6 +35,7 @@ import jp.long_long_float.cuick.ast.AtWhileNode;
 import jp.long_long_float.cuick.ast.BinaryOpNode;
 import jp.long_long_float.cuick.ast.BlockNode;
 import jp.long_long_float.cuick.ast.BreakNode;
+import jp.long_long_float.cuick.ast.BuiltInCode;
 import jp.long_long_float.cuick.ast.CaseNode;
 import jp.long_long_float.cuick.ast.CastNode;
 import jp.long_long_float.cuick.ast.CondExprNode;
@@ -74,6 +75,7 @@ import jp.long_long_float.cuick.entity.Variable;
 import jp.long_long_float.cuick.exception.FileException;
 import jp.long_long_float.cuick.exception.SyntaxException;
 import jp.long_long_float.cuick.foreach.Enumerable;
+import jp.long_long_float.cuick.foreach.PointerEnumerable;
 import jp.long_long_float.cuick.foreach.RangeEnumerable;
 import jp.long_long_float.cuick.foreach.VariableSetEnumerable;
 import jp.long_long_float.cuick.type.BasicType;
@@ -195,7 +197,7 @@ TOKEN: {
   | <STRUCT : "struct">
   | <SWITCH : "switch">
   | <TEMPLATE : "template">
-  | <THIS : "this">
+ // | <THIS : "this">
   | <THROW : "throw">
   | <TRUE : "true">
   | <TRY : "try">
@@ -274,13 +276,14 @@ AST compilation_unit():
         t = getToken(1);
     }
     (
-        LOOKAHEAD([name()] type_with_suffix() name() "(")
-        func=deffun() { decls.funcs.add(func); }
-    |   LOOKAHEAD([name()] type_with_suffix() type_with_suffix() ".")
+        
+        LOOKAHEAD(<EXTEND>/* type_with_suffix() type_with_suffix()*/)
         func=def_extendfun() { decls.funcs.add(func); }
-    |   LOOKAHEAD(type()) vars=defvars() { decls.vars.addAll(vars); }
-    |   at_command=at_command() { decls.atCommands.add(at_command); }
+    |   LOOKAHEAD(type_with_suffix() name() "(")
+        func=deffun() { decls.funcs.add(func); }
+    |   LOOKAHEAD(type() ["&"] ("*")* name()) vars=defvars() { decls.vars.addAll(vars); }
     |   stmt=stmt() { decls.stmts.add(stmt); }
+    |   at_command=at_command() { decls.atCommands.add(at_command); }
     )* <EOF>
     {
         return new AST(location(t), decls);
@@ -325,7 +328,7 @@ Function deffun():
     BlockNode body;
 }
 {
-    ret=type_with_suffix() n=name() "(" [ ps=params() ] ")" body=block()
+    ret=type_with_suffix() n=name() "(" ps=params() ")" body=block()
         {
             Type type = new FunctionType(ret, ps != null ? ps.parametersType() : null);
             return new Function(new TypeNode(type), n, ps, body);
@@ -353,13 +356,13 @@ Function def_extendfun():
 Params params():
 {
     List<Parameter> params = new ArrayList<Parameter>();
-    Parameter param, param1;
+    Parameter param, param1 = null;
 }
 {
-    param1=param() { params.add(param1); } 
-    ( "," param=param() { params.add(param); } )*
+    [param1=param() { params.add(param1); } 
+    ( "," param=param() { params.add(param); } )*]
         {
-            return new Params(param1.location(), params);
+            return (param1 != null ? new Params(param1.location(), params) : new Params(null, new ArrayList<Parameter>()));
         }
 }
 
@@ -382,8 +385,8 @@ BlockNode block():
 {
     t="{"
     (
-        LOOKAHEAD(type()) vars=defvars() { varsAll.addAll(vars); }
-    |   stmt=stmt() { stmts.add(stmt); }
+	        LOOKAHEAD(type() ["&"] ("*")* name()) vars=defvars() { varsAll.addAll(vars); }
+	    |   stmt=stmt() { stmts.add(stmt); }
     )* "}"
         {
             return new BlockNode(location(t), varsAll, stmts);
@@ -459,7 +462,7 @@ Type type_base():
         { return new UnionType(location(t), name.image); }
     |  LOOKAHEAD({isType(getToken(1).image)}) name=<IDENTIFIER>
         { return new UserType(location(nameType.image)); }*/
-    t1=basic_type() { types.add(t1.image); } ( t2=basic_type() { types.add(t2.image); } )*
+    t1=basic_type() { types.add(t1.image); } ( "-" t2=basic_type() { types.add(t2.image); } )*
         { return new BasicType(types, location(t1)); }
     | t=<IDENTIFIER>        { return new NamedType(t.image, location(t)); }
 }
@@ -467,19 +470,18 @@ Type type_base():
 Token basic_type():{
   Token t;}
 {
-  (t=<CHAR> | t=<SHORT> | t=<INT> | t=<LONG> | t=<UNSIGNED> | t=<FLOAT> | t=<DOUBLE>)  {    return t;
+  (t=<CHAR> | t=<SHORT> | t=<INT> | t=<LONG> | t=<UNSIGNED> | t=<FLOAT> | t=<DOUBLE> | t=<VOID>)  {    return t;
   }}
 
 StmtNode stmt():
 {
     StmtNode n = null;
-    ExprNode e = null;
 }
 {
     (
         ";" //null statement
-    |   e=expr() ";"
-        { n = new ExprStmtNode(e.location(), e); }
+    |   LOOKAHEAD(term() ("," term())* "=") n=multiplex_assign()
+    |   n=expr_stmt()
     |   n=block()
     |   n=if_stmt()
     |   n=while_stmt()
@@ -491,10 +493,19 @@ StmtNode stmt():
     |   n=continue_stmt()
     |   n=return_stmt()
     |   n=typedef_stmt()
+    
     )
         {
             return n;
         }
+}
+
+ExprStmtNode expr_stmt():
+{    ExprNode expr;
+}
+{    expr=expr() ";"
+    {        return new ExprStmtNode(expr.location(), expr);
+    }
 }
 
 IfNode if_stmt():
@@ -568,7 +579,9 @@ ForEachNode foreach_stmt():
 }
 {
     t=<FOR> "("
-        [var_type=type()] var_name=name() { var = new Pair<Type, String>(var_type, var_name); }
+        (            LOOKAHEAD(name() ":") var_name=name() { var = new Pair<Type, String>(var_type, var_name); }
+          | var_type=type() var_name=name() { var = new Pair<Type, String>(var_type, var_name); }
+        )
         //("," [var_type=type()] var_name=name() { vars.add(new Pair<Type, String>(var_type, var_name)); })*
         ":" [">" | "<" { fore = true; }]
         enume=enumerable() //{ enumes.add(enume); }
@@ -594,6 +607,8 @@ Enumerable enumerable():
         }
     //ポインタ
     |  LOOKAHEAD(expr() ":") expr=expr() ":" range=range()
+        {            return new PointerEnumerable(expr, range);
+        }
     //変数(配列 tuple 整数 std::map container込み)の集合
     |  expr=expr() { exprs.add(expr); } ("," expr=expr() { exprs.add(expr); })*
         {
@@ -729,8 +744,8 @@ MultiplexAssignNode multiplex_assign():
 {
     expr=term(){ lhses.add(expr); }
         ("," expr=term(){ lhses.add(expr); } )+
-        "=" expr=term(){ rhses.add(expr); }
-        ("," expr=term(){ rhses.add(expr); })*
+        "=" expr=expr(){ rhses.add(expr); }
+        ("," expr=expr(){ rhses.add(expr); })*
         {
             return new MultiplexAssignNode(lhses, rhses);
         }
@@ -748,18 +763,20 @@ ExprNode expr():
         {
             return new AssignNode(lhs, rhs);
         }
-    | LOOKAHEAD(term() ",") n=multiplex_assign()
-        {            return n;
-        }
     | LOOKAHEAD(term() opassign_op())
       lhs=term() op=opassign_op() rhs=expr()
         {
             return new OpAssignNode(lhs, op, rhs);
         }
+    /*| LOOKAHEAD(term() ("," term())+ "=") n=multiplex_assign()
+        {
+            return n;
+        }*/
     | expr=expr10()
         {
             return expr;
         }
+    
 }
 
 String opassign_op(): {}
@@ -841,7 +858,7 @@ ExprNode expr5():
 ExprNode expr4():
 { ExprNode l, r; }
 {
-    l=expr3() ("&" r=expr3() { l = new BinaryOpNode(l, "&", r); })//*
+    l=expr3() ("&" r=expr3() { l = new BinaryOpNode(l, "&", r); })*
         {
             return l;
         }
@@ -924,6 +941,7 @@ ExprNode postfix():
     //List<TypeNode> types = null;
     List<ExprNode> args;
     List<Type> templ_types = null;
+    BlockNode block = null;
 }
 {
     expr=primary()
@@ -934,7 +952,7 @@ ExprNode postfix():
     | "::" memb=name()      { expr = new StaticMemberNode(expr, memb); }
     | "->" memb=name()      { expr = new PtrMemberNode(expr, memb); }
     //| LOOKAHEAD([templ_types()] "(" ")") [templ_types=templ_types()] "(" ")" { expr = new FuncallNode(expr, templ_types, args); }
-    | [templ_types=templ_types()] "(" args=args() ")" { expr = new FuncallNode(expr, templ_types, args); }
+    | [templ_types=templ_types()] "(" args=args() ")" [ block=block() ] { expr = new FuncallNode(expr, templ_types, args, block); }
     )*
         {
             return expr;
@@ -948,7 +966,7 @@ List<Type> templ_types():
 }
 {
     "[[" type=type_with_suffix() { types.add(type); }
-        ("," type=type_with_suffix(){ types.add(type); } )+ "]]"
+        ("," type=type_with_suffix(){ types.add(type); } )* "]]"
         {
             return types;
         }
@@ -1016,6 +1034,9 @@ ExprNode primary():
     |   t=<IDENTIFIER>
         {
             return new VariableNode(location(t), t.image);
+        }
+    |   t=<BUILT_IN_CODE>
+        {            return new BuiltInCode(location(t), t.image);
         }
     |   "(" n=expr() ")"
         {
@@ -1118,7 +1139,7 @@ AtTestNode at_test():
                outCases.add(new AtTestCase(location(t2), lines));
                lines = new ArrayList<Token>();
             }
-         )
+         )*
     "}"
     {        return new AtTestNode(location(t), inCases, outCases);
     }

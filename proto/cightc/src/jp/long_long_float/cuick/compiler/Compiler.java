@@ -1,10 +1,6 @@
 package jp.long_long_float.cuick.compiler;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 
 import jp.long_long_float.cuick.ast.AST;
 import jp.long_long_float.cuick.exception.FileException;
@@ -15,20 +11,9 @@ import jp.long_long_float.cuick.utility.ErrorHandler;
 public class Compiler {
     static public void main(String[] args) {
         try {
-            BufferedReader br = new BufferedReader(new FileReader(args[0]));
-            for(String line = br.readLine();line != null;line = br.readLine()) {
-                System.out.println(line);
-            }
-            br.close();
-        } catch (FileNotFoundException e1) {
-            // TODO 自動生成された catch ブロック
-            e1.printStackTrace();
-        } catch (IOException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
-        }
-        try {
-            new Compiler("cuickc").parseFile(args[0]).dump();
+            AST ast = new Compiler("cuickc").parseFile(args[0]);
+            ast.dump();
+            
         } catch (SyntaxException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();

@@ -1,12 +1,1 @@
-`cout << "from C++" << endl;`;
-puts("from cuick");
-
-vector[[$T]] gets(int n){
-    vector[[$T]] ret;
-    n.times(){ cin >> ret[it]; };
-    ret;
-}
-
-extend void $CONT.sort(){
-    sort(this.begin(), this.end());
-}
+tuple(int, int) pos(1, 2);

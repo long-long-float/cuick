@@ -276,10 +276,9 @@ AST compilation_unit():
         t = getToken(1);
     }
     (
-        
         LOOKAHEAD(<EXTEND>/* type_with_suffix() type_with_suffix()*/)
         func=def_extendfun() { decls.funcs.add(func); }
-    |   LOOKAHEAD(type_with_suffix() name() "(")
+    |   LOOKAHEAD(type_with_suffix() name() "(" params() ")" "{")
         func=deffun() { decls.funcs.add(func); }
     |   LOOKAHEAD(type() ["&"] ("*")* name()) vars=defvars() { decls.vars.addAll(vars); }
     |   stmt=stmt() { decls.stmts.add(stmt); }
@@ -301,13 +300,13 @@ List<Variable> defvars():
 }
 {
     //storage(staticなど)は無し
-    type=type() { baseType = type; } ["&" { type = new ReferenceType(type); }] ("*" { type = new PointerType(type); })* name=name() ["[" [expr()] "]"] ["=" ( "{" expr() ("," expr())* "}" | init=expr() ) ]
+    type=type() { baseType = type; } ["&" { type = new ReferenceType(type); }] ("*" { type = new PointerType(type); })* name=name() [ "(" args() ")" ] ["[" [expr()] "]"] ["=" ( "{" expr() ("," expr())* "}" | expr() ) ]
         {
             defs.add(new Variable(new TypeNode(type), name, init));
             type = baseType;
             init = null;
         }
-    (","  { baseType = type; } ["&" { type = new ReferenceType(type); }] ("*" { type = new PointerType(type); })* name=name() ["[" [expr()] "]"] ["=" ( "{" expr() ("," expr())* "}" | init=expr() ) ]
+    (","  { baseType = type; } ["&" { type = new ReferenceType(type); }] ("*" { type = new PointerType(type); })* name=name() [ "(" args() ")" ] ["[" [expr()] "]"] ["=" ( "{" expr() ("," expr())* "}" | expr() ) ]
         {
             defs.add(new Variable(new TypeNode(type), name, init));
             type = baseType;
@@ -965,8 +964,8 @@ List<Type> templ_types():
     Type type;
 }
 {
-    "[[" type=type_with_suffix() { types.add(type); }
-        ("," type=type_with_suffix(){ types.add(type); } )* "]]"
+    "(" type=type_with_suffix() { types.add(type); }
+        ("," type=type_with_suffix(){ types.add(type); } )* ")"
         {
             return types;
         }

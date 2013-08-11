@@ -74,4 +74,10 @@ public class TextUtils {
         
         return encoding;
     }
+    
+    static public String times(String str, int count) {
+        String ret = "";
+        for(int i = 0;i < count;i++) ret += str;
+        return ret;
+    }
 }

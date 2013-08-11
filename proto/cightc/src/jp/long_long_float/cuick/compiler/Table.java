@@ -16,17 +16,19 @@ public final class Table {
         return Table.TableHolder.instance;
     }
     
-    private List<Type> tuples = new ArrayList<Type>();
-    
     private Table() {
         
     }
     
+    private List<Type> tuples = new ArrayList<Type>();
+    
     public void entryTuple(Type tuple) {
-        if(tuples.indexOf(tuple) != -1) {
+        if(tuples.indexOf(tuple) == -1) {
             tuples.add(tuple);
         }
     }
     
-    
+    public List<Type> getTuples() {
+        return tuples;
+    }
 }

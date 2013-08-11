@@ -82,9 +82,6 @@ import jp.long_long_float.cuick.type.BasicType;
 import jp.long_long_float.cuick.type.FunctionTemplateType;
 import jp.long_long_float.cuick.type.FunctionType;
 import jp.long_long_float.cuick.type.NamedType;
-import jp.long_long_float.cuick.type.PointerType;
-import jp.long_long_float.cuick.type.ReferenceType;
-import jp.long_long_float.cuick.type.TemplateType;
 import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.ErrorHandler;
 import jp.long_long_float.cuick.utility.Pair;
@@ -296,21 +293,18 @@ List<Variable> defvars():
     Type baseType;
     Type type;
     String name;
-    ExprNode init = null;
 }
 {
     //storage(staticなど)は無し
-    type=type() { baseType = type; } ["&" { type = new ReferenceType(type); }] ("*" { type = new PointerType(type); })* name=name() [ "(" args() ")" ] ["[" [expr()] "]"] ["=" ( "{" expr() ("," expr())* "}" | expr() ) ]
+    type=type() { baseType = type.clone(); } ["&" { type.setReference(); }] ("*" { type.addPointer(); })* name=name() [ "(" args() ")" ] ["[" [expr()] "]"] ["=" ( "{" expr() ("," expr())* "}" | expr() ) ]
         {
-            defs.add(new Variable(new TypeNode(type), name, init));
+            defs.add(new Variable(new TypeNode(type), name));
             type = baseType;
-            init = null;
         }
-    (","  { baseType = type; } ["&" { type = new ReferenceType(type); }] ("*" { type = new PointerType(type); })* name=name() [ "(" args() ")" ] ["[" [expr()] "]"] ["=" ( "{" expr() ("," expr())* "}" | expr() ) ]
+    (","  { baseType = type.clone(); } ["&" { type.setReference(); }] ("*" { type.addPointer(); })* name=name() [ "(" args() ")" ] ["[" [expr()] "]"] ["=" ( "{" expr() ("," expr())* "}" | expr() ) ]
         {
-            defs.add(new Variable(new TypeNode(type), name, init));
+            defs.add(new Variable(new TypeNode(type), name));
             type = baseType;
-            init = null;
         }
     )* ";"
         {
@@ -367,11 +361,11 @@ Params params():
 
 Parameter param():
 {
-    Type t;
+    Type type;
     String n;
 }
 {
-    t=type() ["&"] ("*")* n=name() ["[" [expr()] "]"] { return new Parameter(new TypeNode(t), n); }
+    type=type() ["&" { type.setReference(); }] ("*" { type.addPointer(); })* n=name() ["[" [expr()] "]"] { return new Parameter(new TypeNode(type), n); }
 }
 
 BlockNode block():
@@ -412,9 +406,9 @@ Type type():
   {
     return new FunctionTemplateType(name, location(t));
   }
-  | type=type_base() [templ_types=templ_types()]
+  | type=type_base() [templ_types=templ_types() { type.setTemplateTypes(templ_types); } ]
   {
-    return new TemplateType(templ_types, type);
+    return type;
   }
 }
 
@@ -429,8 +423,8 @@ Type type_with_suffix():
   Type type;
 }
 {
-  type=type() ("*" { type = new PointerType(type); })*
-    ["&" { type = new ReferenceType(type); }]
+  type=type() ("*" { type.addPointer(); })*
+    ["&" { type.setReference(); }]
   {    return type;
   }
 }
@@ -1024,7 +1018,9 @@ ExprNode primary():
     |   t=<STRING>
         {
             //return new StringLiteralNode(location(t), new PointerType(IntegerType.charRef()), stringValue(t.image));
-            return new LiteralNode(location(t), new PointerType(new BasicType("char", location(t))), t.image);
+            Type type = new BasicType("char", location(t));
+            type.addPointer();
+            return new LiteralNode(location(t), type, t.image);
         }
     /*|   r=range()
         {

@@ -2,7 +2,7 @@ package jp.long_long_float.cuick.ast;
 
 import jp.long_long_float.cuick.parser.Token;
 
-public class Location {
+public class Location implements Cloneable {
     protected String sourceName;
     protected CuickToken token;
     

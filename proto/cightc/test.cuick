@@ -1,1 +1,2 @@
-tuple(int, int) a;
+tuple(int, int) pos;
+tuple(int, int) pos2;

@@ -4,8 +4,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.List;
 
 import jp.long_long_float.cuick.ast.AST;
+import jp.long_long_float.cuick.cppStructure.CodeBuilder;
 import jp.long_long_float.cuick.cppStructure.Function;
 import jp.long_long_float.cuick.cppStructure.Struct;
 import jp.long_long_float.cuick.exception.FileException;
@@ -20,33 +22,41 @@ public class Compiler {
             AST ast = new Compiler("cuickc").parseFile(args[0]);
             ast.dump();
             
-            File file = new File(args[0] + ".cpp");
-            PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+            //System.out.println(Table.getInstance().getTuples());
+            
+            CodeBuilder cb = new CodeBuilder();
             //headers
             String[] headers = new String[]{"iostream", "vector", "map", "algorithm"};
             for(String header : headers) {
-                writer.println("#include<" + header + ">");
+                cb.addLine("#include<" + header + ">");
             }
             //tuples
             int tupleID = 0;
-            for(Type tuple : Table.getInstance().getTuples()) {
+            List<Type> tuples = Table.getInstance().getTuples();
+            for(Type tuple : tuples) {
                 Struct struct = new Struct("tuple" + tupleID);
                 tupleID++;
                 int itemID = 0;
                 for(Type member : tuple.getTemplateTypes()) {
-                    struct.addMember(member.typeString(), "item" + itemID);
+                    int id = itemID, index;
+                    if((index = tuples.indexOf(member)) != -1) {
+                        id = index;
+                    }
+                    struct.addMember(member.toString(), "item" + id);
                     itemID++;
                 }
-                writer.println(struct.generateCode());
+                cb.addLine(struct.generateCode());
             }
             //main
             Function main = new Function("int", "main");
             main.addStmt("return 0;");
-            writer.println(main.generateCode());
+            cb.addLine(main.generateCode());
             
+            File file = new File(args[0] + ".cpp");
+            PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+            writer.print(cb.toString());
             writer.close();
             
-            System.out.println(Table.getInstance().getTuples());
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();

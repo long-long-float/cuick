@@ -473,7 +473,7 @@ StmtNode stmt():
 {
     (
         ";" //null statement
-    |   LOOKAHEAD(term() ("," term())* "=") n=multiplex_assign()
+    |   LOOKAHEAD(term() ("," term())+ "=") n=multiplex_assign()
     |   n=expr_stmt()
     |   n=block()
     |   n=if_stmt()

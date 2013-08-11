@@ -3890,6 +3890,7 @@ $T*
   private boolean jj_3_5() {
     if (jj_3R_39()) return true;
     Token xsp;
+    if (jj_3R_40()) return true;
     while (true) {
       xsp = jj_scanpos;
       if (jj_3R_40()) { jj_scanpos = xsp; break; }

@@ -3,6 +3,8 @@ package jp.long_long_float.cuick.cppStructure;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.long_long_float.cuick.cppStructure.CodeBuilder.BlockCallback;
+
 import org.apache.commons.lang3.StringUtils;
 
 public class Function extends CppStructure {
@@ -28,16 +30,17 @@ public class Function extends CppStructure {
     
     @Override
     public String generateCode() {
-        CodeContext cc = CodeContext.getInstance();
-        StringBuilder ret = new StringBuilder();
-        ret.append(cc.line(retType + " " + name + "(" + StringUtils.join(args, ", ") + ") {"));
-        cc.indent();
-        for(String stmt : body) {
-            ret.append(cc.line(stmt));
-        }
-        cc.unindent();
-        ret.append(cc.line("}"));
-        return ret.toString();
+        CodeBuilder cb = new CodeBuilder();
+        cb.addLine(retType + " " + name + "(" + StringUtils.join(args, ", ") + ")");
+        cb.block(new BlockCallback() {
+            @Override
+            public void call(CodeBuilder cb) {
+                for(String stmt : body) {
+                    cb.addLine(stmt);
+                }
+            }
+        }, false);
+        return cb.toString();
     }
 
 }

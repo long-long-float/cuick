@@ -6,6 +6,8 @@ import jp.long_long_float.cuick.ast.Location;
 import jp.long_long_float.cuick.utility.TextUtils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public abstract class Type implements Cloneable{
     private Location location;
@@ -53,6 +55,20 @@ public abstract class Type implements Cloneable{
     
     @Override
     public String toString() {
-        return typeString() + "<" + StringUtils.join(templTypes, ", ") + ">" + TextUtils.times("*", pointerCount) + (isReference ? "&" : "");
+        String ret = typeString();
+        if(templTypes != null) {
+            ret += "<" + StringUtils.join(templTypes, ", ") + ">";
+        }
+        return ret + TextUtils.times("*", pointerCount) + (isReference ? "&" : "");
+    }
+    
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        return EqualsBuilder.reflectionEquals(this, obj);
     }
 }

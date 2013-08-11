@@ -3,6 +3,8 @@ package jp.long_long_float.cuick.cppStructure;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.long_long_float.cuick.cppStructure.CodeBuilder.BlockCallback;
+
 public class Struct extends CppStructure{
     private String name;
     private List<String> members = new ArrayList<String>();
@@ -17,16 +19,17 @@ public class Struct extends CppStructure{
     }
     
     public String generateCode() {
-        CodeContext cc = CodeContext.getInstance();
-        StringBuilder ret = new StringBuilder();
-        ret.append(cc.line("struct " + name + " {"));
-        cc.indent();
-        for(String member : members) {
-            ret.append(cc.line(member + ";"));
-        }
-        cc.unindent();
-        ret.append(cc.line("};"));
-        return ret.toString();
+        CodeBuilder cb = new CodeBuilder();
+        cb.addLine("struct " + name);
+        cb.block(new BlockCallback() {
+            @Override
+            public void call(CodeBuilder cb) {
+                for(String member : members) {
+                    cb.addLine(member + ";");
+                }
+            }
+        }, true);
+        return cb.toString();
     }
     
 }

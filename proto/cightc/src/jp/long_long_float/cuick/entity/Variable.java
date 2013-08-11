@@ -1,23 +1,18 @@
 package jp.long_long_float.cuick.entity;
 
 import jp.long_long_float.cuick.ast.Dumper;
-import jp.long_long_float.cuick.ast.ExprNode;
 import jp.long_long_float.cuick.ast.TypeNode;
 
 public class Variable extends Entity {
-
-    protected ExprNode initializer;
     
-    public Variable(TypeNode type, String name, ExprNode init) {
+    public Variable(TypeNode type, String name) {
         super(type, name);
-        this.initializer = init;
     }
     
     @Override
     protected void _dump(Dumper d) {
         d.printMember("type", type());
         d.printMember("name", name);
-        d.printMember("initializer", initializer);
     }
 
 }

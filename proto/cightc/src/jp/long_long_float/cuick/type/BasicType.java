@@ -20,7 +20,7 @@ public class BasicType extends Type {
         this.basicTypes.add(basicType);
     }
     
-    public String toString() {
+    public String typeString() {
         return StringUtils.join(basicTypes, " ");
     }
 }

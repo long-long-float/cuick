@@ -8,6 +8,11 @@ public class ReturnNode extends StmtNode {
         super(loc);
         this.expr = expr;
     }
+    
+    @Override
+    public String toString() {
+        return "return" + (expr != null ? " " + expr.toString() : "") + ";";
+    }
 
     @Override
     protected void _dump(Dumper d) {

@@ -1,6 +1,5 @@
 package jp.long_long_float.cuick.type;
 
-import org.apache.commons.lang3.StringUtils;
 
 public class FunctionType extends Type{
     protected Type returnType;
@@ -14,6 +13,6 @@ public class FunctionType extends Type{
     
     @Override
     public String typeString() {
-        return "" + returnType + "(" + StringUtils.join(paramTypes, ", ") + ")";
+        return returnType.toString();
     } 
 }

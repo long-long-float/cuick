@@ -21,6 +21,23 @@ public class ForEachNode extends StmtNode {
         this.lastBody = lastBody;
     }
     
+    public Type varType() {
+        return var.getFirst();
+    }
+    
+    public String varName() {
+        return var.getSecond();
+    }
+    
+    public StmtNode body() {
+        return body;
+    }
+    
+    @Override
+    public String toString() {
+        return enumerable.toString(this);
+    }
+    
     @Override
     protected void _dump(Dumper d) {
         d.printMember("var type", var.getFirst());

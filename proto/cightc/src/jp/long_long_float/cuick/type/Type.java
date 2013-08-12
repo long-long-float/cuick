@@ -38,8 +38,9 @@ public abstract class Type implements Cloneable{
         return ret;
     }
 
-    public void addPointer() {
+    public Type addPointer() {
         pointerCount++;
+        return this;
     }
 
     public void setTemplateTypes(List<Type> templTypes) {

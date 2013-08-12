@@ -61,6 +61,7 @@ import jp.long_long_float.cuick.ast.SizeofExprNode;
 import jp.long_long_float.cuick.ast.SizeofTypeNode;
 import jp.long_long_float.cuick.ast.StaticMemberNode;
 import jp.long_long_float.cuick.ast.StmtNode;
+import jp.long_long_float.cuick.ast.StringLiteralNode;
 import jp.long_long_float.cuick.ast.SuffixOpNode;
 import jp.long_long_float.cuick.ast.SwitchNode;
 import jp.long_long_float.cuick.ast.TypeNode;
@@ -84,9 +85,8 @@ import jp.long_long_float.cuick.type.FunctionType;
 import jp.long_long_float.cuick.type.NamedType;
 import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.ErrorHandler;
+import jp.long_long_float.cuick.utility.Pair;
 import jp.long_long_float.cuick.utility.TextUtils;
-
-import org.apache.commons.lang3.tuple.Pair;
 
 public class Parser {
 	private String sourceName;
@@ -595,7 +595,7 @@ Enumerable enumerable():
 }
 {
     //range
-    LOOKAHEAD(expr() "...") range=range()
+    LOOKAHEAD(expr() ("..." | "..")) range=range()
         {
             return new RangeEnumerable(range);
         }
@@ -946,7 +946,8 @@ ExprNode postfix():
     | "::" memb=name()      { expr = new StaticMemberNode(expr, memb); }
     | "->" memb=name()      { expr = new PtrMemberNode(expr, memb); }
     //| LOOKAHEAD([templ_types()] "(" ")") [templ_types=templ_types()] "(" ")" { expr = new FuncallNode(expr, templ_types, args); }
-    | [templ_types=templ_types()] "(" args=args() ")" [ block=block() ] { expr = new FuncallNode(expr, templ_types, args, block); }
+    | LOOKAHEAD(templ_types() "(") templ_types=templ_types() "(" args=args() ")" [ block=block() ] { expr = new FuncallNode(expr, templ_types, args, block); }
+    | "(" args=args() ")" [ block=block() ] { expr = new FuncallNode(expr, null, args, block); }
     )*
         {
             return expr;
@@ -1019,9 +1020,10 @@ ExprNode primary():
     |   t=<STRING>
         {
             //return new StringLiteralNode(location(t), new PointerType(IntegerType.charRef()), stringValue(t.image));
-            Type type = new BasicType("char", location(t));
+            /*Type type = new BasicType("char", location(t));
             type.addPointer();
-            return new LiteralNode(location(t), type, t.image);
+            return new LiteralNode(location(t), type, t.image);*/
+            return new StringLiteralNode(location(t), t.image);
         }
     /*|   r=range()
         {

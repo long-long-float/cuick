@@ -2,20 +2,9 @@
 #include<vector>
 #include<map>
 #include<algorithm>
-struct tuple0
-{
-    tuple1 item0;
-    tuple1 item1;
-};
-
-struct tuple1
-{
-    int item0;
-    int item1;
-};
-
 int main()
 {
+    for(int i = 0;i < 10;i++)puts("hello");
     return 0;
 }
 

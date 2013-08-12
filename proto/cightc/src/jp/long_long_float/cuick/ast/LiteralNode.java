@@ -18,6 +18,11 @@ public class LiteralNode extends ExprNode {
     public Location location() {
         return location;
     }
+    
+    @Override
+    public String toString() {
+        return value;
+    }
 
     @Override
     protected void _dump(Dumper d) {

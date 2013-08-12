@@ -11,6 +11,18 @@ public class RangeNode extends ExprNode {
         this.rexpr = rexpr;
     }
     
+    public ExprNode begin() {
+        return lexpr;
+    }
+    
+    public ExprNode end() {
+        return rexpr;
+    }
+    
+    public boolean isIncludingEnd() {
+        return rangeStr == "..";
+    }
+    
     @Override
     public Location location() {
         return lexpr.location();

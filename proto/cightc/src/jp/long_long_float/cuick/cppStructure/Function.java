@@ -29,7 +29,7 @@ public class Function extends CppStructure {
     }
     
     @Override
-    public String generateCode() {
+    public String toString() {
         CodeBuilder cb = new CodeBuilder();
         cb.addLine(retType + " " + name + "(" + StringUtils.join(args, ", ") + ")");
         cb.block(new BlockCallback() {

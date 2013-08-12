@@ -18,7 +18,7 @@ public class Struct extends CppStructure{
         return this;
     }
     
-    public String generateCode() {
+    public String toString() {
         CodeBuilder cb = new CodeBuilder();
         cb.addLine("struct " + name);
         cb.block(new BlockCallback() {

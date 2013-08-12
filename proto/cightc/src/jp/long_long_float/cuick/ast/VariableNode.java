@@ -1,12 +1,11 @@
 package jp.long_long_float.cuick.ast;
 
-import jp.long_long_float.cuick.entity.Entity;
 
 
 public class VariableNode extends LHSNode {
     private Location location;
     private String name;
-    private Entity entity;
+    //private Entity entity;
     
     public VariableNode(Location loc, String name) {
         this.location = loc;
@@ -16,6 +15,11 @@ public class VariableNode extends LHSNode {
     @Override
     public Location location() {
         return location;
+    }
+    
+    @Override
+    public String toString() {
+        return name;
     }
 
     @Override

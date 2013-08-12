@@ -7,9 +7,11 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import jp.long_long_float.cuick.ast.AST;
+import jp.long_long_float.cuick.ast.StmtNode;
 import jp.long_long_float.cuick.cppStructure.CodeBuilder;
 import jp.long_long_float.cuick.cppStructure.Function;
 import jp.long_long_float.cuick.cppStructure.Struct;
+import jp.long_long_float.cuick.entity.Parameter;
 import jp.long_long_float.cuick.exception.FileException;
 import jp.long_long_float.cuick.exception.SyntaxException;
 import jp.long_long_float.cuick.parser.Parser;
@@ -22,7 +24,9 @@ public class Compiler {
             AST ast = new Compiler("cuickc").parseFile(args[0]);
             ast.dump();
             
-            //System.out.println(Table.getInstance().getTuples());
+            Table table = Table.getInstance();
+            System.out.println(table.getTuples());
+            System.out.println(table.getFunctions());
             
             CodeBuilder cb = new CodeBuilder();
             //headers
@@ -32,7 +36,7 @@ public class Compiler {
             }
             //tuples
             int tupleID = 0;
-            List<Type> tuples = Table.getInstance().getTuples();
+            List<Type> tuples = table.getTuples();
             for(Type tuple : tuples) {
                 Struct struct = new Struct("tuple" + tupleID);
                 tupleID++;
@@ -46,12 +50,26 @@ public class Compiler {
                     struct.addMember(name, "item" + itemID);
                     itemID++;
                 }
-                cb.addLine(struct.generateCode());
+                cb.addLine(struct.toString());
+            }
+            //functions
+            for(jp.long_long_float.cuick.entity.Function function : table.getFunctions()) {
+                Function deployedFunc = new Function(function.type().toString(), function.name());
+                for(Parameter param : function.params()) {
+                    deployedFunc.addArg(param.type().toString(), param.name());
+                }
+                for(StmtNode stmt : function.body().stmts()) {
+                    deployedFunc.addStmt(stmt.toString());
+                };
+                cb.addLine(deployedFunc.toString());
             }
             //main
             Function main = new Function("int", "main");
+            for(StmtNode stmt : ast.declarations().stmts()) {
+                main.addStmt(stmt.toString());
+            }
             main.addStmt("return 0;");
-            cb.addLine(main.generateCode());
+            cb.addLine(main.toString());
             
             File file = new File(args[0] + ".cpp");
             PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file)));

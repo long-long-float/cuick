@@ -13,5 +13,10 @@ public class ExprStmtNode extends StmtNode {
     protected void _dump(Dumper d) {
         d.printMember("expr", expr);
     }
+    
+    @Override
+    public String toString() {
+        return expr.toString() + ";";
+    }
 
 }

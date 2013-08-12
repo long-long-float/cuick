@@ -19,6 +19,11 @@ public class BinaryOpNode extends ExprNode {
     public Location location() {
         return left.location();
     }
+    
+    @Override
+    public String toString() {
+        return "" + left + " " + operator + " " + right;
+    }
 
     @Override
     protected void _dump(Dumper d) {

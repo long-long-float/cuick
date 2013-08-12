@@ -15,6 +15,11 @@ public class CondExprNode extends ExprNode {
     public Location location() {
         return cond.location();
     }
+    
+    @Override
+    public String toString() {
+        return "" + cond + " ? " + thenExpr + " : " + elseExpr;
+    }
 
     @Override
     protected void _dump(Dumper d) {

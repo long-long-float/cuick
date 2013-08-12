@@ -10,6 +10,10 @@ public class AST extends Node{
         this.declarations = declarations;
     }
     
+    public Declarations declarations() {
+        return declarations;
+    }
+    
     public Location location() {
         return source;
     }

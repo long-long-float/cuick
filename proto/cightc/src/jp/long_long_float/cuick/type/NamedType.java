@@ -17,4 +17,13 @@ public class NamedType extends Type {
     public String typeString() {
         return name;
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if(!super.equals(obj)) return false;
+        if(getClass() != obj.getClass()) return false;
+        
+        NamedType other = (NamedType)obj;
+        return name == other.name;
+    }
 }

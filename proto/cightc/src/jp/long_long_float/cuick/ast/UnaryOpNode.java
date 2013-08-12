@@ -16,6 +16,11 @@ public class UnaryOpNode extends ExprNode {
     public Location location() {
         return expr.location();
     }
+    
+    @Override
+    public String toString() {
+        return operator + expr;
+    }
 
     @Override
     protected void _dump(Dumper d) {

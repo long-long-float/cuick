@@ -15,6 +15,10 @@ abstract public class Entity implements Dumpable{
         this.typeNode = type;
     }
     
+    public String name() {
+        return name;
+    }
+    
     public TypeNode typeNode() {
         return typeNode;
     }

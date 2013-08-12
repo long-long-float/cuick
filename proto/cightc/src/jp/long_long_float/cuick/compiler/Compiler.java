@@ -38,11 +38,12 @@ public class Compiler {
                 tupleID++;
                 int itemID = 0;
                 for(Type member : tuple.getTemplateTypes()) {
-                    int id = itemID, index;
+                    String name = member.toString();
+                    int index;
                     if((index = tuples.indexOf(member)) != -1) {
-                        id = index;
+                        name = "tuple" + index;
                     }
-                    struct.addMember(member.toString(), "item" + id);
+                    struct.addMember(name, "item" + itemID);
                     itemID++;
                 }
                 cb.addLine(struct.generateCode());

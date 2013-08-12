@@ -129,9 +129,9 @@ public class Parser implements ParserConstants {
     <ONE_LINE: ("\n" | "\r\n" | "\r") (~["\n", "\r"])* ("\n" | "\r\n" | "\r")>
 }*/
 
-//�?�?
+//�?�?
 
-//ソース全�?
+//ソース全�?
   final public AST compilation_unit() throws ParseException {
     trace_call("compilation_unit");
     try {
@@ -258,7 +258,7 @@ public class Parser implements ParserConstants {
     }
   }
 
-//変数宣�?
+//変数宣�?
   final public List<Variable> defvars() throws ParseException {
     trace_call("defvars");
     try {
@@ -266,7 +266,7 @@ public class Parser implements ParserConstants {
     Type baseType;
     Type type;
     String name;
-      //storage(staticなど)は無�?
+      //storage(staticなど)は無�?
           type = type();
                   baseType = type.clone();
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -782,7 +782,7 @@ public class Parser implements ParserConstants {
   }
 
 /*
-何もつ�?��な�?�??�?
+何もつ�?��な�?�??�?
 int
 vector<int, int>
 $T
@@ -834,7 +834,7 @@ $T
   }
 
 /*
-*�?が付いた型
+*�?が付いた型
 int*
 int&
 $T*
@@ -2501,7 +2501,7 @@ $T*
       case INTEGER:
         t = jj_consume_token(INTEGER);
             //return integerNode(location(t), t.image);
-            {if (true) return new LiteralNode(location(t), new BasicType("int", location(t)), t.image);} //TODO int以外�?も作る
+            {if (true) return new LiteralNode(location(t), new BasicType("int", location(t)), t.image);} //TODO int以外�?も作る
 
         break;
       case CHARACTER:

@@ -4,8 +4,8 @@
 #include<algorithm>
 struct tuple0
 {
-    int item0;
-    int item1;
+    tuple1 item0;
+    tuple1 item1;
 };
 
 struct tuple1

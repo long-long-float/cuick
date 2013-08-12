@@ -75,8 +75,8 @@ import jp.long_long_float.cuick.type.FunctionType;
 import jp.long_long_float.cuick.type.NamedType;
 import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.ErrorHandler;
-import jp.long_long_float.cuick.utility.Pair;
 import jp.long_long_float.cuick.utility.TextUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 /** Token Manager. */
 public class ParserTokenManager implements ParserConstants

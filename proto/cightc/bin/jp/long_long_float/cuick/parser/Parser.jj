@@ -41,6 +41,7 @@ import jp.long_long_float.cuick.ast.CastNode;
 import jp.long_long_float.cuick.ast.CondExprNode;
 import jp.long_long_float.cuick.ast.ContinueNode;
 import jp.long_long_float.cuick.ast.Declarations;
+import jp.long_long_float.cuick.ast.DefvarNode;
 import jp.long_long_float.cuick.ast.DoWhileNode;
 import jp.long_long_float.cuick.ast.ExprNode;
 import jp.long_long_float.cuick.ast.ExprStmtNode;
@@ -278,7 +279,7 @@ AST compilation_unit():
         func=def_extendfun() { decls.funcs.add(func); }
     |   LOOKAHEAD(type_with_suffix() name() "(" params() ")" "{")
         func=deffun() { decls.funcs.add(func); }
-    |   LOOKAHEAD(type() ["&"] ("*")* name()) vars=defvars() { decls.vars.addAll(vars); }
+    |   LOOKAHEAD(type() ["&"] ("*")* name()) stmt=defvars() { decls.stmts.add(stmt); }
     |   stmt=stmt() { decls.stmts.add(stmt); }
     |   at_command=at_command() { decls.atCommands.add(at_command); }
     )* <EOF>
@@ -288,7 +289,7 @@ AST compilation_unit():
 }
 
 //変数宣言
-List<Variable> defvars():
+DefvarNode defvars():
 {
     List<Variable> defs = new ArrayList<Variable>();
     Type baseType;
@@ -309,7 +310,7 @@ List<Variable> defvars():
         }
     )* ";"
         {
-            return defs;
+            return new DefvarNode(type.location(), type, defs);
         }
 }
 
@@ -372,18 +373,18 @@ Parameter param():
 BlockNode block():
 {
     Token t;
-    List<Variable> vars, varsAll = new ArrayList<Variable>();
+    //List<Variable> vars, varsAll = new ArrayList<Variable>();
     StmtNode stmt;
     List<StmtNode> stmts = new ArrayList<StmtNode>();
 }
 {
     t="{"
     (
-	        LOOKAHEAD(type() ["&"] ("*")* name()) vars=defvars() { varsAll.addAll(vars); }
+	        LOOKAHEAD(type() ["&"] ("*")* name()) stmt=defvars() { stmts.add(stmt); }
 	    |   stmt=stmt() { stmts.add(stmt); }
     )* "}"
         {
-            return new BlockNode(location(t), varsAll, stmts);
+            return new BlockNode(location(t), stmts);
         }
 }
 

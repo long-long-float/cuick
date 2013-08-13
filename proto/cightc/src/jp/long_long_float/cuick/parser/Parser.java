@@ -34,6 +34,7 @@ import jp.long_long_float.cuick.ast.CastNode;
 import jp.long_long_float.cuick.ast.CondExprNode;
 import jp.long_long_float.cuick.ast.ContinueNode;
 import jp.long_long_float.cuick.ast.Declarations;
+import jp.long_long_float.cuick.ast.DefvarNode;
 import jp.long_long_float.cuick.ast.DoWhileNode;
 import jp.long_long_float.cuick.ast.ExprNode;
 import jp.long_long_float.cuick.ast.ExprStmtNode;
@@ -130,9 +131,9 @@ public class Parser implements ParserConstants {
     <ONE_LINE: ("\n" | "\r\n" | "\r") (~["\n", "\r"])* ("\n" | "\r\n" | "\r")>
 }*/
 
-//�?�?
+//�?�?
 
-//ソース全�?
+//ソース全�?
   final public AST compilation_unit() throws ParseException {
     trace_call("compilation_unit");
     try {
@@ -203,8 +204,8 @@ public class Parser implements ParserConstants {
           func = deffun();
                         decls.funcs.add(func);
         } else if (jj_2_3(2147483647)) {
-          vars = defvars();
-                                                               decls.vars.addAll(vars);
+          stmt = defvars();
+                                                               decls.stmts.add(stmt);
         } else {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case BREAK:
@@ -259,15 +260,15 @@ public class Parser implements ParserConstants {
     }
   }
 
-//変数宣�?
-  final public List<Variable> defvars() throws ParseException {
+//変数宣�?
+  final public DefvarNode defvars() throws ParseException {
     trace_call("defvars");
     try {
     List<Variable> defs = new ArrayList<Variable>();
     Type baseType;
     Type type;
     String name;
-      //storage(staticなど)は無�?
+      //storage(staticなど)は無�?
           type = type();
                   baseType = type.clone();
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -514,7 +515,7 @@ public class Parser implements ParserConstants {
             type = baseType;
       }
       jj_consume_token(97);
-            {if (true) return defs;}
+            {if (true) return new DefvarNode(type.location(), type, defs);}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("defvars");
@@ -685,7 +686,7 @@ public class Parser implements ParserConstants {
     trace_call("block");
     try {
     Token t;
-    List<Variable> vars, varsAll = new ArrayList<Variable>();
+    //List<Variable> vars, varsAll = new ArrayList<Variable>();
     StmtNode stmt;
     List<StmtNode> stmts = new ArrayList<StmtNode>();
       t = jj_consume_token(89);
@@ -734,8 +735,8 @@ public class Parser implements ParserConstants {
           break label_9;
         }
         if (jj_2_4(2147483647)) {
-          vars = defvars();
-                                                                       varsAll.addAll(vars);
+          stmt = defvars();
+                                                                       stmts.add(stmt);
         } else {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case BREAK:
@@ -775,7 +776,7 @@ public class Parser implements ParserConstants {
         }
       }
       jj_consume_token(96);
-            {if (true) return new BlockNode(location(t), varsAll, stmts);}
+            {if (true) return new BlockNode(location(t), stmts);}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("block");
@@ -783,7 +784,7 @@ public class Parser implements ParserConstants {
   }
 
 /*
-何もつ�?��な�?�??�?
+何もつ�?��な�?�??�?
 int
 vector<int, int>
 $T
@@ -835,7 +836,7 @@ $T
   }
 
 /*
-*�?が付いた型
+*�?が付いた型
 int*
 int&
 $T*
@@ -2514,7 +2515,7 @@ $T*
       case INTEGER:
         t = jj_consume_token(INTEGER);
             //return integerNode(location(t), t.image);
-            {if (true) return new LiteralNode(location(t), new BasicType("int", location(t)), t.image);} //TODO int以外�?も作る
+            {if (true) return new LiteralNode(location(t), new BasicType("int", location(t)), t.image);} //TODO int以外�?も作る
 
         break;
       case CHARACTER:
@@ -2920,12 +2921,6 @@ $T*
     try { return !jj_3_18(); }
     catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(17, xla); }
-  }
-
-  private boolean jj_3R_194() {
-    if (jj_scan_token(95)) return true;
-    if (jj_3R_41()) return true;
-    return false;
   }
 
   private boolean jj_3R_208() {
@@ -4638,6 +4633,12 @@ $T*
       if (jj_3R_131()) { jj_scanpos = xsp; break; }
     }
     if (jj_scan_token(96)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_194() {
+    if (jj_scan_token(95)) return true;
+    if (jj_3R_41()) return true;
     return false;
   }
 

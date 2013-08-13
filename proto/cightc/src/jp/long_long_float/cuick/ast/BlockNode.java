@@ -17,6 +17,11 @@ public class BlockNode extends StmtNode {
         this.stmts = stmts;
     }
     
+    public BlockNode(Location loc, List<StmtNode> stmts) {
+        super(loc);
+        this.stmts = stmts;
+    }
+
     public List<StmtNode> stmts() {
         return stmts;
     }

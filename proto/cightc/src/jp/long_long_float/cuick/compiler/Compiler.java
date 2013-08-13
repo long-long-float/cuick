@@ -4,7 +4,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import jp.long_long_float.cuick.ast.AST;
 import jp.long_long_float.cuick.ast.StmtNode;
@@ -29,40 +32,9 @@ public class Compiler {
             System.out.println(table.getFunctions());
             
             CodeBuilder cb = new CodeBuilder();
-            //headers
-            String[] headers = new String[]{"iostream", "vector", "map", "algorithm"};
-            for(String header : headers) {
-                cb.addLine("#include<" + header + ">");
-            }
-            //tuples
-            int tupleID = 0;
-            List<Type> tuples = table.getTuples();
-            for(Type tuple : tuples) {
-                Struct struct = new Struct("tuple" + tupleID);
-                tupleID++;
-                int itemID = 0;
-                for(Type member : tuple.getTemplateTypes()) {
-                    String name = member.toString();
-                    int index;
-                    if((index = tuples.indexOf(member)) != -1) {
-                        name = "tuple" + index;
-                    }
-                    struct.addMember(name, "item" + itemID);
-                    itemID++;
-                }
-                cb.addLine(struct.toString());
-            }
-            //functions
-            for(jp.long_long_float.cuick.entity.Function function : table.getFunctions()) {
-                Function deployedFunc = new Function(function.type().toString(), function.name());
-                for(Parameter param : function.params()) {
-                    deployedFunc.addArg(param.type().toString(), param.name());
-                }
-                for(StmtNode stmt : function.body().stmts()) {
-                    deployedFunc.addStmt(stmt.toString());
-                };
-                cb.addLine(deployedFunc.toString());
-            }
+            deployHeaders(cb);
+            deployTuples(cb);
+            deployFunctions(cb);
             //main
             Function main = new Function("int", "main");
             for(StmtNode stmt : ast.declarations().stmts()) {
@@ -79,6 +51,80 @@ public class Compiler {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
+        }
+    }
+    
+    static private void deployHeaders(CodeBuilder cb) {
+        String[] headers = new String[]{"iostream", "vector", "map", "algorithm"};
+        for(String header : headers) {
+            cb.addLine("#include<" + header + ">");
+        }
+    }
+    
+    static private void deployTuples(CodeBuilder cb) {
+        List<Type> tuples = Table.getInstance().getTuples();
+        //tupleの依存関係を作る
+        List<List<Integer>> tupleTree = new ArrayList<List<Integer>>(tuples.size());
+        List<Integer> parentNums = new ArrayList<Integer>(tuples.size());
+        for(int i = 0;i < tuples.size();i++) {
+            tupleTree.add(new ArrayList<Integer>());
+            parentNums.add(0);
+        }
+        for(int tupleID = 0;tupleID < tuples.size();tupleID++) {
+            for(Type member : tuples.get(tupleID).getTemplateTypes()) {
+                int index;
+                if((index = tuples.indexOf(member)) != -1) {
+                    tupleTree.get(tupleID).add(index);
+                    parentNums.set(index, parentNums.get(index) + 1);
+                }
+            }
+        }
+        List<Integer> root = new ArrayList<Integer>();
+        for(int i = 0;i < parentNums.size();i++) {
+            if(parentNums.get(i) == 0) root.add(i);
+        }
+        //木の末端にあるものから配置
+        Queue<Integer> queue = new LinkedList<Integer>();
+        for(Integer rootID : root) {
+            queue.offer(rootID);
+        }
+        List<Integer> deployedTupleIDs = new ArrayList<Integer>();
+        while(!queue.isEmpty()) {
+            int tupleID = queue.poll();
+            if(!deployedTupleIDs.contains(tupleID)) {
+                deployedTupleIDs.add(tupleID);
+            }
+            for(Integer i : tupleTree.get(tupleID)) {
+                queue.offer(i);
+            }
+        }
+        for(int i = deployedTupleIDs.size() - 1;i >= 0;i--) {
+            int tupleID = deployedTupleIDs.get(i);
+            Struct struct = new Struct("tuple" + tupleID);
+            List<Type> templTypes = tuples.get(tupleID).getTemplateTypes();
+            for(int memberID = 0;memberID < templTypes.size();memberID++) {
+                Type member = templTypes.get(memberID);
+                String name = member.toString();
+                int index;
+                if((index = tuples.indexOf(member)) != -1) {
+                    name = "tuple" + index;
+                }
+                struct.addMember(name, "item" + memberID);
+            }
+            cb.addLine(struct.toString());
+        }
+    }
+    
+    static private void deployFunctions(CodeBuilder cb) {
+        for(jp.long_long_float.cuick.entity.Function function : Table.getInstance().getFunctions()) {
+            Function deployedFunc = new Function(function.type().toString(), function.name());
+            for(Parameter param : function.params()) {
+                deployedFunc.addArg(param.type().toString(), param.name());
+            }
+            for(StmtNode stmt : function.body().stmts()) {
+                deployedFunc.addStmt(stmt.toString());
+            };
+            cb.addLine(deployedFunc.toString());
         }
     }
     

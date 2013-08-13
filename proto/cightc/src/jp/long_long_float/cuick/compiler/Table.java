@@ -25,9 +25,10 @@ public final class Table {
     private List<Function> functions = new ArrayList<Function>();
     
     public void entryTuple(Type tuple) {
-        if(tuples.indexOf(tuple) == -1) {
-            tuples.add(tuple);
-        }
+        //この時点では完全な型ではないので(templateがない)
+        //if(tuples.indexOf(tuple) == -1) {
+        tuples.add(tuple);
+        //}
     }
     
     public void entryFunction(Function func) {
@@ -36,8 +37,17 @@ public final class Table {
         }
     }
     
+    /**
+     * 一意なtupleのリストを返す
+     */
     public List<Type> getTuples() {
-        return tuples;
+        List<Type> ret = new ArrayList<Type>();
+        for(Type tuple : tuples) {
+            if(!ret.contains(tuple)) {
+                ret.add(tuple);
+            }
+        }
+        return ret;
     }
     
     public List<Function> getFunctions() {

@@ -6,6 +6,7 @@ import jp.long_long_float.cuick.ast.Location;
 import jp.long_long_float.cuick.utility.TextUtils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public abstract class Type implements Cloneable{
@@ -69,15 +70,18 @@ public abstract class Type implements Cloneable{
     
     @Override
     public boolean equals(Object obj) {
-        if(this == obj) return true;
-        if(obj == null || getClass() != obj.getClass()) return false;
-        
-        Type other = (Type)obj;
-        boolean ret = true;
-        ret &= (isReference == other.isReference);
-        ret &= (pointerCount == other.pointerCount);
-        ret &= ((templTypes == null && templTypes == other.templTypes)
-                ||(templTypes != null && templTypes.equals(other.templTypes)));
-        return ret;
+        if(obj instanceof Type) {
+            Type other = (Type)obj;
+            boolean ret = new EqualsBuilder()
+                    .append(isReference, other.isReference)
+                    .append(pointerCount, other.pointerCount)
+                    .append(templTypes, other.templTypes)
+                    .isEquals();
+            //System.out.println(toString() + (ret ? " == " : " != ") + other.toString());
+            return ret;
+        }
+        else {
+            return false;
+        }
     }
 }

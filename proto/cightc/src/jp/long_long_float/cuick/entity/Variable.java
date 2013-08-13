@@ -10,6 +10,11 @@ public class Variable extends Entity {
     }
     
     @Override
+    public String toString() {
+        return name;
+    }
+    
+    @Override
     protected void _dump(Dumper d) {
         d.printMember("type", type());
         d.printMember("name", name);

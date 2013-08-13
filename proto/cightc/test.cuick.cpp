@@ -2,9 +2,15 @@
 #include<vector>
 #include<map>
 #include<algorithm>
+struct tuple0
+{
+    int item0;
+    int item1;
+};
+
 int main()
 {
-    for(int i = 0;i < 10;i++)puts("hello");
+    tuple<int, int> pos;
     return 0;
 }
 

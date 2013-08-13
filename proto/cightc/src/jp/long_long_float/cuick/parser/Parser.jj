@@ -291,26 +291,31 @@ AST compilation_unit():
 //変数宣言
 DefvarNode defvars():
 {
-    List<Variable> defs = new ArrayList<Variable>();
-    Type baseType;
+    List<Variable> vars = new ArrayList<Variable>();
+    Variable var;
+    //Type baseType;
     Type type;
-    String name;
+    //String name;
 }
 {
     //storage(staticなど)は無し
-    type=type() { baseType = type.clone(); } ["&" { type.setReference(); }] ("*" { type.addPointer(); })* name=name() [ "(" args() ")" ] ["[" [expr()] "]"] ["=" ( "{" expr() ("," expr())* "}" | expr() ) ]
+    type=type() var=defvar(type) { vars.add(var); } ("," var=defvar(type) { vars.add(var); } )* ";"
         {
-            defs.add(new Variable(new TypeNode(type), name));
-            type = baseType;
+            return new DefvarNode(type.location(), type, vars);
         }
-    (","  { baseType = type.clone(); } ["&" { type.setReference(); }] ("*" { type.addPointer(); })* name=name() [ "(" args() ")" ] ["[" [expr()] "]"] ["=" ( "{" expr() ("," expr())* "}" | expr() ) ]
+}
+
+Variable defvar(Type type):{
+    String name;
+    List<ExprNode> constructorArgs = null;
+    boolean isArray = false;
+    ExprNode arraySize = null;
+    List<ExprNode> init = new ArrayList<ExprNode>();
+    ExprNode expr;}
+{    { type = type.clone(); } ["&" { type.setReference(); }] ("*" { type.addPointer(); })*
+    name=name() [ "(" constructorArgs=args() ")" ] ["[" { isArray = true; } [arraySize=expr()] "]"] ["=" ( "{" expr=expr() { init.add(expr); } ("," expr=expr() { init.add(expr); } )* "}" | expr=expr() { init.add(expr); } ) ]
         {
-            defs.add(new Variable(new TypeNode(type), name));
-            type = baseType;
-        }
-    )* ";"
-        {
-            return new DefvarNode(type.location(), type, defs);
+            return new Variable(new TypeNode(type), name, constructorArgs, isArray, arraySize, init);
         }
 }
 
@@ -365,9 +370,16 @@ Parameter param():
 {
     Type type;
     String n;
+    boolean isArray = false;
+    ExprNode arraySize = null;
+    ExprNode defaultValue = null;
 }
 {
-    type=type() ["&" { type.setReference(); }] ("*" { type.addPointer(); })* n=name() ["[" [expr()] "]"] { return new Parameter(new TypeNode(type), n); }
+    type=type() ["&" { type.setReference(); }] ("*" { type.addPointer(); })* n=name()
+    ["[" { isArray = true; } [arraySize=expr()] "]"] ["=" defaultValue=expr() ]
+    {
+        return new Parameter(new TypeNode(type), n, isArray, arraySize, defaultValue);
+    }
 }
 
 BlockNode block():
@@ -471,6 +483,7 @@ Token basic_type():{
 StmtNode stmt():
 {
     StmtNode n = null;
+    Type type;
 }
 {
     (
@@ -481,7 +494,7 @@ StmtNode stmt():
     |   n=if_stmt()
     |   n=while_stmt()
     |   n=dowhile_stmt()
-    |   LOOKAHEAD(<FOR> "(" expr() ";") n=for_stmt()
+    |   LOOKAHEAD(<FOR> "(" [type=type() defvar(type)] ";") n=for_stmt()
     |   n=foreach_stmt()
     |   n=switch_stmt()
     |   n=break_stmt()
@@ -546,13 +559,15 @@ DoWhileNode dowhile_stmt():
 ForNode for_stmt():
 {
     Token t;
+    Type type = null;
+    Variable var = null;
     ExprNode init = null, cond = null, incr = null;
     StmtNode body;
 }
 {
-    t=<FOR> "(" [init=expr()] ";" [cond=expr()] ";" [incr=expr()] ")" body=stmt()
+    t=<FOR> "(" [type=type() var=defvar(type)] ";" [cond=expr()] ";" [incr=expr()] ")" body=stmt()
         {
-            return new ForNode(location(t), init, cond, incr, body);
+            return new ForNode(location(t), type, var, cond, incr, body);
         }
 }
 
@@ -884,7 +899,8 @@ ExprNode expr2():
 ExprNode expr1():
 { ExprNode l, r; }
 {
-    l=term() ( "*" r=term() { l = new BinaryOpNode(l, "*", r); }
+    l=term() ( "**" r=term() { l = new PowerOpNode(l, r); }
+             | "*" r=term() { l = new BinaryOpNode(l, "*", r); }
              | "/" r=term() { l = new BinaryOpNode(l, "/", r); }
              | "%" r=term() { l = new BinaryOpNode(l, "%", r); }
              )*

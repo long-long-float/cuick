@@ -27,7 +27,7 @@ public class BlockNode extends StmtNode {
     }
     
     protected void _dump(Dumper d) {
-        d.printNodeList("variables", variables);
+        //d.printNodeList("variables", variables);
         d.printNodeList("stmts", stmts);
     }
 }

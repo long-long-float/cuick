@@ -1,1 +1,5 @@
-int a = 2**10;
+gets(int)().times{
+    int a, b, c;
+    a, b, c = gets(int)(3).sort();
+    puts(a ** 2 == b ** 2 + c ** 2 ? "YES" : "NO");
+};

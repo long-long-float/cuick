@@ -24,6 +24,8 @@ public final class CodeContext {
     public void indent() { indent++; }
     public void unindent() { indent--; }
     
+    public int getIndent() { return indent; }
+    
     public String getTabSpace() {
         return TextUtils.times(indentWidth, indent);
     }

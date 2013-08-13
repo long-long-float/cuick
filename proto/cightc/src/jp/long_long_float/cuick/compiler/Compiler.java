@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Queue;
 
 import jp.long_long_float.cuick.ast.AST;
+import jp.long_long_float.cuick.ast.BuiltInCodeStmt;
 import jp.long_long_float.cuick.ast.StmtNode;
 import jp.long_long_float.cuick.cppStructure.CodeBuilder;
 import jp.long_long_float.cuick.cppStructure.Function;
@@ -30,13 +31,16 @@ public class Compiler {
             Table table = Table.getInstance();
             System.out.println(table.getTuples());
             System.out.println(table.getFunctions());
+            System.out.println(table.getBuiltInCodeStmt());
             
             CodeBuilder cb = new CodeBuilder();
             deployHeaders(cb);
+            deployBuiltInCodes(cb);
             deployTuples(cb);
             deployFunctions(cb);
             //main
             Function main = new Function("int", "main");
+            main.addArg("int", "argc").addArg("char**", "argv");
             for(StmtNode stmt : ast.declarations().stmts()) {
                 main.addStmt(stmt.toString());
             }
@@ -58,6 +62,12 @@ public class Compiler {
         String[] headers = new String[]{"iostream", "vector", "map", "algorithm"};
         for(String header : headers) {
             cb.addLine("#include<" + header + ">");
+        }
+    }
+    
+    static private void deployBuiltInCodes(CodeBuilder cb) {
+        for(BuiltInCodeStmt code : Table.getInstance().getBuiltInCodeStmt()) {
+            cb.addLine(code.toString());
         }
     }
     

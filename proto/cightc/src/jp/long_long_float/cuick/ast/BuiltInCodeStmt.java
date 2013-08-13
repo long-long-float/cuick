@@ -1,18 +1,16 @@
 package jp.long_long_float.cuick.ast;
 
-public class BuiltInCode extends ExprNode {
+import jp.long_long_float.cuick.compiler.Table;
 
-    protected Location location;
+public class BuiltInCodeStmt extends StmtNode {
+
     protected String code;
     
-    public BuiltInCode(Location loc, String code) {
-        this.location = loc;
+    public BuiltInCodeStmt(Location loc, String code) {
+        super(loc);
         this.code = code;
-    }
-    
-    @Override
-    public Location location() {
-        return location;
+        
+        Table.getInstance().entryBuiltInCodeStmt(this);
     }
     
     @Override

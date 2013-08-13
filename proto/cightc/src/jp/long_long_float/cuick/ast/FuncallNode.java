@@ -40,7 +40,9 @@ public class FuncallNode extends ExprNode {
     @Override
     protected void _dump(Dumper d) {
         d.printMember("expr", expr);
+        if(templTypes != null) d.printMember("templTypes", templTypes);
         d.printNodeList("args", args);
+        d.printMember("block", block);
     }
 
 }

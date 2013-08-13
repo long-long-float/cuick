@@ -3,6 +3,7 @@ package jp.long_long_float.cuick.compiler;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.long_long_float.cuick.ast.BuiltInCodeStmt;
 import jp.long_long_float.cuick.entity.Function;
 import jp.long_long_float.cuick.type.Type;
 
@@ -23,6 +24,7 @@ public final class Table {
     
     private List<Type> tuples = new ArrayList<Type>();
     private List<Function> functions = new ArrayList<Function>();
+    private List<BuiltInCodeStmt> builtInCodes = new ArrayList<BuiltInCodeStmt>();
     
     public void entryTuple(Type tuple) {
         //この時点では完全な型ではないので(templateがない)
@@ -32,8 +34,14 @@ public final class Table {
     }
     
     public void entryFunction(Function func) {
-        if(functions.indexOf(func) == -1) {
+        if(!functions.contains(func)) {
             functions.add(func);
+        }
+    }
+    
+    public void entryBuiltInCodeStmt(BuiltInCodeStmt code) {
+        if(!builtInCodes.contains(code)) {
+            builtInCodes.add(code);
         }
     }
     
@@ -52,5 +60,9 @@ public final class Table {
     
     public List<Function> getFunctions() {
         return functions;
+    }
+    
+    public List<BuiltInCodeStmt> getBuiltInCodeStmt() {
+        return builtInCodes;
     }
 }

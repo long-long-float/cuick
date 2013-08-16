@@ -15,7 +15,6 @@ import jp.long_long_float.cuick.ast.StmtNode;
 import jp.long_long_float.cuick.cppStructure.CodeBuilder;
 import jp.long_long_float.cuick.cppStructure.Function;
 import jp.long_long_float.cuick.cppStructure.Struct;
-import jp.long_long_float.cuick.entity.Parameter;
 import jp.long_long_float.cuick.exception.FileException;
 import jp.long_long_float.cuick.exception.SyntaxException;
 import jp.long_long_float.cuick.parser.Parser;
@@ -126,15 +125,8 @@ public class Compiler {
     }
     
     static private void deployFunctions(CodeBuilder cb) {
-        for(jp.long_long_float.cuick.entity.Function function : Table.getInstance().getFunctions()) {
-            Function deployedFunc = new Function(function.type().toString(), function.name());
-            for(Parameter param : function.params()) {
-                deployedFunc.addArg(param.type().toString(), param.name());
-            }
-            for(StmtNode stmt : function.body().stmts()) {
-                deployedFunc.addStmt(stmt.toString());
-            };
-            cb.addLine(deployedFunc.toString());
+        for(jp.long_long_float.cuick.entity.Function func : Table.getInstance().getFunctions()) {
+            cb.addLine(func.toString());
         }
     }
     

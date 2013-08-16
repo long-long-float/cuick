@@ -2,15 +2,35 @@
 #include<vector>
 #include<map>
 #include<algorithm>
+int times(this_)
+{
+    for(int i = 0;i < this;i++)yield(i);
+}
+
+T gets()
+{
+    T ret;
+    cin >> ret;
+    ret;
+}
+
+vector<T> gets(n)
+{
+    vector<T> ret(n);
+    n.times()    {
+        cin >> jp.long_long_float.cuick.ast.ArefNode@3c97e111;
+    };
+;
+    ret;
+}
+
+void sort(this_)
+{
+    sort(this.begin(), this.end());
+}
+
 int main(int argc, char** argv)
 {
-    jp.long_long_float.cuick.ast.MemberNode@5d71e34(){
-    int a, b, c;
-    jp.long_long_float.cuick.ast.MultiplexAssignNode@3c97e111
-    ;
-    puts(std::pow((double)a, (double)2) == std::pow((double)b, (double)2) + std::pow((double)c, (double)2) ? "YES" : "NO");
-};
-;
     return 0;
 }
 

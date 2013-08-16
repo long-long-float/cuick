@@ -14,6 +14,11 @@ public class MemberNode extends LHSNode {
     public Location location() {
         return expr.location();
     }
+    
+    @Override
+    public String toString() {
+        return expr + "." + member;
+    }
 
     @Override
     protected void _dump(Dumper d) {

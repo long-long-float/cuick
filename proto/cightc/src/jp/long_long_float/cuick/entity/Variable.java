@@ -14,14 +14,14 @@ public class Variable extends Entity {
     protected List<ExprNode> constructorArgs = null;
     protected boolean isArray = false;
     protected ExprNode arraySize = null;
-    protected List<ExprNode> init = new ArrayList<ExprNode>();
+    protected List<ExprNode> init;
     
     public Variable(TypeNode type, String name, List<ExprNode> constructorArgs, boolean isArray, ExprNode arraySize, List<ExprNode> init) {
         super(type, name);
         this.constructorArgs = constructorArgs;
         this.isArray = isArray;
         this.arraySize = arraySize;
-        this.init = init;
+        this.init = (init != null ? init : new ArrayList<ExprNode>());
     }
     
     @Override

@@ -18,7 +18,7 @@ vector<T> gets(n)
 {
     vector<T> ret(n);
     n.times()    {
-        cin >> jp.long_long_float.cuick.ast.ArefNode@3c97e111;
+        cin >> jp.long_long_float.cuick.ast.ArefNode@7069b861;
     };
 ;
     ret;

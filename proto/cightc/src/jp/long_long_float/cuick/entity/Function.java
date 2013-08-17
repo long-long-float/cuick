@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 public class Function extends Entity{
     protected Params params;
     protected BlockNode body;
+    protected LocalScope scope;
     
     private Location loc = null; //for extend
     
@@ -37,8 +38,14 @@ public class Function extends Entity{
         }
     }
     
+    /*
     public Params params() {
         return params;
+    }
+    */
+    
+    public List<Parameter> parameters() {
+        return params.parameters();
     }
     
     public BlockNode body() {
@@ -73,5 +80,9 @@ public class Function extends Entity{
         d.printMember("name", name);
         d.printMember("params", params);
         d.printMember("body", body);
+    }
+
+    public void setScope(LocalScope scope) {
+        this.scope = scope;
     }
 }

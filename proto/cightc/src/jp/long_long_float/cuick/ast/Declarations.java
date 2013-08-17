@@ -9,10 +9,10 @@ import jp.long_long_float.cuick.entity.Function;
 import jp.long_long_float.cuick.entity.Variable;
 
 public class Declarations {
-    public Set<Variable> vars = new LinkedHashSet<Variable>();
-    public Set<Function> funcs = new LinkedHashSet<Function>();
-    public Set<StmtNode> stmts = new LinkedHashSet<StmtNode>();
-    public Set<AtCommandNode> atCommands = new LinkedHashSet<AtCommandNode>();
+    protected Set<Variable> vars = new LinkedHashSet<Variable>();
+    protected Set<Function> funcs = new LinkedHashSet<Function>();
+    protected Set<StmtNode> stmts = new LinkedHashSet<StmtNode>();
+    protected Set<AtCommandNode> atCommands = new LinkedHashSet<AtCommandNode>();
     
     public void add(Declarations decls) {
         vars.addAll(decls.vars);

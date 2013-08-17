@@ -136,13 +136,13 @@ public class Parser implements ParserConstants {
         }
         if (jj_2_1(2147483647)) {
           func = def_extendfun();
-                               decls.funcs().add(func);
+                               decls.funcs.add(func);
         } else if (jj_2_2(2147483647)) {
           func = deffun();
-                        decls.funcs().add(func);
+                        decls.funcs.add(func);
         } else if (jj_2_3(2147483647)) {
           stmt = defvars();
-                                                               decls.stmts().add(stmt);
+                                                               decls.stmts.add(stmt);
         } else {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case BREAK:
@@ -172,7 +172,7 @@ public class Parser implements ParserConstants {
           case 133:
           case 134:
             stmt = stmt();
-                      decls.stmts().add(stmt);
+                      decls.stmts.add(stmt);
             break;
           case 137:
           case 138:
@@ -180,7 +180,7 @@ public class Parser implements ParserConstants {
           case 140:
           case 141:
             at_command = at_command();
-                                  decls.atCommands().add(at_command);
+                                  decls.atCommands.add(at_command);
             break;
           default:
             jj_la1[1] = jj_gen;

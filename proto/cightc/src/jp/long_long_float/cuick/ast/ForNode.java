@@ -37,4 +37,15 @@ public class ForNode extends StmtNode {
         d.printMember("body", body);
     }
 
+    public ExprNode cond() {
+        return cond;
+    }
+
+    public ExprNode incr() {
+        return incr;
+    }
+
+    public StmtNode body() {
+        return body;
+    }
 }

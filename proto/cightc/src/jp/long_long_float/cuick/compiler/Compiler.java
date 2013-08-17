@@ -19,6 +19,7 @@ import jp.long_long_float.cuick.cppStructure.Struct;
 import jp.long_long_float.cuick.exception.CompileException;
 import jp.long_long_float.cuick.exception.FileException;
 import jp.long_long_float.cuick.exception.OptionParseError;
+import jp.long_long_float.cuick.exception.SemanticException;
 import jp.long_long_float.cuick.exception.SyntaxException;
 import jp.long_long_float.cuick.parser.Parser;
 import jp.long_long_float.cuick.type.Type;
@@ -126,15 +127,16 @@ public class Compiler {
 
     private void compile(String srcPath, String destPath, Options opts) throws CompileException{
         AST ast = parseFile(srcPath, opts);
+        ast.dump();
         AST sem = semanticAnalyze(ast, opts);
         writeFile(destPath, sem);
     }
 
     private void writeFile(String path, AST ast) throws FileException {
         Table table = Table.getInstance();
-        System.out.println(table.getTuples());
-        System.out.println(table.getFunctions());
-        System.out.println(table.getBuiltInCodeStmt());
+        //System.out.println(table.getTuples());
+        //System.out.println(table.getFunctions());
+        //System.out.println(table.getBuiltInCodeStmt());
         
         CodeBuilder cb = new CodeBuilder();
         deployHeaders(cb);
@@ -187,7 +189,7 @@ public class Compiler {
         return Parser.parseFile(new File(path), errorHandler);
     }
     
-    public AST semanticAnalyze(AST ast, /*TypeTable types, */Options opts) {
+    public AST semanticAnalyze(AST ast, /*TypeTable types, */Options opts) throws SemanticException {
         new LocalResolver(errorHandler).resolve(ast);
         return ast;
     }

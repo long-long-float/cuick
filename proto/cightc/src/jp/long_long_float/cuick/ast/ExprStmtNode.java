@@ -19,4 +19,8 @@ public class ExprStmtNode extends StmtNode {
         return expr.toString() + ";";
     }
 
+    public ExprNode expr() {
+        return expr;
+    }
+
 }

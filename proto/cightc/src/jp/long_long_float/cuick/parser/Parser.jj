@@ -213,12 +213,12 @@ AST compilation_unit():
     }
     (
         LOOKAHEAD(<EXTEND>/* type_with_suffix() type_with_suffix()*/)
-        func=def_extendfun() { decls.funcs().add(func); }
+        func=def_extendfun() { decls.funcs.add(func); }
     |   LOOKAHEAD(type_with_suffix() name() "(" params() ")" "{")
-        func=deffun() { decls.funcs().add(func); }
-    |   LOOKAHEAD(type() ["&"] ("*")* name()) stmt=defvars() { decls.stmts().add(stmt); }
-    |   stmt=stmt() { decls.stmts().add(stmt); }
-    |   at_command=at_command() { decls.atCommands().add(at_command); }
+        func=deffun() { decls.funcs.add(func); }
+    |   LOOKAHEAD(type() ["&"] ("*")* name()) stmt=defvars() { decls.stmts.add(stmt); }
+    |   stmt=stmt() { decls.stmts.add(stmt); }
+    |   at_command=at_command() { decls.atCommands.add(at_command); }
     )* <EOF>
     {
         return new AST(location(t), decls);

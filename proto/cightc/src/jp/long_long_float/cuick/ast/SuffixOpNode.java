@@ -9,4 +9,8 @@ public class SuffixOpNode extends UnaryArithmeticOpNode {
     public String toString() {
         return expr + operator;
     }
+
+    public ExprNode expr() {
+        return expr;
+    }
 }

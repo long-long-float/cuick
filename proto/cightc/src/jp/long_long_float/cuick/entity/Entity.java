@@ -9,10 +9,12 @@ import jp.long_long_float.cuick.type.Type;
 abstract public class Entity implements Dumpable{
     protected String name;
     protected TypeNode typeNode;
+    protected long nRefered;
     
     public Entity(TypeNode type, String name) {
         this.name = name;
         this.typeNode = type;
+        this.nRefered = 0;
     }
     
     public String name() {
@@ -30,6 +32,14 @@ abstract public class Entity implements Dumpable{
     public Location location() {
         return typeNode.location();
     }
+    
+    public void refered() {
+        nRefered++;
+    }
+    
+    public boolean isRefered() {
+        return nRefered > 0;
+    }
 
     @Override
     public void dump(Dumper d) {
@@ -38,4 +48,5 @@ abstract public class Entity implements Dumpable{
     }
     
     abstract protected void _dump(Dumper d);
+    
 }

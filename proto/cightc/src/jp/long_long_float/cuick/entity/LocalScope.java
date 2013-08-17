@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import jp.long_long_float.cuick.exception.SemanticException;
+import jp.long_long_float.cuick.utility.ErrorHandler;
 
 public class LocalScope extends Scope{
     protected Scope parent;
@@ -51,5 +52,16 @@ public class LocalScope extends Scope{
             throw new Error("duplicated variable: " + var.name());
         }
         variables.put(var.name(), var);
+    }
+
+    public void checkReferences(ErrorHandler errorHandler) {
+        for(Variable var : variables.values()) {
+            if(!var.isRefered()) {
+                errorHandler.warn(var.location(), "unused variable : " + var.name());
+            }
+        }
+        for(LocalScope c : children) {
+            c.checkReferences(errorHandler);
+        }
     }
 }

@@ -45,4 +45,12 @@ public class FuncallNode extends ExprNode {
         d.printMember("block", block);
     }
 
+    public ExprNode expr() {
+        return expr;
+    }
+
+    public List<ExprNode> args() {
+        return args;
+    }
+
 }

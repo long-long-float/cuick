@@ -12,8 +12,4 @@ abstract public class StmtNode extends Node {
     public Location location() {
         return location;
     }
-
-    public <S, E> E accept(ASTVisitor<S, E> visitor) {
-        return visitor.visit(this);
-    }
 }

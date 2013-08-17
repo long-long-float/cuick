@@ -1,18 +1,16 @@
 package jp.long_long_float.cuick.ast;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import jp.long_long_float.cuick.entity.Function;
 import jp.long_long_float.cuick.entity.Variable;
 
 public class Declarations {
-    protected Set<Variable> vars = new LinkedHashSet<Variable>();
-    protected Set<Function> funcs = new LinkedHashSet<Function>();
-    protected Set<StmtNode> stmts = new LinkedHashSet<StmtNode>();
-    protected Set<AtCommandNode> atCommands = new LinkedHashSet<AtCommandNode>();
+    public Set<Variable> vars = new LinkedHashSet<Variable>();
+    public Set<Function> funcs = new LinkedHashSet<Function>();
+    public Set<StmtNode> stmts = new LinkedHashSet<StmtNode>();
+    public Set<AtCommandNode> atCommands = new LinkedHashSet<AtCommandNode>();
     
     public void add(Declarations decls) {
         vars.addAll(decls.vars);
@@ -20,7 +18,7 @@ public class Declarations {
         stmts.addAll(decls.stmts);
         atCommands.addAll(decls.atCommands);
     }
-    
+    /*
     public List<Variable> vars() {
         return new ArrayList<Variable>(vars);
     }
@@ -36,4 +34,5 @@ public class Declarations {
     public List<AtCommandNode> atCommands() {
         return new ArrayList<AtCommandNode>(atCommands);
     }
+    */
 }

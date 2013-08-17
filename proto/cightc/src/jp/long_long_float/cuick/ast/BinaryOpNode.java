@@ -32,4 +32,11 @@ public class BinaryOpNode extends ExprNode {
         d.printMember("right", right);
     }
 
+    public ExprNode left() {
+        return left;
+    }
+
+    public ExprNode right() {
+        return right;
+    }
 }

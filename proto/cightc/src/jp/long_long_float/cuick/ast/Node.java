@@ -21,4 +21,8 @@ abstract public class Node implements Dumpable{
     }
     
     abstract protected void _dump(Dumper d);
+    
+    public <S, E> E accept(ASTVisitor<S, E> visitor) {
+        return visitor.visit(this);
+    }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import jp.long_long_float.cuick.exception.SemanticException;
+import jp.long_long_float.cuick.utility.ErrorHandler;
 
 public class ToplevelScope extends Scope {
     
@@ -44,6 +45,22 @@ public class ToplevelScope extends Scope {
     public void defineEntity(Entity ent) {
         // TODO 自動生成されたメソッド・スタブ
         
+    }
+
+    public void checkReferences(ErrorHandler errorHandler) {
+        /*
+        for(Entity ent : entities.values()) {
+            if(ent.isDefined() && ent.isPrivate()) {
+                errorHandler.warn(ent.location(), "unused variable : " + ent.name());
+            }
+        }
+        */
+        // do not check parameters
+        for(LocalScope funcScope : children) {
+            for(LocalScope s : funcScope.children) {
+                s.checkReferences(errorHandler);
+            }
+        }
     }
 
 }

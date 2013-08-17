@@ -13,6 +13,10 @@ target/
 *.war
 *.ear
 *.db
+
+# Binary Files #
+*.obj
+*.exe
  
 ######################
 # Windows

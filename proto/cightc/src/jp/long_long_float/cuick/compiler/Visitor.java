@@ -17,6 +17,7 @@ import jp.long_long_float.cuick.ast.DefvarNode;
 import jp.long_long_float.cuick.ast.DoWhileNode;
 import jp.long_long_float.cuick.ast.ExprNode;
 import jp.long_long_float.cuick.ast.ExprStmtNode;
+import jp.long_long_float.cuick.ast.ForEachNode;
 import jp.long_long_float.cuick.ast.ForNode;
 import jp.long_long_float.cuick.ast.FuncallNode;
 import jp.long_long_float.cuick.ast.IfNode;
@@ -26,6 +27,7 @@ import jp.long_long_float.cuick.ast.Node;
 import jp.long_long_float.cuick.ast.OpAssignNode;
 import jp.long_long_float.cuick.ast.PrefixOpNode;
 import jp.long_long_float.cuick.ast.PtrMemberNode;
+import jp.long_long_float.cuick.ast.RangeNode;
 import jp.long_long_float.cuick.ast.ReturnNode;
 import jp.long_long_float.cuick.ast.SizeofExprNode;
 import jp.long_long_float.cuick.ast.SizeofTypeNode;
@@ -37,11 +39,15 @@ import jp.long_long_float.cuick.ast.UnaryOpNode;
 import jp.long_long_float.cuick.ast.VariableNode;
 import jp.long_long_float.cuick.ast.WhileNode;
 import jp.long_long_float.cuick.entity.Variable;
+import jp.long_long_float.cuick.foreach.Enumerable;
+import jp.long_long_float.cuick.foreach.RangeEnumerable;
 
 public class Visitor implements ASTVisitor<Void, Void> {
     
     protected void visitStmt(StmtNode stmt) {
-        stmt.accept(this);
+        if(stmt != null) {
+            stmt.accept(this);
+        }
     }
     
     protected void visitStmts(List< ? extends StmtNode> stmts) {
@@ -58,6 +64,10 @@ public class Visitor implements ASTVisitor<Void, Void> {
         for (ExprNode e : exprs) {
             visitExpr(e);
         }
+    }
+    
+    private void visitEnume(Enumerable enumerable) {
+        enumerable.accept(this);
     }
     
     @Override
@@ -140,6 +150,15 @@ public class Visitor implements ASTVisitor<Void, Void> {
         visitExpr(n.cond());
         visitExpr(n.incr());
         visitStmt(n.body());
+        return null;
+    }
+    
+    public Void visit(ForEachNode n) {
+        visitStmt(n.body());
+        visitEnume(n.enumerable());
+        if(n.lastBody() != null) {
+            visitStmt(n.lastBody());
+        }
         return null;
     }
 
@@ -290,6 +309,19 @@ public class Visitor implements ASTVisitor<Void, Void> {
     }
     
     public Void visit(StringLiteralNode node) {
+        return null;
+    }
+    
+    public Void visit(RangeNode node) {
+        visitExpr(node.begin());
+        visitExpr(node.end());
+        return null;
+    }
+    
+    //enumerables
+    
+    public Void visit(RangeEnumerable node) {
+        visitExpr(node.range());
         return null;
     }
 }

@@ -2,16 +2,14 @@ package jp.long_long_float.cuick.ast;
 
 import jp.long_long_float.cuick.entity.Entity;
 
-
-
 public class VariableNode extends LHSNode {
     private Location location;
-    private String name;
+    private String provisionalName;
     private Entity entity;
     
     public VariableNode(Location loc, String name) {
         this.location = loc;
-        this.name = name;
+        this.provisionalName = name;
     }
     
     @Override
@@ -19,19 +17,19 @@ public class VariableNode extends LHSNode {
         return location;
     }
     
+    public String name() {
+        return entity != null ? entity.name() : provisionalName;
+    }
+    
     @Override
     public String toString() {
-        return name;
+        return name();
     }
 
     @Override
     protected void _dump(Dumper d) {
-        d.printMember("name", name);
+        d.printMember("name", name());
         d.printMember("type", (entity != null ? entity.type() : "???"));
-    }
-
-    public String name() {
-        return name;
     }
     
     public Entity entity() {

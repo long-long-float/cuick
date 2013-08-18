@@ -289,7 +289,7 @@ Function def_extendfun():
 {
     t=<EXTEND> ret=type_with_suffix() receiver=type_with_suffix() "." n=name() "(" ps=params() ")" body=block()
         {
-            ps.addParamFront(new Parameter(new TypeNode(receiver), "this_"));
+            ps.addParamFront(new Parameter(new TypeNode(receiver), "this"));
             Type type = new FunctionType(ret, ps.parametersType());
             return new Function(location(t), new TypeNode(type), n, ps, body);
         }
@@ -526,7 +526,6 @@ ForEachNode foreach_stmt():
     Type var_type = null;
     String var_name;
     //List<Pair<Type, String>> vars = new ArrayList<Pair<Type, String>>();
-    Pair<Type, String> var;
     
     boolean fore = true;
 
@@ -537,8 +536,8 @@ ForEachNode foreach_stmt():
 }
 {
     t=<FOR> "("
-        (            LOOKAHEAD(name() ":") var_name=name() { var = new Pair<Type, String>(var_type, var_name); }
-          | var_type=type() var_name=name() { var = new Pair<Type, String>(var_type, var_name); }
+        (            LOOKAHEAD(type() ":") var_name=name()
+          | var_type=type() var_name=name()
         )
         //("," [var_type=type()] var_name=name() { vars.add(new Pair<Type, String>(var_type, var_name)); })*
         ":" [">" | "<" { fore = true; }]
@@ -546,7 +545,7 @@ ForEachNode foreach_stmt():
         ")" body=stmt()
         [ LOOKAHEAD(1) <LAST> lastBody=stmt() ]
         {
-            return new ForEachNode(location(t), var, fore, enume, body, lastBody);
+            return new ForEachNode(location(t), var_type, var_name, fore, enume, body, lastBody);
         }
 }
 

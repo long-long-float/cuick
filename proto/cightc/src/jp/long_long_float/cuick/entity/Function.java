@@ -33,9 +33,6 @@ public class Function extends Entity{
     public Function(Location loc, TypeNode type, String name, Params params, BlockNode body) {
         this(type, name, params, body);
         this.loc = loc;
-        for(StmtNode stmt : body.stmts()) {
-            //stmt.replaceVariable("this", "this_");
-        }
     }
     
     /*

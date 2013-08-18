@@ -2,10 +2,13 @@
 #include<vector>
 #include<map>
 #include<algorithm>
+int times(this_())
+{
+    for(int i = 0;i < this_;i++)yield(i);
+}
+
 int main(int argc, char** argv)
 {
-    int i = 0;
-    puts(i);
     return 0;
 }
 

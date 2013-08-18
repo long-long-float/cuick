@@ -18,7 +18,7 @@ public class Variable extends Entity {
     
     public Variable(TypeNode type, String name, List<ExprNode> constructorArgs, boolean isArray, ExprNode arraySize, List<ExprNode> init) {
         super(type, name);
-        this.constructorArgs = constructorArgs;
+        this.constructorArgs = (constructorArgs != null ? constructorArgs : new ArrayList<ExprNode>());
         this.isArray = isArray;
         this.arraySize = arraySize;
         this.init = (init != null ? init : new ArrayList<ExprNode>());
@@ -57,5 +57,9 @@ public class Variable extends Entity {
     protected void _dump(Dumper d) {
         d.printMember("type", type());
         d.printMember("name", name);
+    }
+
+    public void rename(String name) {
+        this.name = name;
     }
 }

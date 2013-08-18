@@ -55,4 +55,8 @@ public class BlockNode extends StmtNode {
     public void setScope(LocalScope scope) {
         this.scope = scope;
     }
+    
+    public LocalScope scope() {
+        return scope;
+    }
 }

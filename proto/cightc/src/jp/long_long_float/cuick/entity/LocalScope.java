@@ -53,6 +53,10 @@ public class LocalScope extends Scope{
         }
         variables.put(var.name(), var);
     }
+    
+    public Variable getDefinedVariable(String name) {
+        return variables.get(name);
+    }
 
     public void checkReferences(ErrorHandler errorHandler) {
         for(Variable var : variables.values()) {

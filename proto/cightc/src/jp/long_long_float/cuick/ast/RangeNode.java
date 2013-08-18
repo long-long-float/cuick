@@ -23,6 +23,10 @@ public class RangeNode extends ExprNode {
         return rangeStr == "..";
     }
     
+    public String getOperator() {
+        return isIncludingEnd() ? "<=" : "<";
+    }
+    
     @Override
     public Location location() {
         return lexpr.location();

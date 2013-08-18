@@ -19,5 +19,6 @@ extend void $CONT.sort() {
     sort(this.begin(), this.end());
 }
 */
-int i = 0;
-puts(i);
+extend int int.times() {
+    for(int i : 0...this) yield(i);
+}

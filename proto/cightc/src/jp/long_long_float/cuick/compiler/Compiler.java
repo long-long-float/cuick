@@ -97,8 +97,11 @@ public class Compiler {
         }
     }
     
-    static private void deployFunctions(CodeBuilder cb) {
-        for(jp.long_long_float.cuick.entity.Function func : Table.getInstance().getFunctions()) {
+    static private void deployFunctions(CodeBuilder cb, AST ast) {
+        /*for(jp.long_long_float.cuick.entity.Function func : Table.getInstance().getFunctions()) {
+            cb.addLine(func.toString());
+        }*/
+        for(jp.long_long_float.cuick.entity.Function func : ast.funcs()) {
             cb.addLine(func.toString());
         }
     }
@@ -128,9 +131,10 @@ public class Compiler {
     private void compile(String srcPath, String destPath, Options opts) throws CompileException{
         AST ast = parseFile(srcPath, opts);
         //ast.dump();
-        AST sem = semanticAnalyze(ast, opts);
-        sem.dump();
-        writeFile(destPath, sem);
+        ast = semanticAnalyze(ast, opts);
+        ast = rename(ast, opts);
+        ast.dump();
+        writeFile(destPath, ast);
     }
 
     private void writeFile(String path, AST ast) throws FileException {
@@ -143,7 +147,7 @@ public class Compiler {
         deployHeaders(cb);
         deployBuiltInCodes(cb);
         deployTuples(cb);
-        deployFunctions(cb);
+        deployFunctions(cb, ast);
         //main
         Function main = new Function("int", "main");
         main.addArg("int", "argc").addArg("char**", "argv");
@@ -192,6 +196,11 @@ public class Compiler {
     
     public AST semanticAnalyze(AST ast, /*TypeTable types, */Options opts) throws SemanticException {
         new LocalResolver(errorHandler).resolve(ast);
+        return ast;
+    }
+    
+    public AST rename(AST ast, Options opts) {
+        new Renamer(errorHandler).rename(ast);
         return ast;
     }
 }

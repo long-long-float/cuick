@@ -14,4 +14,9 @@ public class Parameter extends Variable{
     public Parameter(TypeNode type, String name) {
         this(type, name, false, null, null);
     }
+    
+    @Override
+    public String toString() {
+        return type() + " " + name();
+    }
 }

@@ -1,6 +1,7 @@
 package jp.long_long_float.cuick.type;
 
 
+
 public class FunctionType extends Type{
     protected Type returnType;
     protected ParamTypes paramTypes;

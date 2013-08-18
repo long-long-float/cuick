@@ -1,6 +1,5 @@
 package jp.long_long_float.cuick.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import jp.long_long_float.cuick.ast.BlockNode;
@@ -57,11 +56,7 @@ public class Function extends Entity{
     @Override
     public String toString() {
         CodeBuilder cb = new CodeBuilder();
-        List<String> args = new ArrayList<String>();
-        if(params != null)  {
-            for(Parameter param : params) args.add(param.toString());
-        }
-        cb.addLine(type() + " " + name + "(" + StringUtils.join(args, ", ") + ")");
+        cb.addLine(type() + " " + name + "(" + StringUtils.join(params, ", ") + ")");
         cb.block(new BlockCallback() {
             @Override
             public void call(CodeBuilder cb) {

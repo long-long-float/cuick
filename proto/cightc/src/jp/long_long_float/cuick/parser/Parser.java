@@ -1087,7 +1087,7 @@ $T*
       }
       jj_consume_token(88);
       body = stmt();
-            {if (true) return new ForNode(location(t), type, var, cond, incr, body);}
+            {if (true) return new ForNode(location(t), var, cond, incr, body);}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("for_stmt");

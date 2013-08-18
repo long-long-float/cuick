@@ -2,7 +2,7 @@
 #include<vector>
 #include<map>
 #include<algorithm>
-int times(this_())
+int times(int this_)
 {
     for(int i = 0;i < this_;i++)yield(i);
 }

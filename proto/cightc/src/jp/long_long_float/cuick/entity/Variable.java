@@ -35,13 +35,13 @@ public class Variable extends Entity {
     @Override
     public String toString() {
         String ret = name;
-        if(constructorArgs != null) {
+        if(!constructorArgs.isEmpty()) {
             ret += "(" + StringUtils.join(constructorArgs, ", ") + ")";
         }
         if(isArray) {
             ret += "[" + (arraySize != null ? arraySize : "") + "]";
         }
-        if(init.size() != 0) {
+        if(!init.isEmpty()) {
             ret += " = ";
             if(init.size() == 1) {
                 ret += init.get(0).toString();

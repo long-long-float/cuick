@@ -515,7 +515,7 @@ ForNode for_stmt():
 {
     t=<FOR> "(" [type=type() var=defvar(type)] ";" [cond=expr()] ";" [incr=expr()] ")" body=stmt()
         {
-            return new ForNode(location(t), type, var, cond, incr, body);
+            return new ForNode(location(t), var, cond, incr, body);
         }
 }
 

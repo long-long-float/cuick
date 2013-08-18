@@ -19,4 +19,12 @@ public class ArefNode extends LHSNode {
         d.printMember("expr", expr);
         d.printMember("index", index);
     }
+
+    public ExprNode index() {
+        return index;
+    }
+
+    public ExprNode expr() {
+        return expr;
+    }
 }

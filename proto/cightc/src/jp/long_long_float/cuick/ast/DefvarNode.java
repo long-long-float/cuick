@@ -28,4 +28,8 @@ public class DefvarNode extends StmtNode {
         d.printMember("vars", vars);
     }
 
+    public List<Variable> vars() {
+        return vars;
+    }
+
 }

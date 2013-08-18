@@ -48,5 +48,9 @@ abstract public class Entity implements Dumpable{
     }
     
     abstract protected void _dump(Dumper d);
+
+    public boolean isDefined() {
+        return true;
+    }
     
 }

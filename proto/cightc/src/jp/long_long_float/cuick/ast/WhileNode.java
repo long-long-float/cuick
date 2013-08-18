@@ -17,4 +17,12 @@ public class WhileNode extends StmtNode {
         d.printMember("body", body);
     }
 
+    public ExprNode cond() {
+        return cond;
+    }
+
+    public StmtNode body() {
+        return body;
+    }
+
 }

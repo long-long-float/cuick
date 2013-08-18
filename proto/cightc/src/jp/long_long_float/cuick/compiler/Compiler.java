@@ -127,8 +127,9 @@ public class Compiler {
 
     private void compile(String srcPath, String destPath, Options opts) throws CompileException{
         AST ast = parseFile(srcPath, opts);
-        ast.dump();
+        //ast.dump();
         AST sem = semanticAnalyze(ast, opts);
+        sem.dump();
         writeFile(destPath, sem);
     }
 

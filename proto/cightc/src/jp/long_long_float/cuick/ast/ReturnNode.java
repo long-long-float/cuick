@@ -18,4 +18,8 @@ public class ReturnNode extends StmtNode {
     protected void _dump(Dumper d) {
     }
 
+    public ExprNode expr() {
+        return expr;
+    }
+
 }

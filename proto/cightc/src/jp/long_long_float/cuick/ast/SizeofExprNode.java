@@ -18,4 +18,8 @@ public class SizeofExprNode extends ExprNode {
         d.printMember("expr", expr);
     }
 
+    public ExprNode expr() {
+        return expr;
+    }
+
 }

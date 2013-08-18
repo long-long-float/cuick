@@ -19,4 +19,12 @@ public class SwitchNode extends StmtNode {
         d.printNodeList("cases", cases);
     }
 
+    public ExprNode cond() {
+        return cond;
+    }
+
+    public List<CaseNode> cases() {
+        return cases;
+    }
+
 }

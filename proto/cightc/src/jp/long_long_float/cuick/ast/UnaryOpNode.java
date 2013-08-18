@@ -27,5 +27,9 @@ public class UnaryOpNode extends ExprNode {
         d.printMember("operator", operator);
         d.printMember("expr", expr);
     }
+    
+    public ExprNode expr() {
+        return expr;
+    }
 
 }

@@ -19,4 +19,12 @@ public class CaseNode extends StmtNode {
         d.printMember("body", body);
     }
 
+    public List<ExprNode> values() {
+        return values;
+    }
+
+    public StmtNode body() {
+        return body;
+    }
+
 }

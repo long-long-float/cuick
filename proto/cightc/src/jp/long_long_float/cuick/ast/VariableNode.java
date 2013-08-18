@@ -26,10 +26,8 @@ public class VariableNode extends LHSNode {
 
     @Override
     protected void _dump(Dumper d) {
-        if (entity != null) {
-            d.printMember("entity", entity);
-        }
         d.printMember("name", name);
+        d.printMember("type", (entity != null ? entity.type() : "???"));
     }
 
     public String name() {

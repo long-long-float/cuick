@@ -202,8 +202,9 @@ AST compilation_unit():
     Declarations decls = new Declarations();
 
     Function func;
-    List<Variable> vars;
-    TypedefNode typedef;
+    //List<Variable> vars;
+    //TypedefNode typedef;
+    DefvarNode defvar;
     AtCommandNode at_command;
     StmtNode stmt;
 }
@@ -216,7 +217,11 @@ AST compilation_unit():
         func=def_extendfun() { decls.funcs.add(func); }
     |   LOOKAHEAD(type_with_suffix() name() "(" params() ")" "{")
         func=deffun() { decls.funcs.add(func); }
-    |   LOOKAHEAD(type() ["&"] ("*")* name()) stmt=defvars() { decls.stmts.add(stmt); }
+    |   LOOKAHEAD(type() ["&"] ("*")* name()) defvar=defvars()
+        {
+            decls.stmts.add(defvar);
+            decls.vars.addAll(defvar.vars());
+        }
     |   stmt=stmt() { decls.stmts.add(stmt); }
     |   at_command=at_command() { decls.atCommands.add(at_command); }
     )* <EOF>
@@ -322,18 +327,22 @@ Parameter param():
 BlockNode block():
 {
     Token t;
-    //List<Variable> vars, varsAll = new ArrayList<Variable>();
+    DefvarNode defvar;
+    List<Variable> vars = new ArrayList<Variable>();// varsAll = new ArrayList<Variable>();
     StmtNode stmt;
     List<StmtNode> stmts = new ArrayList<StmtNode>();
 }
 {
     t="{"
     (
-	        LOOKAHEAD(type() ["&"] ("*")* name()) stmt=defvars() { stmts.add(stmt); }
+	        LOOKAHEAD(type() ["&"] ("*")* name()) defvar=defvars()
+	        {	           stmts.add(defvar);
+	           vars.addAll(defvar.vars());
+	        }
 	    |   stmt=stmt() { stmts.add(stmt); }
     )* "}"
         {
-            return new BlockNode(location(t), stmts);
+            return new BlockNode(location(t), vars, stmts);
         }
 }
 

@@ -17,4 +17,12 @@ public class DoWhileNode extends StmtNode {
         d.printMember("body", body);
     }
 
+    public StmtNode body() {
+        return body;
+    }
+
+    public ExprNode cond() {
+        return cond;
+    }
+
 }

@@ -37,14 +37,18 @@ public class ToplevelScope extends Scope {
     public Entity get(String name) throws SemanticException {
         Entity ent = entities.get(name);
         if(ent == null) {
-            throw new SemanticException("unresolved reference : " + name);
+            //XXX undefinedに関しては関与しない
+            //throw new SemanticException("unresolved reference : " + name);
         }
         return ent;
     }
 
-    public void defineEntity(Entity ent) {
-        // TODO 自動生成されたメソッド・スタブ
-        
+    public void defineEntity(Entity ent) throws SemanticException {
+        Entity e = entities.get(ent.name());
+        if(e != null && e.isDefined()) {
+            throw new SemanticException("duplicated definition: " + ent.name() + ": " + e.location() + " and " + ent.location());
+        }
+        entities.put(ent.name(), ent);
     }
 
     public void checkReferences(ErrorHandler errorHandler) {

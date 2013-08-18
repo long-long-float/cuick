@@ -19,5 +19,13 @@ public class AbstractAssignNode extends ExprNode {
         d.printMember("lhs", lhs);
         d.printMember("rhs", rhs);
     }
+    
+    public ExprNode lhs() {
+        return lhs;
+    }
 
+    public ExprNode rhs() {
+        return rhs;
+    }
+    
 }

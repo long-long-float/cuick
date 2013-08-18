@@ -24,6 +24,14 @@ public class Variable extends Entity {
         this.init = (init != null ? init : new ArrayList<ExprNode>());
     }
     
+    public boolean isArray() {
+        return isArray;
+    }
+    
+    public List<ExprNode> init() {
+        return init;
+    }
+    
     @Override
     public String toString() {
         String ret = name;
@@ -50,5 +58,4 @@ public class Variable extends Entity {
         d.printMember("type", type());
         d.printMember("name", name);
     }
-
 }

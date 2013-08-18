@@ -27,4 +27,8 @@ public class CastNode extends ExprNode {
         d.printMember("expr", expr);
     }
 
+    public ExprNode expr() {
+        return expr;
+    }
+
 }

@@ -27,4 +27,8 @@ public class MemberNode extends LHSNode {
         d.printMember("member", member);
     }
 
+    public ExprNode expr() {
+        return expr;
+    }
+
 }

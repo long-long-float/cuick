@@ -101,8 +101,10 @@ public class LocalResolver extends Visitor {
     public Void visit(VariableNode node) {
         try {
             Entity ent = currentScope().get(node.name());
-            ent.refered();
-            node.setEntity(ent);
+            if(ent != null) {
+                ent.refered();
+                node.setEntity(ent);
+            }
         }
         catch (SemanticException ex) {
             errorHandler.error(node.location(), ex.getMessage());

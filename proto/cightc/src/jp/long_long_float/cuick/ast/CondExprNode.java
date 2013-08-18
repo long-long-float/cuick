@@ -28,4 +28,16 @@ public class CondExprNode extends ExprNode {
         d.printMember("elseExpr", elseExpr);
     }
 
+    public ExprNode cond() {
+        return cond;
+    }
+
+    public ExprNode thenExpr() {
+        return thenExpr;
+    }
+
+    public ExprNode elseExpr() {
+        return elseExpr;
+    }
+
 }

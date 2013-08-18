@@ -20,4 +20,16 @@ public class IfNode extends StmtNode {
         d.printMember("elseBody", elseBody);
     }
 
+    public ExprNode cond() {
+        return cond;
+    }
+
+    public StmtNode thenBody() {
+        return thenBody;
+    }
+
+    public StmtNode elseBody() {
+        return elseBody;
+    }
+
 }

@@ -2,9 +2,14 @@
 #include<vector>
 #include<map>
 #include<algorithm>
-int times(int this_)
+vector<T> gets(int n)
 {
-    for(int i = 0;i < jp.long_long_float.cuick.ast.AsOpNode@2e71edc0;i++)yield(i);
+    vector<T> ret(n);
+    n.times()    {
+        cin >> jp.long_long_float.cuick.ast.ArefNode@b56efe;
+    };
+;
+    ret;
 }
 
 int main(int argc, char** argv)

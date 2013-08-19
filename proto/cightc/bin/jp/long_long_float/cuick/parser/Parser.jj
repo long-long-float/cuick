@@ -929,8 +929,8 @@ List<Type> templ_types():
     Type type;
 }
 {
-    "(" type=type_with_suffix() { types.add(type); }
-        ("," type=type_with_suffix(){ types.add(type); } )* ")"
+    "<" type=type_with_suffix() { types.add(type); }
+        ("," type=type_with_suffix(){ types.add(type); } )* ">"
         {
             return types;
         }

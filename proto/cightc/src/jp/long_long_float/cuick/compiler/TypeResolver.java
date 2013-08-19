@@ -5,6 +5,7 @@ import java.util.Arrays;
 import jp.long_long_float.cuick.ast.AST;
 import jp.long_long_float.cuick.ast.AddressNode;
 import jp.long_long_float.cuick.ast.ArefNode;
+import jp.long_long_float.cuick.ast.AsOpNode;
 import jp.long_long_float.cuick.ast.AssignNode;
 import jp.long_long_float.cuick.ast.BinaryOpNode;
 import jp.long_long_float.cuick.ast.CastNode;
@@ -172,6 +173,12 @@ public class TypeResolver extends Visitor {
     public Void visit(StringLiteralNode node) {
         super.visit(node);
         node.setType(new BasicType("char", node.location()).addPointer());
+        return null;
+    }
+    
+    public Void visit(AsOpNode node) {
+        super.visit(node);
+        node.setType(node.asType());
         return null;
     }
 }

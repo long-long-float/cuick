@@ -5,6 +5,7 @@ import java.util.List;
 
 import jp.long_long_float.cuick.ast.ASTVisitor;
 import jp.long_long_float.cuick.ast.ArefNode;
+import jp.long_long_float.cuick.ast.AsOpNode;
 import jp.long_long_float.cuick.ast.AssignNode;
 import jp.long_long_float.cuick.ast.BinaryOpNode;
 import jp.long_long_float.cuick.ast.BlockNode;
@@ -330,6 +331,11 @@ public class Visitor implements ASTVisitor<Void, Void> {
     public Void visit(RangeNode node) {
         visitExpr(node.begin());
         visitExpr(node.end());
+        return null;
+    }
+    
+    public Void visit(AsOpNode node) {
+        visitExpr(node.expr());
         return null;
     }
     

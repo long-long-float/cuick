@@ -150,6 +150,7 @@ TOKEN: {
   | <WHILE : "while">
   | <DOLLAR : "$">
   | <EXTEND : "extend">
+  | <AS : "as">
 }
 
 TOKEN: {
@@ -863,7 +864,7 @@ ExprNode term():
 }
 {
       LOOKAHEAD("(" type())
-      "(" t=type() ("*")* ")" n=term()     { return new CastNode(t, n); }
+      "(" t=type() ("*" { t.addPointer(); })* ")" n=term()     { return new CastNode(t, n); }
     | n=unary()                     { return n; }
 }
 
@@ -900,6 +901,7 @@ ExprNode postfix():
     List<ExprNode> args;
     List<Type> templ_types = null;
     BlockNode block = null;
+    Type asType;
 }
 {
     expr=primary()
@@ -914,6 +916,7 @@ ExprNode postfix():
     | LOOKAHEAD(templ_types() "(") templ_types=templ_types() "(" args=args() ")" [ block=block() ] { expr = new FuncallNode(expr, templ_types, args, block); }
     | LOOKAHEAD(1) block=block()  { expr = new FuncallNode(expr, null, new ArrayList<ExprNode>(), block); }
     | "(" args=args() ")" [ block=block() ] { expr = new FuncallNode(expr, null, args, block); }
+    | <AS> asType=type()    { expr = new AsOpNode(expr, asType); }
     )*
         {
             return expr;

@@ -7,10 +7,8 @@ import jp.long_long_float.cuick.utility.ErrorHandler;
 
 public class Renamer extends Visitor {
     
-    private final ErrorHandler errorHandler;
-    
     public Renamer(ErrorHandler h) {
-        this.errorHandler = h;
+        super(h);
     }
     
     public void rename(AST ast) {

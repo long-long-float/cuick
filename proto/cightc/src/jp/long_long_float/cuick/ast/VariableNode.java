@@ -33,9 +33,12 @@ public class VariableNode extends LHSNode {
     }
     
     public Entity entity() {
+        /*
+         * 知らない関数だとnullがありうるので
         if(entity == null) {
             throw new Error("VariableNode.entity == null");
         }
+        */
         return entity;
     }
 

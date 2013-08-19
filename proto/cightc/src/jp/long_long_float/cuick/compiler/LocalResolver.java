@@ -5,7 +5,6 @@ import java.util.Stack;
 
 import jp.long_long_float.cuick.ast.AST;
 import jp.long_long_float.cuick.ast.BlockNode;
-import jp.long_long_float.cuick.ast.Location;
 import jp.long_long_float.cuick.ast.StmtNode;
 import jp.long_long_float.cuick.ast.VariableNode;
 import jp.long_long_float.cuick.entity.Entity;
@@ -19,10 +18,9 @@ import jp.long_long_float.cuick.utility.ErrorHandler;
 
 public class LocalResolver extends Visitor {
     private final Stack<Scope> scopeStack;
-    private final ErrorHandler errorHandler;
     
     public LocalResolver(ErrorHandler h) {
-        this.errorHandler = h;
+        super(h);
         this.scopeStack = new Stack<Scope>();
     }
     
@@ -88,13 +86,9 @@ public class LocalResolver extends Visitor {
             }
         }
         catch (SemanticException ex) {
-            errorHandler.error(node.location(), ex.getMessage());
+            error(node.location(), ex.getMessage());
         }
         return null;
-    }
-
-    private void error(Location location, String message) {
-        errorHandler.error(location, message);
     }
 
     private LocalScope popScope() {

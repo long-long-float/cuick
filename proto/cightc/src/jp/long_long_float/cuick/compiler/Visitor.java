@@ -22,6 +22,7 @@ import jp.long_long_float.cuick.ast.ForNode;
 import jp.long_long_float.cuick.ast.FuncallNode;
 import jp.long_long_float.cuick.ast.IfNode;
 import jp.long_long_float.cuick.ast.LiteralNode;
+import jp.long_long_float.cuick.ast.Location;
 import jp.long_long_float.cuick.ast.MemberNode;
 import jp.long_long_float.cuick.ast.Node;
 import jp.long_long_float.cuick.ast.OpAssignNode;
@@ -41,8 +42,24 @@ import jp.long_long_float.cuick.ast.WhileNode;
 import jp.long_long_float.cuick.entity.Variable;
 import jp.long_long_float.cuick.foreach.Enumerable;
 import jp.long_long_float.cuick.foreach.RangeEnumerable;
+import jp.long_long_float.cuick.foreach.VariableSetEnumerable;
+import jp.long_long_float.cuick.utility.ErrorHandler;
 
 public class Visitor implements ASTVisitor<Void, Void> {
+    
+    protected final ErrorHandler errorHandler;
+    
+    protected Visitor(ErrorHandler h) {
+        this.errorHandler = h;
+    }
+    
+    protected void error(Location location, String message) {
+        errorHandler.error(location, message);
+    }
+    
+    protected void warn(Location location, String message) {
+        errorHandler.warn(location, message);
+    }
     
     protected void visitStmt(StmtNode stmt) {
         if(stmt != null) {
@@ -194,9 +211,7 @@ public class Visitor implements ASTVisitor<Void, Void> {
     public Void visit(CondExprNode n) {
         visitExpr(n.cond());
         visitExpr(n.thenExpr());
-        if (n.elseExpr() != null) {
-            visitExpr(n.elseExpr());
-        }
+        visitExpr(n.elseExpr());
         return null;
     }
 
@@ -322,6 +337,11 @@ public class Visitor implements ASTVisitor<Void, Void> {
     
     public Void visit(RangeEnumerable node) {
         visitExpr(node.range());
+        return null;
+    }
+    
+    public Void visit(VariableSetEnumerable node) {
+        visitExprs(node.exprs());
         return null;
     }
 }

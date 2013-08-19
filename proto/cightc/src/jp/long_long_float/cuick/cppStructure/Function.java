@@ -7,6 +7,7 @@ import jp.long_long_float.cuick.cppStructure.CodeBuilder.BlockCallback;
 
 import org.apache.commons.lang3.StringUtils;
 
+@Deprecated
 public class Function extends CppStructure {
 
     private String retType, name;

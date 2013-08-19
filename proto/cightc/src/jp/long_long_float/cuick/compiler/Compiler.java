@@ -134,6 +134,8 @@ public class Compiler {
         ast = semanticAnalyze(ast, opts);
         ast = rename(ast, opts);
         ast.dump();
+        ast = typeResolve(ast, opts);
+        ast.dump();
         writeFile(destPath, ast);
     }
 
@@ -201,6 +203,11 @@ public class Compiler {
     
     public AST rename(AST ast, Options opts) {
         new Renamer(errorHandler).rename(ast);
+        return ast;
+    }
+    
+    public AST typeResolve(AST ast, Options opts) {
+        new TypeResolver(errorHandler).resolve(ast);
         return ast;
     }
 }

@@ -20,5 +20,5 @@ extend void $CONT.sort() {
 }
 */
 extend int int.times() {
-    for(int i : 0...this) yield(i);
+    for(i : f()) yield(i);
 }

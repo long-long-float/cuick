@@ -879,8 +879,8 @@ ExprNode unary():
     | "-" n=term()      { return new UnaryOpNode("-", n); }
     | "!" n=term()      { return new UnaryOpNode("!", n); }
     | "~" n=term()      { return new UnaryOpNode("~", n); }
-    | "*" n=term()      { return new UnaryOpNode("*", n); }//{ return new DereferenceNode(n); }
-    | "&" n=term()      { return new UnaryOpNode("&", n); }//{ return new AddressNode(n); }
+    | "*" n=term()      { return new DereferenceNode(n); }
+    | "&" n=term()      { return new AddressNode(n); }
     | LOOKAHEAD(3) <SIZEOF> "(" t=type() ")"
         {
             return new SizeofTypeNode(new TypeNode(t)/*, size_t()*/);

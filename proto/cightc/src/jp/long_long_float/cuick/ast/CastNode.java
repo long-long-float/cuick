@@ -30,5 +30,9 @@ public class CastNode extends ExprNode {
     public ExprNode expr() {
         return expr;
     }
+    
+    public Type destType() {
+        return typeNode.type();
+    }
 
 }

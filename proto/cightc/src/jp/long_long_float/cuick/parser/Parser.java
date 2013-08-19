@@ -2108,12 +2108,12 @@ $T*
       case 91:
         jj_consume_token(91);
         n = term();
-                          {if (true) return new UnaryOpNode("*", n);}
+                          {if (true) return new DereferenceNode(n);}
         break;
       case 90:
         jj_consume_token(90);
         n = term();
-                          {if (true) return new UnaryOpNode("&", n);}
+                          {if (true) return new AddressNode(n);}
         break;
       default:
         jj_la1[68] = jj_gen;

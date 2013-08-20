@@ -1,7 +1,9 @@
 package jp.long_long_float.cuick.ast;
 import java.io.PrintStream;
 
-abstract public class Node implements Dumpable{
+import jp.long_long_float.cuick.compiler.Acceptable;
+
+abstract public class Node implements Dumpable, Acceptable{
     public Node(){   
     }
     

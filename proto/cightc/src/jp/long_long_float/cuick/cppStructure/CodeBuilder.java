@@ -4,6 +4,11 @@ package jp.long_long_float.cuick.cppStructure;
 public class CodeBuilder {
     private StringBuilder sb = new StringBuilder();
     
+    public CodeBuilder add(String str) {
+        sb.append(CodeContext.getInstance().getTabSpace() + str);
+        return this;
+    }
+    
     public CodeBuilder addLine(String line) {
         sb.append(CodeContext.getInstance().getTabSpace() + line + System.getProperty("line.separator"));
         return this;

@@ -18,6 +18,14 @@ public class DefvarNode extends StmtNode {
         this.type = type;
     }
     
+    public List<Variable> vars() {
+        return vars;
+    }
+    
+    public Type type() {
+        return type;
+    }
+    
     @Override
     public String toString() {
         return type.toString() + " " + StringUtils.join(vars, ", ") + ";";
@@ -26,10 +34,6 @@ public class DefvarNode extends StmtNode {
     @Override
     protected void _dump(Dumper d) {
         d.printMember("vars", vars);
-    }
-
-    public List<Variable> vars() {
-        return vars;
     }
 
 }

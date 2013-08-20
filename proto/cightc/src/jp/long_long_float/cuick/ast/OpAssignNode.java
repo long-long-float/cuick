@@ -7,4 +7,8 @@ public class OpAssignNode extends AbstractAssignNode {
         super(lhs, rhs);
         this.operator = op;
     }
+
+    public String operator() {
+        return operator;
+    }
 }

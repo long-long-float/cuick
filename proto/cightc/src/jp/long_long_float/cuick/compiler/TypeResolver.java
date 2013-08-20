@@ -27,6 +27,7 @@ import jp.long_long_float.cuick.ast.UnaryOpNode;
 import jp.long_long_float.cuick.ast.VariableNode;
 import jp.long_long_float.cuick.entity.Function;
 import jp.long_long_float.cuick.type.BasicType;
+import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.ErrorHandler;
 
 public class TypeResolver extends Visitor {
@@ -45,9 +46,15 @@ public class TypeResolver extends Visitor {
     }
     
     public void typeEqualCheck(ExprNode expr, ExprNode expr1, ExprNode expr2) {
+        if(expr1 == null || expr1.type() == null || expr2 == null || expr2.type() == null) return;
         if(!expr1.type().equals(expr2.type())) {
             warn(expr.location(), "Types are difficult.");
         }
+    }
+    
+    public Type selectType(ExprNode expr1, ExprNode expr2) {
+        if(expr1 != null && expr1.type() != null) return expr1.type();
+        return expr2.type();
     }
     
     public Void visit(CondExprNode n) {
@@ -68,14 +75,14 @@ public class TypeResolver extends Visitor {
     public Void visit(OpAssignNode n) {
         super.visit(n);
         typeEqualCheck(n, n.lhs(), n.rhs());
-        n.setType(n.lhs().type());
+        n.setType(selectType(n.lhs(), n.rhs()));
         return null;
     }
 
     public Void visit(BinaryOpNode n) {
         super.visit(n);
         typeEqualCheck(n, n.left(), n.right());
-        n.setType(n.left().type());
+        n.setType(selectType(n.left(), n.right()));
         return null;
     }
 
@@ -166,7 +173,7 @@ public class TypeResolver extends Visitor {
     
     public Void visit(LiteralNode node) {
         super.visit(node);
-        node.setType(new BasicType("???", node.location()));
+        node.setType(node.typeNode().type());
         return null;
     }
     

@@ -2401,13 +2401,13 @@ $T*
       case INTEGER:
         t = jj_consume_token(INTEGER);
             //return integerNode(location(t), t.image);
-            {if (true) return new LiteralNode(location(t), new BasicType("int", location(t)), t.image);} //TODO int以外�?も作る
+            {if (true) return new LiteralNode(location(t), new CInt(location(t)), t.image);} //TODO int以外�?も作る
 
         break;
       case CHARACTER:
         t = jj_consume_token(CHARACTER);
             //return new IntegerLiteralNode(location(t), IntegerType.charRef(), characterCode(t.image));
-            {if (true) return new LiteralNode(location(t), new BasicType("char", location(t)), t.image);}
+            {if (true) return new LiteralNode(location(t), new CChar(location(t)), t.image);}
         break;
       case STRING:
         t = jj_consume_token(STRING);

@@ -2,26 +2,49 @@ package jp.long_long_float.cuick.compiler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
 import jp.long_long_float.cuick.ast.AST;
 import jp.long_long_float.cuick.ast.ASTVisitor;
+import jp.long_long_float.cuick.ast.ArefNode;
+import jp.long_long_float.cuick.ast.AsOpNode;
+import jp.long_long_float.cuick.ast.AssignNode;
 import jp.long_long_float.cuick.ast.BinaryOpNode;
 import jp.long_long_float.cuick.ast.BlockNode;
+import jp.long_long_float.cuick.ast.BreakNode;
 import jp.long_long_float.cuick.ast.BuiltInCodeStmt;
+import jp.long_long_float.cuick.ast.CaseNode;
+import jp.long_long_float.cuick.ast.CastNode;
+import jp.long_long_float.cuick.ast.CondExprNode;
+import jp.long_long_float.cuick.ast.ContinueNode;
+import jp.long_long_float.cuick.ast.DefvarNode;
+import jp.long_long_float.cuick.ast.DoWhileNode;
 import jp.long_long_float.cuick.ast.ExprNode;
 import jp.long_long_float.cuick.ast.ExprStmtNode;
 import jp.long_long_float.cuick.ast.ForEachNode;
 import jp.long_long_float.cuick.ast.ForNode;
 import jp.long_long_float.cuick.ast.FuncallNode;
+import jp.long_long_float.cuick.ast.IfNode;
 import jp.long_long_float.cuick.ast.LiteralNode;
+import jp.long_long_float.cuick.ast.MemberNode;
+import jp.long_long_float.cuick.ast.OpAssignNode;
+import jp.long_long_float.cuick.ast.PrefixOpNode;
+import jp.long_long_float.cuick.ast.PtrMemberNode;
 import jp.long_long_float.cuick.ast.RangeNode;
+import jp.long_long_float.cuick.ast.ReturnNode;
+import jp.long_long_float.cuick.ast.SizeofExprNode;
+import jp.long_long_float.cuick.ast.SizeofTypeNode;
 import jp.long_long_float.cuick.ast.StmtNode;
+import jp.long_long_float.cuick.ast.StringLiteralNode;
 import jp.long_long_float.cuick.ast.SuffixOpNode;
+import jp.long_long_float.cuick.ast.SwitchNode;
 import jp.long_long_float.cuick.ast.TypeNode;
+import jp.long_long_float.cuick.ast.UnaryOpNode;
 import jp.long_long_float.cuick.ast.VariableNode;
+import jp.long_long_float.cuick.ast.WhileNode;
 import jp.long_long_float.cuick.cppStructure.CodeBuilder;
 import jp.long_long_float.cuick.cppStructure.ForStmt;
 import jp.long_long_float.cuick.cppStructure.Struct;
@@ -30,8 +53,9 @@ import jp.long_long_float.cuick.entity.Parameter;
 import jp.long_long_float.cuick.entity.Params;
 import jp.long_long_float.cuick.entity.Variable;
 import jp.long_long_float.cuick.foreach.RangeEnumerable;
-import jp.long_long_float.cuick.type.BasicType;
+import jp.long_long_float.cuick.foreach.VariableSetEnumerable;
 import jp.long_long_float.cuick.type.FunctionType;
+import jp.long_long_float.cuick.type.IInteger;
 import jp.long_long_float.cuick.type.PrimitiveTypes;
 import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.ErrorHandler;
@@ -46,6 +70,15 @@ public class CodeGenerator extends ASTVisitor<String, String> {
     
     public String generate(AST ast) {
         return ast.accept(this);
+    }
+    
+    public <T> String join(Iterable<? extends Acceptable> iterable, String separator) {
+        StringBuilder sb = new StringBuilder();
+        Iterator<? extends Acceptable> itr = iterable.iterator();
+        for(int i = 0;itr.hasNext();i++) {
+            sb.append((i > 0 ? separator : "") + itr.next().accept(this));
+        }
+        return sb.toString();
     }
     
     public String visit(AST ast) {
@@ -143,7 +176,7 @@ public class CodeGenerator extends ASTVisitor<String, String> {
     
     public String visit(Function ent) {
         CodeBuilder cb = new CodeBuilder();
-        cb.addLine(ent.type() + " " + ent.name() + "(" + StringUtils.join(ent.parameters(), ", ") + ")");
+        cb.addLine(ent.type() + " " + ent.name() + "(" + join(ent.parameters(), ", ") + ")");
         cb.addLine(ent.body().accept(this));
         return cb.toString();
     }
@@ -151,7 +184,7 @@ public class CodeGenerator extends ASTVisitor<String, String> {
     public String visit(Variable ent) {
         String ret = ent.name();
         if(!ent.constructorArgs().isEmpty()) {
-            ret += "(" + StringUtils.join(ent.constructorArgs(), ", ") + ")";
+            ret += "(" + join(ent.constructorArgs(), ", ") + ")";
         }
         if(ent.isArray()) {
             ret += "[" + (ent.arraySize() != null ? ent.arraySize() : "") + "]";
@@ -163,10 +196,14 @@ public class CodeGenerator extends ASTVisitor<String, String> {
                 ret += init.get(0).accept(this);
             }
             else {
-                ret += "{" + StringUtils.join(init, ", ") + "}";
+                ret += "{" + join(init, ", ") + "}";
             }
         }
         return ret;
+    }
+    
+    public String visit(Parameter ent) {
+        return ent.type() + " " + ent.name();
     }
     
     //statements
@@ -195,6 +232,56 @@ public class CodeGenerator extends ASTVisitor<String, String> {
         return node.enumerable().accept(this);
     }
     
+    public String visit(DefvarNode node) {
+        return node.type().toString() + " " + join(node.vars(), ", ") + ";";
+    }
+    
+    public String visit(IfNode n) {
+        String ret = "if" + "(" + n.cond().accept(this) + ")" + n.thenBody().accept(this);
+        if(n.elseBody() != null) {
+            ret += "else" + n.elseBody().accept(this);
+        }
+        return ret;
+    }
+
+    public String visit(SwitchNode n) {
+        CodeBuilder cb = new CodeBuilder();
+        cb.add("switch" + "(" + n.cond().accept(this) + ")");
+        cb.beginBlock();
+        cb.addLine(join(n.cases(), "\n"));
+        cb.endBlock(false);
+        return cb.toString();
+    }
+
+    public String visit(CaseNode n) {
+        CodeBuilder cb = new CodeBuilder();
+        for(ExprNode expr : n.values()) {
+            cb.addLine("case " + expr.accept(this) + ":");
+        }
+        cb.add(n.body().accept(this));
+        return cb.toString();
+    }
+
+    public String visit(WhileNode n) {
+        return "while" + "(" + n.cond().accept(this) + ")" + n.body().accept(this);
+    }
+
+    public String visit(DoWhileNode n) {
+        return "do" + n.body().accept(this) + "while" + "(" + n.cond().accept(this) + ");";
+    }
+
+    public String visit(BreakNode n) {
+        return "break;";
+    }
+
+    public String visit(ContinueNode n) {
+        return "continue;";
+    }
+
+    public String visit(ReturnNode n) {
+        return "return" + (n.expr() != null ? " " + n.expr().accept(this) : "") + ";";
+    }
+    
     //expressions
     
     public String visit(BinaryOpNode node) {
@@ -210,7 +297,7 @@ public class CodeGenerator extends ASTVisitor<String, String> {
         if(node.templTypes().size() > 0) {
             ret += "<" + StringUtils.join(node.templTypes(), ", ") + ">";
         }
-        ret += "(" + StringUtils.join(node.args(), ", ") + ")";
+        ret += "(" + join(node.args(), ", ") + ")";
         if(node.block() != null) {
             ret += node.block().toString();
         }
@@ -225,6 +312,62 @@ public class CodeGenerator extends ASTVisitor<String, String> {
         return node.value();
     }
     
+    public String visit(CondExprNode n) {
+        return "" + n.cond().accept(this) + " ? " + n.thenExpr().accept(this) + " : " + n.elseExpr().accept(this);
+    }
+    
+    public String visit(AssignNode n) {
+        return n.lhs().accept(this) + " = " + n.rhs().accept(this);
+    }
+
+    public String visit(OpAssignNode n) {
+        return n.lhs().accept(this) + " " + n.operator() + " " + n.rhs().accept(this);
+    }
+
+    public String visit(UnaryOpNode node) {
+        return node.operator() + node.expr().accept(this);
+    }
+
+    public String visit(PrefixOpNode node) {
+        return node.operator() + node.expr().accept(this);
+    }
+
+    public String visit(ArefNode node) {
+        return node.expr().accept(this) + "[" + node.index().accept(this) + "]";
+    }
+
+    public String visit(MemberNode node) {
+        return node.expr().accept(this) + "." + node.member();
+    }
+
+    public String visit(PtrMemberNode node) {
+        return node.expr().accept(this) + "." + node.member();
+    }
+
+    public String visit(CastNode node) {
+        return "(" + node.type() + ")" + node.expr().accept(this);
+    }
+
+    public String visit(SizeofExprNode node) {
+        return "sizeof" + "(" + node.expr().accept(this) + ")";
+    }
+
+    public String visit(SizeofTypeNode node) {
+        return "sizeof" + "(" + node.type() + ")";
+    }
+    
+    public String visit(StringLiteralNode node) {
+        return node.value();
+    }
+    
+    public String visit(RangeNode node) {
+        return null;
+    }
+    
+    public String visit(AsOpNode node) {
+        return node.expr().accept(this);
+    }
+    
     //enumerables
     
     public String visit(RangeEnumerable enume) {
@@ -234,10 +377,29 @@ public class CodeGenerator extends ASTVisitor<String, String> {
         RangeNode range = enume.range();
         ForNode forNode = new ForNode(null, 
                 //variable(BasicTypes.int, varName, null, false, null, Arrays.asList(range.begin()))
-                new Variable(new TypeNode(new BasicType("int", null)), varName, null, false, null, Arrays.asList(range.begin())),
+                new Variable(new TypeNode(PrimitiveTypes.cint.type()), varName, null, false, null, Arrays.asList(range.begin())),
                 new BinaryOpNode(var, range.getOperator(), range.end()), 
                 new SuffixOpNode("++", var), 
                 forEachNode.body());
         return forNode.accept(this);
     }
+    
+    public String visit(VariableSetEnumerable enume) {
+      //TODO int以外の整数に対応
+        if(enume.exprs().size() == 1) {
+            ExprNode var = enume.exprs().get(0);
+            if(var.type() == null) {
+                throw new Error("Type is undefined! Please use \"as\" oerator.");
+            }
+            
+            if(var.type() instanceof IInteger) {
+                RangeEnumerable new_enume = new RangeEnumerable(new RangeNode(
+                        new LiteralNode(null, enume.forEachNode().var().type(), "0"), "...", enume.exprs().get(0)));
+                new_enume.setForEachNode(enume.forEachNode());
+                return new_enume.accept(this);
+            }
+        }
+        return enume.toString();
+    }
+    
 }

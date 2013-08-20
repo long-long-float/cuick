@@ -19,7 +19,9 @@ extend void $CONT.sort() {
     sort(this.begin(), this.end());
 }
 */
-extend int int.times() {
-    for(i : 0...this) yield(i);
+for(i : 10) {
+    for(j : 20) {
+        puts(i * j);
+    }
+    puts();
 }
-//vector<string> ary = get<string>(10);

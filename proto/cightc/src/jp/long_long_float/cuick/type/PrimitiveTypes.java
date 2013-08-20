@@ -1,5 +1,6 @@
 package jp.long_long_float.cuick.type;
 
+@Deprecated
 public enum PrimitiveTypes {
     cint(new CInt());
     

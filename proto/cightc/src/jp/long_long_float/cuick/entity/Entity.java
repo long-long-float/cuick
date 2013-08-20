@@ -5,9 +5,10 @@ import jp.long_long_float.cuick.ast.Dumpable;
 import jp.long_long_float.cuick.ast.Dumper;
 import jp.long_long_float.cuick.ast.Location;
 import jp.long_long_float.cuick.ast.TypeNode;
+import jp.long_long_float.cuick.compiler.Acceptable;
 import jp.long_long_float.cuick.type.Type;
 
-abstract public class Entity implements Dumpable{
+abstract public class Entity implements Dumpable, Acceptable{
     protected String name;
     protected TypeNode typeNode;
     protected long nRefered;

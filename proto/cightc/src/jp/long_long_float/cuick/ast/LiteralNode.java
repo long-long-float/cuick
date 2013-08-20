@@ -19,6 +19,10 @@ public class LiteralNode extends ExprNode {
         return location;
     }
     
+    public TypeNode typeNode() {
+        return typeNode;
+    }
+    
     public String value() {
         return value;
     }

@@ -30,5 +30,9 @@ public class MemberNode extends LHSNode {
     public ExprNode expr() {
         return expr;
     }
+    
+    public String member() {
+        return member;
+    }
 
 }

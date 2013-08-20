@@ -22,8 +22,6 @@ public class VariableSetEnumerable extends Enumerable {
         if(exprs.size() == 1) {
             ExprNode var = exprs.get(0);
             if(var.type() == null) {
-                //TODO as演算子を作る
-                //TODO toStirngもvisitor使った方がいいんじゃないか。。。
                 throw new Error("Type is undefined! Please use \"as\" oerator.");
             }
             

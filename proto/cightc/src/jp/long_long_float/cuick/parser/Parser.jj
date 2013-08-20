@@ -979,12 +979,12 @@ ExprNode primary():
     t=<INTEGER>
         {
             //return integerNode(location(t), t.image);
-            return new LiteralNode(location(t), new BasicType("int", location(t)), t.image); //TODO int以外のも作る
+            return new LiteralNode(location(t), new CInt(location(t)), t.image); //TODO int以外のも作る
         }
     |   t=<CHARACTER>
         {
             //return new IntegerLiteralNode(location(t), IntegerType.charRef(), characterCode(t.image));
-            return new LiteralNode(location(t), new BasicType("char", location(t)), t.image);
+            return new LiteralNode(location(t), new CChar(location(t)), t.image);
         }
     |   t=<STRING>
         {

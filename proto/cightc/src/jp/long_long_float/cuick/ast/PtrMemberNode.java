@@ -26,4 +26,8 @@ public class PtrMemberNode extends LHSNode {
         return expr;
     }
 
+    public String member() {
+        return member;
+    }
+
 }

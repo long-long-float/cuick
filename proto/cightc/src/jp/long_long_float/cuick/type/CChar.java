@@ -4,7 +4,7 @@ import jp.long_long_float.cuick.ast.Location;
 
 public class CChar extends BasicType implements IInteger{
     public CChar() {
-        super("char", null);
+        this(null);
     }
     
     public CChar(Location loc) {

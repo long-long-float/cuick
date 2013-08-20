@@ -17,6 +17,7 @@ public class VariableSetEnumerable extends Enumerable {
     }
 
     @Override
+    @Deprecated
     public String toString(ForEachNode forEachNode) {
         //TODO int以外の整数に対応
         if(exprs.size() == 1) {

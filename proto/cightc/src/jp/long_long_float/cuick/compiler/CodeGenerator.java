@@ -54,9 +54,9 @@ import jp.long_long_float.cuick.entity.Params;
 import jp.long_long_float.cuick.entity.Variable;
 import jp.long_long_float.cuick.foreach.RangeEnumerable;
 import jp.long_long_float.cuick.foreach.VariableSetEnumerable;
+import jp.long_long_float.cuick.type.CInt;
 import jp.long_long_float.cuick.type.FunctionType;
 import jp.long_long_float.cuick.type.IInteger;
-import jp.long_long_float.cuick.type.PrimitiveTypes;
 import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.ErrorHandler;
 
@@ -88,9 +88,9 @@ public class CodeGenerator extends ASTVisitor<String, String> {
         deployTuples(cb);
         deployFunctions(cb, ast);
         //main
-        Params params = new Params(null, Arrays.asList(new Parameter(new TypeNode(PrimitiveTypes.cint.type()), "argc")));
+        Params params = new Params(null, Arrays.asList(new Parameter(new TypeNode(new CInt()), "argc")));
         BlockNode body = new BlockNode(null, ast.stmts());
-        Function main = new Function(new TypeNode(new FunctionType(PrimitiveTypes.cint.type(), params.parametersType())), "main", params, body);
+        Function main = new Function(new TypeNode(new FunctionType(new CInt(), params.parametersType())), "main", params, body);
         cb.addLine(main.accept(this));
         
         return cb.toString();
@@ -377,7 +377,7 @@ public class CodeGenerator extends ASTVisitor<String, String> {
         RangeNode range = enume.range();
         ForNode forNode = new ForNode(null, 
                 //variable(BasicTypes.int, varName, null, false, null, Arrays.asList(range.begin()))
-                new Variable(new TypeNode(PrimitiveTypes.cint.type()), varName, null, false, null, Arrays.asList(range.begin())),
+                new Variable(new TypeNode(new CInt()), varName, null, false, null, Arrays.asList(range.begin())),
                 new BinaryOpNode(var, range.getOperator(), range.end()), 
                 new SuffixOpNode("++", var), 
                 forEachNode.body());
@@ -385,7 +385,6 @@ public class CodeGenerator extends ASTVisitor<String, String> {
     }
     
     public String visit(VariableSetEnumerable enume) {
-      //TODO int以外の整数に対応
         if(enume.exprs().size() == 1) {
             ExprNode var = enume.exprs().get(0);
             if(var.type() == null) {

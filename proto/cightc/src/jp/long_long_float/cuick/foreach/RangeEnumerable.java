@@ -26,6 +26,7 @@ public class RangeEnumerable extends Enumerable {
     }
     
     @Override
+    @Deprecated
     public String toString(ForEachNode forEachNode) {
         String varName = forEachNode.var().name();
         VariableNode var = new VariableNode(null, varName);

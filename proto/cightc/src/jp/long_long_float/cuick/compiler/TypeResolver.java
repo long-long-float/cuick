@@ -1,7 +1,5 @@
 package jp.long_long_float.cuick.compiler;
 
-import java.util.Arrays;
-
 import jp.long_long_float.cuick.ast.AST;
 import jp.long_long_float.cuick.ast.AddressNode;
 import jp.long_long_float.cuick.ast.ArefNode;
@@ -26,7 +24,9 @@ import jp.long_long_float.cuick.ast.SuffixOpNode;
 import jp.long_long_float.cuick.ast.UnaryOpNode;
 import jp.long_long_float.cuick.ast.VariableNode;
 import jp.long_long_float.cuick.entity.Function;
-import jp.long_long_float.cuick.type.BasicType;
+import jp.long_long_float.cuick.type.CChar;
+import jp.long_long_float.cuick.type.CInt;
+import jp.long_long_float.cuick.type.CUnsignedInt;
 import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.ErrorHandler;
 
@@ -136,7 +136,7 @@ public class TypeResolver extends Visitor {
 
     public Void visit(AddressNode node) {
         super.visit(node);
-        node.setType(new BasicType("int", node.location()).addPointer());
+        node.setType(new CInt(node.location()).addPointer());
         return null;
     }
 
@@ -148,13 +148,13 @@ public class TypeResolver extends Visitor {
 
     public Void visit(SizeofExprNode node) {
         super.visit(node);
-        node.setType(new BasicType(Arrays.asList("unsigned", "int"), node.location()));
+        node.setType(new CUnsignedInt(node.location()));
         return null;
     }
 
     public Void visit(SizeofTypeNode node) {
         super.visit(node);
-        node.setType(new BasicType(Arrays.asList("unsigned", "int"), node.location()));
+        node.setType(new CUnsignedInt(node.location()));
         return null;
     }
 
@@ -179,7 +179,7 @@ public class TypeResolver extends Visitor {
     
     public Void visit(StringLiteralNode node) {
         super.visit(node);
-        node.setType(new BasicType("char", node.location()).addPointer());
+        node.setType(new CChar(node.location()).addPointer());
         return null;
     }
     

@@ -2,7 +2,7 @@ package jp.long_long_float.cuick.ast;
 
 import jp.long_long_float.cuick.entity.Variable;
 import jp.long_long_float.cuick.foreach.Enumerable;
-import jp.long_long_float.cuick.type.BasicType;
+import jp.long_long_float.cuick.type.CInt;
 import jp.long_long_float.cuick.type.Type;
 
 public class ForEachNode extends StmtNode {
@@ -19,7 +19,7 @@ public class ForEachNode extends StmtNode {
         //TODO ここでtypeを確定しておく
         if(type == null) {
             //type = enume.typeInference();
-            type = new BasicType("int", null);
+            type = new CInt();
         }
         this.var = new Variable(new TypeNode(type), name, null, false, null, null);
         this.isFore = isFore;

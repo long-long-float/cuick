@@ -24,6 +24,7 @@ public class ForEachNode extends StmtNode {
         this.var = new Variable(new TypeNode(type), name, null, false, null, null);
         this.isFore = isFore;
         this.enumerable = enume;
+        this.enumerable.setForEachNode(this);
         this.body = body;
         this.lastBody = lastBody;
     }

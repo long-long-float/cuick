@@ -1,6 +1,5 @@
 package jp.long_long_float.cuick.compiler;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import jp.long_long_float.cuick.ast.ASTVisitor;
@@ -23,9 +22,7 @@ import jp.long_long_float.cuick.ast.ForNode;
 import jp.long_long_float.cuick.ast.FuncallNode;
 import jp.long_long_float.cuick.ast.IfNode;
 import jp.long_long_float.cuick.ast.LiteralNode;
-import jp.long_long_float.cuick.ast.Location;
 import jp.long_long_float.cuick.ast.MemberNode;
-import jp.long_long_float.cuick.ast.Node;
 import jp.long_long_float.cuick.ast.OpAssignNode;
 import jp.long_long_float.cuick.ast.PrefixOpNode;
 import jp.long_long_float.cuick.ast.PtrMemberNode;
@@ -46,20 +43,10 @@ import jp.long_long_float.cuick.foreach.RangeEnumerable;
 import jp.long_long_float.cuick.foreach.VariableSetEnumerable;
 import jp.long_long_float.cuick.utility.ErrorHandler;
 
-public class Visitor implements ASTVisitor<Void, Void> {
-    
-    protected final ErrorHandler errorHandler;
+public class Visitor extends ASTVisitor<Void, Void> {
     
     protected Visitor(ErrorHandler h) {
-        this.errorHandler = h;
-    }
-    
-    protected void error(Location location, String message) {
-        errorHandler.error(location, message);
-    }
-    
-    protected void warn(Location location, String message) {
-        errorHandler.warn(location, message);
+        super(h);
     }
     
     protected void visitStmt(StmtNode stmt) {
@@ -88,29 +75,6 @@ public class Visitor implements ASTVisitor<Void, Void> {
         enumerable.accept(this);
     }
     
-    @Override
-    public Void visit(Node n) {
-        String nodeName = n.getClass().getSimpleName();
-        try {
-            getClass().getMethod("visit", n.getClass()).invoke(this, n);
-        } catch (IllegalAccessException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            throw new Error(e.getCause());
-        } catch (NoSuchMethodException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     //statements
     
     public Void visit(DefvarNode node) {
@@ -350,4 +314,6 @@ public class Visitor implements ASTVisitor<Void, Void> {
         visitExprs(node.exprs());
         return null;
     }
+
+    
 }

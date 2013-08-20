@@ -39,4 +39,8 @@ public class BinaryOpNode extends ExprNode {
     public ExprNode right() {
         return right;
     }
+
+    public String operator() {
+        return operator;
+    }
 }

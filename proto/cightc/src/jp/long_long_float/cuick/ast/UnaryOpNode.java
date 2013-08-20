@@ -31,5 +31,9 @@ public class UnaryOpNode extends ExprNode {
     public ExprNode expr() {
         return expr;
     }
+    
+    public String operator() {
+        return operator;
+    }
 
 }

@@ -1,5 +1,6 @@
 package jp.long_long_float.cuick.entity;
 
+import jp.long_long_float.cuick.ast.ASTVisitor;
 import jp.long_long_float.cuick.ast.Dumpable;
 import jp.long_long_float.cuick.ast.Dumper;
 import jp.long_long_float.cuick.ast.Location;
@@ -51,6 +52,15 @@ abstract public class Entity implements Dumpable{
 
     public boolean isDefined() {
         return true;
+    }
+    
+    public <S, E> E accept(ASTVisitor<S, E> visitor) {
+        return visitor.visit(this);
+    }
+    
+    @Deprecated
+    public String toString() {
+        throw new Error("toString() is deprecated!");
     }
     
 }

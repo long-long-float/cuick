@@ -18,11 +18,18 @@ public class CodeBuilder {
     }
     
     public void block(BlockCallback callback, boolean semicolon) {
-        CodeContext cc = CodeContext.getInstance();
-        addLine("{");
-        cc.indent();
+        beginBlock();
         callback.call(this);
-        cc.unindent();
+        endBlock(semicolon);
+    }
+    
+    public void beginBlock() {
+        addLine("{");
+        CodeContext.getInstance().indent();
+    }
+    
+    public void endBlock(boolean semicolon) {
+        CodeContext.getInstance().unindent();
         addLine("}" + (semicolon ? ";" : ""));
     }
 }

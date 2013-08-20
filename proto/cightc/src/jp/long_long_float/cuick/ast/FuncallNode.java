@@ -1,5 +1,6 @@
 package jp.long_long_float.cuick.ast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jp.long_long_float.cuick.type.Type;
@@ -14,7 +15,7 @@ public class FuncallNode extends ExprNode {
     
     public FuncallNode(ExprNode expr, List<Type> templTypes, List<ExprNode> args, BlockNode block) {
         this.expr = expr;
-        this.templTypes = templTypes;
+        this.templTypes = (templTypes != null ? templTypes : new ArrayList<Type>());
         this.args = args;
         this.block = block;
     }
@@ -24,10 +25,26 @@ public class FuncallNode extends ExprNode {
         return expr.location();
     }
     
+    public ExprNode expr() {
+        return expr;
+    }
+    
+    public List<Type> templTypes() {
+        return templTypes;
+    }
+    
+    public List<ExprNode> args() {
+        return args;
+    }
+    
+    public BlockNode block() {
+        return block;
+    }
+    
     @Override
     public String toString() {
         String ret = expr.toString();
-        if(templTypes != null && templTypes.size() > 0) {
+        if(templTypes.size() > 0) {
             ret += "<" + StringUtils.join(templTypes, ", ") + ">";
         }
         ret += "(" + StringUtils.join(args, ", ") + ")";
@@ -40,17 +57,8 @@ public class FuncallNode extends ExprNode {
     @Override
     protected void _dump(Dumper d) {
         d.printMember("expr", expr);
-        if(templTypes != null) d.printMember("templTypes", templTypes);
+        d.printMember("templTypes", templTypes);
         d.printNodeList("args", args);
         d.printMember("block", block);
     }
-
-    public ExprNode expr() {
-        return expr;
-    }
-
-    public List<ExprNode> args() {
-        return args;
-    }
-
 }

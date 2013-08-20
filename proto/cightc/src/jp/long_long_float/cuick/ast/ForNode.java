@@ -33,6 +33,10 @@ public class ForNode extends StmtNode {
         d.printMember("incr", incr);
         d.printMember("body", body);
     }
+    
+    public Variable var() {
+        return var;
+    }
 
     public ExprNode cond() {
         return cond;

@@ -28,8 +28,16 @@ public class Variable extends Entity {
         return isArray;
     }
     
+    public ExprNode arraySize() {
+        return arraySize;
+    }
+    
     public List<ExprNode> init() {
         return init;
+    }
+    
+    public List<ExprNode> constructorArgs() {
+        return constructorArgs;
     }
     
     @Override
@@ -62,4 +70,6 @@ public class Variable extends Entity {
     public void rename(String name) {
         this.name = name;
     }
+
+    
 }

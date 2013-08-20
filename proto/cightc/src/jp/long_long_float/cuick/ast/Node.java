@@ -25,4 +25,9 @@ abstract public class Node implements Dumpable{
     public <S, E> E accept(ASTVisitor<S, E> visitor) {
         return visitor.visit(this);
     }
+    
+    @Deprecated
+    public String toString() {
+        throw new Error("toString() is deprecated!");
+    }
 }

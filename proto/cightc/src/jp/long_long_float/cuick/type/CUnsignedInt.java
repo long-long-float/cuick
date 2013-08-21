@@ -1,8 +1,8 @@
 package jp.long_long_float.cuick.type;
 
-import java.util.Arrays;
 
 import jp.long_long_float.cuick.ast.Location;
+import jp.long_long_float.cuick.utility.ListUtils;
 
 public class CUnsignedInt extends BasicType implements IInteger {
     public CUnsignedInt() {
@@ -10,6 +10,6 @@ public class CUnsignedInt extends BasicType implements IInteger {
     }
     
     public CUnsignedInt(Location loc) {
-        super(Arrays.asList("unsigned", "int"), null);
+        super(ListUtils.asList("unsigned", "int"), null);
     }
 }

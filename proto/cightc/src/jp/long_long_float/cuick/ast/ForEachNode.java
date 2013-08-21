@@ -16,10 +16,10 @@ public class ForEachNode extends StmtNode {
     public ForEachNode(Location loc, Type type, String name, boolean isFore, Enumerable enume, StmtNode body, StmtNode lastBody) {
         super(loc);
         //TODO ここでtypeを確定しておく
-        if(type == null) {
+        /*if(type == null) {
             type = enume.getVarType();
             //type = new CInt();
-        }
+        }*/
         this.var = new Variable(new TypeNode(type), name, null, false, null, null);
         this.isFore = isFore;
         this.enumerable = enume;
@@ -38,6 +38,10 @@ public class ForEachNode extends StmtNode {
     
     public Enumerable enumerable() {
         return enumerable;
+    }
+    
+    public void setEnumerable(Enumerable enume) {
+        this.enumerable = enume;
     }
     
     public StmtNode lastBody() {
@@ -59,11 +63,11 @@ public class ForEachNode extends StmtNode {
     
     @Override
     protected void _dump(Dumper d) {
-        d.printMember("var", var);
+        if(var.typeNode() != null) d.printMember("var.type", var.type());
+        d.printMember("var.name", var.name());
         d.printMember("isFore", isFore);
         d.printMember("enumerable", enumerable);
         d.printMember("body", body);
         d.printMember("lastBody", lastBody);
     }
-
 }

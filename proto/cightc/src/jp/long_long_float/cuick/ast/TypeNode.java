@@ -25,4 +25,8 @@ public class TypeNode extends Node {
         d.printMember("type", type);
     }
 
+    public void setType(Type type) {
+        this.type = type;
+    }
+
 }

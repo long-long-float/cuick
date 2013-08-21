@@ -44,11 +44,27 @@ public class Compiler {
 
     private void compile(String srcPath, String destPath, Options opts) throws CompileException{
         AST ast = parseFile(srcPath, opts);
-        //ast.dump();
-        ast = semanticAnalyze(ast, opts);
-        ast = rename(ast, opts);
+        ast.dump();
+        System.out.println("===============================");
+        ast = localResolve(ast, opts);
+        ast.dump();
+        System.out.println("===============================");
         ast = typeResolve(ast, opts);
         ast.dump();
+        System.out.println("===============================");
+        new ASTTranslator(errorHandler).translate(ast);
+        ast.dump();
+        System.out.println("===============================");
+        ast = localResolve(ast, opts);
+        ast.dump();
+        System.out.println("===============================");
+        ast = typeResolve(ast, opts);
+        ast.dump();
+        System.out.println("===============================");
+        ast = rename(ast, opts);
+        ast.dump();
+        
+        
         writeFile(destPath, ast, opts);
     }
 
@@ -91,7 +107,7 @@ public class Compiler {
         return Parser.parseFile(new File(path), errorHandler);
     }
     
-    public AST semanticAnalyze(AST ast, /*TypeTable types, */Options opts) throws SemanticException {
+    public AST localResolve(AST ast, /*TypeTable types, */Options opts) throws SemanticException {
         new LocalResolver(errorHandler).resolve(ast);
         return ast;
     }

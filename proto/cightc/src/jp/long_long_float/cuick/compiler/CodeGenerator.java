@@ -1,7 +1,6 @@
 package jp.long_long_float.cuick.compiler;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,6 +58,7 @@ import jp.long_long_float.cuick.type.CInt;
 import jp.long_long_float.cuick.type.FunctionType;
 import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.ErrorHandler;
+import jp.long_long_float.cuick.utility.ListUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -88,8 +88,8 @@ public class CodeGenerator extends ASTVisitor<String, String> {
         deployTuples(cb);
         deployFunctions(cb, ast);
         //main
-        Params params = new Params(null, Arrays.asList(new Parameter(new TypeNode(new CInt()), "argc")));
-        BlockNode body = new BlockNode(null, ast.stmts());
+        Params params = new Params(null, ListUtils.asList(new Parameter(new TypeNode(new CInt()), "argc")));
+        BlockNode body = new BlockNode(null, null, ast.stmts());
         Function main = new Function(new TypeNode(new FunctionType(new CInt(), params.parametersType())), "main", params, body);
         cb.addLine(main.accept(this));
         
@@ -187,7 +187,7 @@ public class CodeGenerator extends ASTVisitor<String, String> {
             ret += "(" + join(ent.constructorArgs(), ", ") + ")";
         }
         if(ent.isArray()) {
-            ret += "[" + (ent.arraySize() != null ? ent.arraySize() : "") + "]";
+            ret += "[" + (ent.ListUtilsize() != null ? ent.ListUtilsize() : "") + "]";
         }
         List<ExprNode> init = ent.init();
         if(!init.isEmpty()) {
@@ -376,8 +376,7 @@ public class CodeGenerator extends ASTVisitor<String, String> {
         VariableNode var = new VariableNode(null, varName);
         RangeNode range = enume.range();
         ForNode forNode = new ForNode(forEachNode.location(), 
-                //variable(BasicTypes.int, varName, null, false, null, Arrays.asList(range.begin()))
-                new Variable(new TypeNode(new CInt()), varName, null, false, null, Arrays.asList(range.begin())),
+                new Variable(new TypeNode(new CInt()), varName, null, false, null, ListUtils.asList(range.begin())),
                 new BinaryOpNode(var, range.getOperator(), range.end()), 
                 new SuffixOpNode("++", var), 
                 forEachNode.body());
@@ -385,6 +384,7 @@ public class CodeGenerator extends ASTVisitor<String, String> {
     }
     
     public String visit(VariableSetEnumerable enume) {
+        /*
         if(enume.exprs().size() == 1) {
             ExprNode rightVar = enume.exprs().get(0);
             if(rightVar.type() == null) {
@@ -409,28 +409,21 @@ public class CodeGenerator extends ASTVisitor<String, String> {
                 }
             }
         }
+        */
         return enume.toString();
     }
     
     public String visit(PointerEnumerable enume) {
         ForEachNode forEachNode = enume.forEachNode();
         //TODO iを他とかぶらないようにする
-        //String counterVarName = "i";
         VariableNode counterVar = new VariableNode(null, "i");
         RangeNode range = enume.range();
         
-        ExprNode pointer = enume.pointer();
-        Variable var = new Variable(pointer.type(), pointer, null, false, null, Arrays.asList(new ArefNode(pointer, conterVar));
-        BlockNode body = forEachNode.body().toBlockNode();
-        body.addStmtFront(new DefvarNode(null, enume.pointer().type().setReference(), Arrays.asList(forEachNode.var())));
-        forEachNode.setBody(body);
-        
         ForNode forNode = new ForNode(enume.forEachNode().location(), 
-                new Variable(new TypeNode(new CInt()), counterVar.name(), null, false, null, Arrays.asList(enume.range().begin())), 
+                new Variable(new TypeNode(new CInt()), counterVar.name(), null, false, null, ListUtils.asList(range.begin())), 
                 new BinaryOpNode(counterVar, range.getOperator(), range.end()), 
                 new SuffixOpNode("++", counterVar), 
                 forEachNode.body());
-        //TODO ここでpointer.type() + "& " + name + " = " + pointer + "[i]";を追加する
         return forNode.accept(this);
     }
     

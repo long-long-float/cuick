@@ -56,7 +56,8 @@ public class AST extends Node{
 
     public void setScope(ToplevelScope scope) {
         if(toplevelScope != null) {
-            throw new Error("must not happen: ToplevelScope set twice");
+            //XXX
+            //throw new Error("must not happen: ToplevelScope set twice");
         }
         toplevelScope = scope;
     }

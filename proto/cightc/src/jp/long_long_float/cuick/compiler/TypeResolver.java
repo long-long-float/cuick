@@ -136,7 +136,7 @@ public class TypeResolver extends Visitor {
 
     public Void visit(AddressNode node) {
         super.visit(node);
-        node.setType(new CInt(node.location()).addPointer());
+        node.setType(new CInt(node.location()).increasePointer());
         return null;
     }
 
@@ -179,7 +179,7 @@ public class TypeResolver extends Visitor {
     
     public Void visit(StringLiteralNode node) {
         super.visit(node);
-        node.setType(new CChar(node.location()).addPointer());
+        node.setType(new CChar(node.location()).increasePointer());
         return null;
     }
     

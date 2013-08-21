@@ -13,16 +13,16 @@ public class Variable extends Entity {
     
     protected List<ExprNode> constructorArgs = null;
     protected boolean isArray = false;
-    protected ExprNode arraySize = null;
+    protected ExprNode ListUtilsize = null;
     protected List<ExprNode> init;
     
-    public Variable(TypeNode type, String name, List<ExprNode> constructorArgs, boolean isArray, ExprNode arraySize, List<ExprNode> init) {
-        super(type, name);
-        if(isArray) this.type().addPointer();
+    public Variable(TypeNode typeNode, String name, List<ExprNode> constructorArgs, boolean isArray, ExprNode ListUtilsize, List<ExprNode> init) {
+        super(typeNode, name);
+        if(isArray) this.setType(this.type().increasePointer());
         
         this.constructorArgs = (constructorArgs != null ? constructorArgs : new ArrayList<ExprNode>());
         this.isArray = isArray;
-        this.arraySize = arraySize;
+        this.ListUtilsize = ListUtilsize;
         this.init = (init != null ? init : new ArrayList<ExprNode>());
     }
     
@@ -30,8 +30,8 @@ public class Variable extends Entity {
         return isArray;
     }
     
-    public ExprNode arraySize() {
-        return arraySize;
+    public ExprNode ListUtilsize() {
+        return ListUtilsize;
     }
     
     public List<ExprNode> init() {
@@ -49,7 +49,7 @@ public class Variable extends Entity {
             ret += "(" + StringUtils.join(constructorArgs, ", ") + ")";
         }
         if(isArray) {
-            ret += "[" + (arraySize != null ? arraySize : "") + "]";
+            ret += "[" + (ListUtilsize != null ? ListUtilsize : "") + "]";
         }
         if(!init.isEmpty()) {
             ret += " = ";
@@ -65,13 +65,11 @@ public class Variable extends Entity {
     
     @Override
     protected void _dump(Dumper d) {
-        d.printMember("type", type());
         d.printMember("name", name);
+        d.printMember("type", type());
     }
 
     public void rename(String name) {
         this.name = name;
     }
-
-    
 }

@@ -1,11 +1,13 @@
 package jp.long_long_float.cuick.ast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jp.long_long_float.cuick.cppStructure.CodeBuilder;
 import jp.long_long_float.cuick.cppStructure.CodeBuilder.BlockCallback;
 import jp.long_long_float.cuick.entity.LocalScope;
 import jp.long_long_float.cuick.entity.Variable;
+import jp.long_long_float.cuick.utility.ListUtils;
 
 public class BlockNode extends StmtNode {
 
@@ -15,12 +17,7 @@ public class BlockNode extends StmtNode {
     
     public BlockNode(Location loc, List<Variable> vars, List<StmtNode> stmts) {
         super(loc);
-        this.variables = vars;
-        this.stmts = stmts;
-    }
-    
-    public BlockNode(Location loc, List<StmtNode> stmts) {
-        super(loc);
+        this.variables = vars != null ? vars : new ArrayList<Variable>();
         this.stmts = stmts;
     }
 
@@ -63,6 +60,11 @@ public class BlockNode extends StmtNode {
     
     public LocalScope scope() {
         return scope;
+    }
+    
+    public void defineVariable(Variable var) {
+        addStmtFront(new DefvarNode(null, var.type(), ListUtils.asList(var)));
+        variables.add(var);
     }
 
     public void addStmtFront(StmtNode stmt) {

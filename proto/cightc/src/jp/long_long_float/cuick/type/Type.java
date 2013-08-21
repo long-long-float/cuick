@@ -24,8 +24,24 @@ public abstract class Type implements Cloneable{
     }
 
     public Type setReference() {
-        isReference = true;
-        return this;
+        Type ret = this.clone();
+        ret.isReference = true;
+        return ret;
+    }
+    
+    public Type increasePointer() {
+        Type ret = this.clone();
+        ret.pointerCount++;
+        return ret;
+    }
+    
+    public Type decreasePointer() {
+        if(!isPointer()) {
+            throw new RuntimeException("This is not a pointer!");
+        }
+        Type ret = this.clone();
+        ret.pointerCount--;
+        return ret;
     }
     
     @Override
@@ -35,14 +51,9 @@ public abstract class Type implements Cloneable{
             ret = (Type)super.clone();
         }
         catch(CloneNotSupportedException ex) {
-            throw new RuntimeException("'clone' is not supported!");
+            throw new RuntimeException("object#clone is not supported!");
         }
         return ret;
-    }
-
-    public Type addPointer() {
-        pointerCount++;
-        return this;
     }
 
     public void setTemplateTypes(List<Type> templTypes) {

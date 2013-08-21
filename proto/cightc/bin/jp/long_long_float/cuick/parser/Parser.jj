@@ -252,13 +252,13 @@ Variable defvar(Type type):{
     String name;
     List<ExprNode> constructorArgs = null;
     boolean isArray = false;
-    ExprNode arraySize = null;
+    ExprNode ListUtilsize = null;
     List<ExprNode> init = new ArrayList<ExprNode>();
     ExprNode expr;}
-{    { type = type.clone(); } ["&" { type.setReference(); }] ("*" { type.addPointer(); })*
-    name=name() [ "(" constructorArgs=args() ")" ] ["[" { isArray = true; } [arraySize=expr()] "]"] ["=" ( "{" expr=expr() { init.add(expr); } ("," expr=expr() { init.add(expr); } )* "}" | expr=expr() { init.add(expr); } ) ]
+{    ["&" { type = type.setReference(); }] ("*" { type = type.addPointer(); })*
+    name=name() [ "(" constructorArgs=args() ")" ] ["[" { isArray = true; } [ListUtilsize=expr()] "]"] ["=" ( "{" expr=expr() { init.add(expr); } ("," expr=expr() { init.add(expr); } )* "}" | expr=expr() { init.add(expr); } ) ]
         {
-            return new Variable(new TypeNode(type), name, constructorArgs, isArray, arraySize, init);
+            return new Variable(new TypeNode(type), name, constructorArgs, isArray, ListUtilsize, init);
         }
 }
 
@@ -314,14 +314,14 @@ Parameter param():
     Type type;
     String n;
     boolean isArray = false;
-    ExprNode arraySize = null;
+    ExprNode ListUtilsize = null;
     ExprNode defaultValue = null;
 }
 {
-    type=type() ["&" { type.setReference(); }] ("*" { type.addPointer(); })* n=name()
-    ["[" { isArray = true; } [arraySize=expr()] "]"] ["=" defaultValue=expr() ]
+    type=type() ["&" { type = type.setReference(); }] ("*" { type = type.addPointer(); })* n=name()
+    ["[" { isArray = true; } [ListUtilsize=expr()] "]"] ["=" defaultValue=expr() ]
     {
-        return new Parameter(new TypeNode(type), n, isArray, arraySize, defaultValue);
+        return new Parameter(new TypeNode(type), n, isArray, ListUtilsize, defaultValue);
     }
 }
 
@@ -384,8 +384,8 @@ Type type_with_suffix():
   Type type;
 }
 {
-  type=type() ("*" { type.addPointer(); })*
-    ["&" { type.setReference(); }]
+  type=type() ("*" { type = type.addPointer(); })*
+    ["&" { type = type.setReference(); }]
   {    return type;
   }
 }
@@ -868,7 +868,7 @@ ExprNode term():
 }
 {
       LOOKAHEAD("(" type())
-      "(" t=type() ("*" { t.addPointer(); })* ")" n=term()     { return new CastNode(t, n); }
+      "(" t=type() ("*" { t = t.addPointer(); })* ")" n=term()     { return new CastNode(t, n); }
     | n=unary()                     { return n; }
 }
 

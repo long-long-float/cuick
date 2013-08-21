@@ -20,4 +20,4 @@ extend void $CONT.sort() {
 }
 */
 int ary[] = {1, 2, 3};
-for(i : ary) puts(i);
+for(e : ary) puts(e);

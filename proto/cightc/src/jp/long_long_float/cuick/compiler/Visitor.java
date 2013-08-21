@@ -39,6 +39,7 @@ import jp.long_long_float.cuick.ast.VariableNode;
 import jp.long_long_float.cuick.ast.WhileNode;
 import jp.long_long_float.cuick.entity.Variable;
 import jp.long_long_float.cuick.foreach.Enumerable;
+import jp.long_long_float.cuick.foreach.PointerEnumerable;
 import jp.long_long_float.cuick.foreach.RangeEnumerable;
 import jp.long_long_float.cuick.foreach.VariableSetEnumerable;
 import jp.long_long_float.cuick.utility.ErrorHandler;
@@ -312,6 +313,12 @@ public class Visitor extends ASTVisitor<Void, Void> {
     
     public Void visit(VariableSetEnumerable node) {
         visitExprs(node.exprs());
+        return null;
+    }
+    
+    public Void visit(PointerEnumerable node) {
+        visitExpr(node.pointer());
+        visitExpr(node.range());
         return null;
     }
 

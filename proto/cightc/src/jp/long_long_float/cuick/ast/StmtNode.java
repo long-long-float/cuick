@@ -1,6 +1,7 @@
 package jp.long_long_float.cuick.ast;
 
-import java.util.Arrays;
+import jp.long_long_float.cuick.utility.ListUtils;
+
 
 abstract public class StmtNode extends Node {
 
@@ -11,7 +12,7 @@ abstract public class StmtNode extends Node {
     }
     
     public BlockNode toBlockNode() {
-        return new BlockNode(location, Arrays.asList(this));
+        return new BlockNode(location, null, ListUtils.asList(this));
     }
     
     @Override

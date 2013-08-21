@@ -68,9 +68,9 @@ public class Parser implements ParserConstants {
     <ONE_LINE: ("\n" | "\r\n" | "\r") (~["\n", "\r"])* ("\n" | "\r\n" | "\r")>
 }*/
 
-//�?�?
+//�?�?
 
-//ソース全�?
+//ソース全�?
   final public AST compilation_unit() throws ParseException {
     trace_call("compilation_unit");
     try {
@@ -199,7 +199,7 @@ public class Parser implements ParserConstants {
     }
   }
 
-//変数宣�?
+//変数宣�?
   final public DefvarNode defvars() throws ParseException {
     trace_call("defvars");
     try {
@@ -207,7 +207,7 @@ public class Parser implements ParserConstants {
     Variable var;
     //Type baseType;
     Type type;
-      //storage(staticなど)は無�?
+      //storage(staticなど)は無�?
           type = type();
       var = defvar(type);
                                    vars.add(var);
@@ -242,11 +242,10 @@ public class Parser implements ParserConstants {
     ExprNode arraySize = null;
     List<ExprNode> init = new ArrayList<ExprNode>();
     ExprNode expr;
-      type = type.clone();
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 91:
         jj_consume_token(91);
-                                    type.setReference();
+           type = type.setReference();
         break;
       default:
         jj_la1[3] = jj_gen;
@@ -263,7 +262,7 @@ public class Parser implements ParserConstants {
           break label_3;
         }
         jj_consume_token(92);
-                                                                   type.addPointer();
+                                                 type = type.increasePointer();
       }
       name = name();
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -472,7 +471,7 @@ public class Parser implements ParserConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 91:
         jj_consume_token(91);
-                       type.setReference();
+                       type = type.setReference();
         break;
       default:
         jj_la1[13] = jj_gen;
@@ -489,7 +488,7 @@ public class Parser implements ParserConstants {
           break label_6;
         }
         jj_consume_token(92);
-                                                      type.addPointer();
+                                                             type = type.increasePointer();
       }
       n = name();
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -644,7 +643,7 @@ public class Parser implements ParserConstants {
   }
 
 /*
-何もつ�?��な�?�??�?
+何もつ�?��な�?�??�?
 int
 vector<int, int>
 $T
@@ -696,7 +695,7 @@ $T
   }
 
 /*
-*�?が付いた型
+*�?が付いた型
 int*
 int&
 $T*
@@ -717,12 +716,12 @@ $T*
           break label_8;
         }
         jj_consume_token(92);
-                     type.addPointer();
+                     type = type.increasePointer();
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 91:
         jj_consume_token(91);
-           type.setReference();
+           type = type.setReference();
         break;
       default:
         jj_la1[23] = jj_gen;
@@ -2039,7 +2038,7 @@ $T*
             break label_26;
           }
           jj_consume_token(92);
-                          t.addPointer();
+                          t.increasePointer();
         }
         jj_consume_token(89);
         n = term();
@@ -2407,7 +2406,7 @@ $T*
       case INTEGER:
         t = jj_consume_token(INTEGER);
             //return integerNode(location(t), t.image);
-            {if (true) return new LiteralNode(location(t), new CInt(location(t)), t.image);} //TODO int以外�?も作る
+            {if (true) return new LiteralNode(location(t), new CInt(location(t)), t.image);} //TODO int以外�?も作る
 
         break;
       case CHARACTER:
@@ -2840,6 +2839,11 @@ $T*
     return false;
   }
 
+  private boolean jj_3R_79() {
+    if (jj_scan_token(92)) return true;
+    return false;
+  }
+
   private boolean jj_3R_47() {
     if (jj_3R_68()) return true;
     Token xsp;
@@ -2878,11 +2882,6 @@ $T*
   private boolean jj_3_12() {
     if (jj_3R_37()) return true;
     if (jj_scan_token(97)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_79() {
-    if (jj_scan_token(92)) return true;
     return false;
   }
 
@@ -3102,11 +3101,6 @@ $T*
     return false;
   }
 
-  private boolean jj_3R_73() {
-    if (jj_scan_token(92)) return true;
-    return false;
-  }
-
   private boolean jj_3R_201() {
     if (jj_scan_token(RETURN)) return true;
     if (jj_3R_40()) return true;
@@ -3173,6 +3167,11 @@ $T*
     return false;
   }
 
+  private boolean jj_3R_73() {
+    if (jj_scan_token(92)) return true;
+    return false;
+  }
+
   private boolean jj_3R_182() {
     if (jj_scan_token(BREAK)) return true;
     if (jj_scan_token(94)) return true;
@@ -3187,11 +3186,6 @@ $T*
 
   private boolean jj_3R_220() {
     if (jj_scan_token(105)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_72() {
-    if (jj_scan_token(91)) return true;
     return false;
   }
 
@@ -3245,6 +3239,11 @@ $T*
 
   private boolean jj_3R_117() {
     if (jj_scan_token(BUILT_IN_CODE)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_72() {
+    if (jj_scan_token(91)) return true;
     return false;
   }
 

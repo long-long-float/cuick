@@ -1,7 +1,5 @@
 package jp.long_long_float.cuick.foreach;
 
-import java.util.Arrays;
-
 import jp.long_long_float.cuick.ast.BinaryOpNode;
 import jp.long_long_float.cuick.ast.Dumper;
 import jp.long_long_float.cuick.ast.ForEachNode;
@@ -12,6 +10,7 @@ import jp.long_long_float.cuick.ast.TypeNode;
 import jp.long_long_float.cuick.ast.VariableNode;
 import jp.long_long_float.cuick.entity.Variable;
 import jp.long_long_float.cuick.type.BasicType;
+import jp.long_long_float.cuick.utility.ListUtils;
 
 public class RangeEnumerable extends Enumerable {
     private RangeNode range;
@@ -31,8 +30,8 @@ public class RangeEnumerable extends Enumerable {
         String varName = forEachNode.var().name();
         VariableNode var = new VariableNode(null, varName);
         ForNode forNode = new ForNode(null, 
-                //variable(BasicTypes.int, varName, null, false, null, Arrays.asList(range.begin()))
-                new Variable(new TypeNode(new BasicType("int", null)), varName, null, false, null, Arrays.asList(range.begin())),
+                //variable(BasicTypes.int, varName, null, false, null, ListUtils.asList(range.begin()))
+                new Variable(new TypeNode(new BasicType("int", null)), varName, null, false, null, ListUtils.asList(range.begin())),
                 new BinaryOpNode(var, range.getOperator(), range.end()), 
                 new SuffixOpNode("++", var), 
                 forEachNode.body());

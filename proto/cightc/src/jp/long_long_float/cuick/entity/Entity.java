@@ -31,6 +31,10 @@ abstract public class Entity implements Dumpable, Acceptable{
         return typeNode.type();
     }
     
+    public void setType(Type type) {
+        typeNode.setType(type);
+    }
+    
     public Location location() {
         return typeNode.location();
     }

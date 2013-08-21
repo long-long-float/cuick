@@ -15,5 +15,10 @@ public class FunctionType extends Type{
     @Override
     public String typeString() {
         return returnType.toString();
-    } 
+    }
+
+    @Override
+    public boolean hasType(String typeStr) {
+        return false;
+    }
 }

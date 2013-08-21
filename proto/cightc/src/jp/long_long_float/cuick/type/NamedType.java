@@ -41,4 +41,9 @@ public class NamedType extends Type {
             return false;
         }
     }
+
+    @Override
+    public boolean hasType(String typeStr) {
+        return false;
+    }
 }

@@ -52,11 +52,11 @@ import jp.long_long_float.cuick.entity.Function;
 import jp.long_long_float.cuick.entity.Parameter;
 import jp.long_long_float.cuick.entity.Params;
 import jp.long_long_float.cuick.entity.Variable;
+import jp.long_long_float.cuick.foreach.PointerEnumerable;
 import jp.long_long_float.cuick.foreach.RangeEnumerable;
 import jp.long_long_float.cuick.foreach.VariableSetEnumerable;
 import jp.long_long_float.cuick.type.CInt;
 import jp.long_long_float.cuick.type.FunctionType;
-import jp.long_long_float.cuick.type.IInteger;
 import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.ErrorHandler;
 
@@ -375,7 +375,7 @@ public class CodeGenerator extends ASTVisitor<String, String> {
         String varName = forEachNode.var().name();
         VariableNode var = new VariableNode(null, varName);
         RangeNode range = enume.range();
-        ForNode forNode = new ForNode(null, 
+        ForNode forNode = new ForNode(forEachNode.location(), 
                 //variable(BasicTypes.int, varName, null, false, null, Arrays.asList(range.begin()))
                 new Variable(new TypeNode(new CInt()), varName, null, false, null, Arrays.asList(range.begin())),
                 new BinaryOpNode(var, range.getOperator(), range.end()), 
@@ -386,19 +386,52 @@ public class CodeGenerator extends ASTVisitor<String, String> {
     
     public String visit(VariableSetEnumerable enume) {
         if(enume.exprs().size() == 1) {
-            ExprNode var = enume.exprs().get(0);
-            if(var.type() == null) {
+            ExprNode rightVar = enume.exprs().get(0);
+            if(rightVar.type() == null) {
                 throw new Error("Type is undefined! Please use \"as\" oerator.");
             }
             
-            if(var.type() instanceof IInteger) {
-                RangeEnumerable new_enume = new RangeEnumerable(new RangeNode(
+            if(rightVar.type().hasType("int")) {
+                VariableNode leftVar = new VariableNode(null, enume.forEachNode().var().name());
+                if(rightVar.type().isPointer()) {
+                    PointerEnumerable new_enume = new PointerEnumerable(leftVar,
+                            new BinaryOpNode(
+                                    new SizeofExprNode(leftVar), "/", 
+                                    new SizeofExprNode(new ArefNode(leftVar, new LiteralNode(null, new CInt(), "0")))));
+                    new_enume.setForEachNode(enume.forEachNode());
+                    return new_enume.accept(this);
+                }
+                else {
+                    RangeEnumerable new_enume = new RangeEnumerable(new RangeNode(
                         new LiteralNode(null, enume.forEachNode().var().type(), "0"), "...", enume.exprs().get(0)));
-                new_enume.setForEachNode(enume.forEachNode());
-                return new_enume.accept(this);
+                    new_enume.setForEachNode(enume.forEachNode());
+                    return new_enume.accept(this);
+                }
             }
         }
         return enume.toString();
+    }
+    
+    public String visit(PointerEnumerable enume) {
+        ForEachNode forEachNode = enume.forEachNode();
+        //TODO iを他とかぶらないようにする
+        //String counterVarName = "i";
+        VariableNode counterVar = new VariableNode(null, "i");
+        RangeNode range = enume.range();
+        
+        ExprNode pointer = enume.pointer();
+        Variable var = new Variable(pointer.type(), pointer, null, false, null, Arrays.asList(new ArefNode(pointer, conterVar));
+        BlockNode body = forEachNode.body().toBlockNode();
+        body.addStmtFront(new DefvarNode(null, enume.pointer().type().setReference(), Arrays.asList(forEachNode.var())));
+        forEachNode.setBody(body);
+        
+        ForNode forNode = new ForNode(enume.forEachNode().location(), 
+                new Variable(new TypeNode(new CInt()), counterVar.name(), null, false, null, Arrays.asList(enume.range().begin())), 
+                new BinaryOpNode(counterVar, range.getOperator(), range.end()), 
+                new SuffixOpNode("++", counterVar), 
+                forEachNode.body());
+        //TODO ここでpointer.type() + "& " + name + " = " + pointer + "[i]";を追加する
+        return forNode.accept(this);
     }
     
 }

@@ -46,4 +46,9 @@ public class BasicType extends Type {
             return false;
         }
     }
+    
+    @Override
+    public boolean hasType(String typeStr) {
+        return basicTypes.contains(typeStr);
+    }
 }

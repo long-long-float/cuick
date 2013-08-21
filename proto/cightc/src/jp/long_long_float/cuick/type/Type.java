@@ -23,8 +23,9 @@ public abstract class Type implements Cloneable{
         return location;
     }
 
-    public void setReference() {
+    public Type setReference() {
         isReference = true;
+        return this;
     }
     
     @Override
@@ -84,4 +85,10 @@ public abstract class Type implements Cloneable{
             return false;
         }
     }
+
+    public boolean isPointer() {
+        return pointerCount > 0;
+    }
+    
+    public abstract boolean hasType(String typeStr);
 }

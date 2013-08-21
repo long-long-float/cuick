@@ -29,6 +29,11 @@ public class BlockNode extends StmtNode {
     }
     
     @Override
+    public BlockNode toBlockNode() {
+        return this;
+    }
+    
+    @Override
     public String toString() {
         CodeBuilder cb = new CodeBuilder();
         //System.out.println(CodeContext.getInstance().getIndent());
@@ -58,5 +63,9 @@ public class BlockNode extends StmtNode {
     
     public LocalScope scope() {
         return scope;
+    }
+
+    public void addStmtFront(StmtNode stmt) {
+        stmts.add(0, stmt);
     }
 }

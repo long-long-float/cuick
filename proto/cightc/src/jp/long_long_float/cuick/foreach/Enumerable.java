@@ -3,6 +3,7 @@ package jp.long_long_float.cuick.foreach;
 import jp.long_long_float.cuick.ast.ForEachNode;
 import jp.long_long_float.cuick.ast.Location;
 import jp.long_long_float.cuick.ast.Node;
+import jp.long_long_float.cuick.type.Type;
 
 abstract public class Enumerable extends Node{
     
@@ -29,4 +30,6 @@ abstract public class Enumerable extends Node{
     public Location location() {
         return location;
     }
+
+    public abstract Type getVarType();
 }

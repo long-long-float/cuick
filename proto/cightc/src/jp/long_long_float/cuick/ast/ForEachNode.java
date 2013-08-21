@@ -2,7 +2,6 @@ package jp.long_long_float.cuick.ast;
 
 import jp.long_long_float.cuick.entity.Variable;
 import jp.long_long_float.cuick.foreach.Enumerable;
-import jp.long_long_float.cuick.type.CInt;
 import jp.long_long_float.cuick.type.Type;
 
 public class ForEachNode extends StmtNode {
@@ -18,8 +17,8 @@ public class ForEachNode extends StmtNode {
         super(loc);
         //TODO ここでtypeを確定しておく
         if(type == null) {
-            //type = enume.typeInference();
-            type = new CInt();
+            type = enume.getVarType();
+            //type = new CInt();
         }
         this.var = new Variable(new TypeNode(type), name, null, false, null, null);
         this.isFore = isFore;
@@ -47,6 +46,10 @@ public class ForEachNode extends StmtNode {
     
     public StmtNode body() {
         return body;
+    }
+    
+    public void setBody(StmtNode body) {
+        this.body = body;
     }
     
     @Override

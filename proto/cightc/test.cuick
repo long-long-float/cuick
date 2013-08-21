@@ -19,9 +19,5 @@ extend void $CONT.sort() {
     sort(this.begin(), this.end());
 }
 */
-for(i : 10) {
-    for(j : 20) {
-        puts(i * j);
-    }
-    puts();
-}
+int ary[] = {1, 2, 3};
+for(i : ary) puts(i);

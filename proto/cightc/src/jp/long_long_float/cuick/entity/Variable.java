@@ -18,6 +18,8 @@ public class Variable extends Entity {
     
     public Variable(TypeNode type, String name, List<ExprNode> constructorArgs, boolean isArray, ExprNode arraySize, List<ExprNode> init) {
         super(type, name);
+        if(isArray) this.type().addPointer();
+        
         this.constructorArgs = (constructorArgs != null ? constructorArgs : new ArrayList<ExprNode>());
         this.isArray = isArray;
         this.arraySize = arraySize;

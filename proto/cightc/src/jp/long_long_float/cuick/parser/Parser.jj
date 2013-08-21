@@ -553,6 +553,7 @@ ForEachNode foreach_stmt():
 Enumerable enumerable():
 {
     ExprNode expr;
+    ExprNode rexpr;
     RangeNode range;
 
     List<ExprNode> exprs = new ArrayList<ExprNode>();   
@@ -564,8 +565,11 @@ Enumerable enumerable():
             return new RangeEnumerable(range);
         }
     //ポインタ
-    |  LOOKAHEAD(expr() ":") expr=expr() ":" range=range()
+    |  LOOKAHEAD(expr() ":" expr() ("..." | "..")) expr=expr() ":" range=range()
         {            return new PointerEnumerable(expr, range);
+        }
+    |  LOOKAHEAD(expr() ":") expr=expr() ":" rexpr=expr()
+        {            return new PointerEnumerable(expr, rexpr);
         }
     //変数(配列 tuple 整数 std::map container込み)の集合
     |  expr=expr() { exprs.add(expr); } ("," expr=expr() { exprs.add(expr); })*

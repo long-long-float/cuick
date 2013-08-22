@@ -9,14 +9,15 @@ public class ForNode extends StmtNode {
     protected Variable var;
     protected ExprNode cond;
     protected ExprNode incr;
-    protected StmtNode body;
+    protected BlockNode body;
     
     public ForNode(Location loc, Variable var, ExprNode cond, ExprNode incr, StmtNode body) {
         super(loc);
         this.var = var;
         this.cond = cond;
         this.incr = incr;//new ExprStmtNode(incr.location(), incr);
-        this.body = body;
+        this.body = body.toBlockNode();
+        this.body.variables().add(var);
     }
     
     @Override

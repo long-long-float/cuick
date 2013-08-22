@@ -1,6 +1,5 @@
 package jp.long_long_float.cuick.compiler;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,26 +50,11 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
     
     @Override
     public Node visit(Node node) {
-        String nodeName = node.getClass().getSimpleName();
-        try {
-            Node ret = (Node) getClass().getMethod("visit", node.getClass()).invoke(this, node);
-            return ret;
-        } catch (IllegalAccessException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            throw new Error(e.getCause());
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-            return node;
-        } catch (SecurityException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
+        Node ret = super.visit(node);
+        if(ret instanceof StmtNode) {
+            new LocalResolver(errorHandler).resolve((StmtNode)ret);
         }
-        return null;
+        return ret;
     }
     
     public Node visit(DefvarNode node) {

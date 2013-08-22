@@ -74,4 +74,14 @@ public class BlockNode extends StmtNode {
         addStmtFront(new DefvarNode(null, var.type(), ListUtils.asList(var)));
         variables.add(var);
     }
+    
+    @Override
+    public BlockNode parentBlockNode(int depth) {
+        return depth == 0 ? this : parent.parentBlockNode(depth - 1);
+    }
+    
+    @Override
+    public boolean isDefinedVariable(String name) {
+        return variables.contains(name) || (parent != null && parent.isDefinedVariable(name));
+    }
 }

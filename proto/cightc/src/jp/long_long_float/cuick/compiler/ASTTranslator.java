@@ -47,7 +47,7 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
             func.body().accept(this);
         }
     }
-    
+    /*
     @Override
     public Node visit(Node node) {
         Node ret = super.visit(node);
@@ -56,7 +56,7 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
         }
         return ret;
     }
-    
+    */
     public Node visit(DefvarNode node) {
         return node;
     }
@@ -126,7 +126,7 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
             
             //TODO iを他とかぶらないようにする
             int id = 0;
-            for(;node.scope().isDefinedVariable("counter" + id);id++) ;
+            for(;node.isDefinedVariable("counter" + id);id++) ;
             VariableNode counterVar = new VariableNode(null, "counter" + id);
             Variable var = new Variable(new TypeNode(varType.decreasePointer()), node.var().name(), null, false, null, ListUtils.asList((ExprNode)new ArefNode(pointer, counterVar)));
             

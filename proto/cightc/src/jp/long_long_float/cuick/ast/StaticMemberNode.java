@@ -21,4 +21,12 @@ public class StaticMemberNode extends LHSNode {
         d.printMember("expr", expr);
         d.printMember("member", member);
     }
+
+    public ExprNode expr() {
+        return expr;
+    }
+
+    public String member() {
+        return member;
+    }
 }

@@ -74,8 +74,8 @@ public class Compiler {
             writer = new BufferedWriter(new FileWriter(new File(path)));
             try {
                 //writer.write(cb.toString());
-                System.out.println(codeGenerate(ast, opts));
-                //writer.write(codeGenerate(ast, opts));
+                //System.out.println(codeGenerate(ast, opts));
+                writer.write(codeGenerate(ast, opts));
             }
             finally {
                 writer.close();

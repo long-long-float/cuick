@@ -34,6 +34,11 @@ public class ToplevelScope extends Scope {
     }
 
     @Override
+    public boolean isDefinedVariable(String name) {
+        return false; //XXX
+    }
+    
+    @Override
     public Entity get(String name) throws SemanticException {
         Entity ent = entities.get(name);
         if(ent == null) {

@@ -25,6 +25,14 @@ public class BlockNode extends StmtNode {
         return stmts;
     }
     
+    public void addStmtFront(StmtNode stmt) {
+        stmts.add(0, stmt);
+    }
+
+    public void setStmt(List<StmtNode> stmts) {
+        this.stmts = stmts;
+    }
+    
     @Override
     public BlockNode toBlockNode() {
         return this;
@@ -65,9 +73,5 @@ public class BlockNode extends StmtNode {
     public void defineVariable(Variable var) {
         addStmtFront(new DefvarNode(null, var.type(), ListUtils.asList(var)));
         variables.add(var);
-    }
-
-    public void addStmtFront(StmtNode stmt) {
-        stmts.add(0, stmt);
     }
 }

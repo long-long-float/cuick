@@ -31,7 +31,7 @@ public class ErrorHandler {
     }
     
     public void warn(Location loc, String msg) {
-        warn(loc.toString() + ": " + msg);
+        warn((loc != null ? loc : "???") + ": " + msg);
     }
 
     public void warn(String msg) {

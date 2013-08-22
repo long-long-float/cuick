@@ -2,9 +2,21 @@ package jp.long_long_float.cuick.ast;
 import java.io.PrintStream;
 
 import jp.long_long_float.cuick.compiler.Acceptable;
+import jp.long_long_float.cuick.entity.Scope;
 
 abstract public class Node implements Dumpable, Acceptable{
+    
+    private Scope scope;
+    
     public Node(){   
+    }
+    
+    public Scope scope() {
+        return scope;
+    }
+    
+    public void setScope(Scope scope) {
+        this.scope = scope;
     }
     
     abstract public Location location();

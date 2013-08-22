@@ -34,8 +34,8 @@ public abstract class ASTVisitor<S, E> {
         } catch (InvocationTargetException e) {
             throw new Error(e.getCause());
         } catch (NoSuchMethodException e) {
-            // TODO 自動生成された catch ブロック
             e.printStackTrace();
+            throw new Error(e.getMessage());
         } catch (SecurityException e) {
             // TODO 自動生成された catch ブロック
             e.printStackTrace();
@@ -56,8 +56,8 @@ public abstract class ASTVisitor<S, E> {
         } catch (InvocationTargetException e) {
             throw new Error(e.getCause());
         } catch (NoSuchMethodException e) {
-            // TODO 自動生成された catch ブロック
             e.printStackTrace();
+            throw new Error(e.getMessage());
         } catch (SecurityException e) {
             // TODO 自動生成された catch ブロック
             e.printStackTrace();

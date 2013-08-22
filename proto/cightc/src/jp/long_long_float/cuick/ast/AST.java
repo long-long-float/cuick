@@ -1,6 +1,7 @@
 package jp.long_long_float.cuick.ast;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import jp.long_long_float.cuick.entity.Entity;
@@ -34,6 +35,10 @@ public class AST extends Node{
         return new ArrayList<StmtNode>(declarations.stmts);
     }
     
+    public void setStmt(List<StmtNode> stmts) {
+        declarations.stmts = new LinkedHashSet<StmtNode>(stmts);
+    }
+    
     public List<Function> funcs() {
         return new ArrayList<Function>(declarations.funcs);
     }
@@ -61,4 +66,6 @@ public class AST extends Node{
         }
         toplevelScope = scope;
     }
+
+    
 }

@@ -5,6 +5,7 @@ import java.util.Stack;
 
 import jp.long_long_float.cuick.ast.AST;
 import jp.long_long_float.cuick.ast.BlockNode;
+import jp.long_long_float.cuick.ast.Node;
 import jp.long_long_float.cuick.ast.StmtNode;
 import jp.long_long_float.cuick.ast.VariableNode;
 import jp.long_long_float.cuick.entity.Entity;
@@ -22,6 +23,13 @@ public class LocalResolver extends Visitor {
     public LocalResolver(ErrorHandler h) {
         super(h);
         this.scopeStack = new Stack<Scope>();
+    }
+    
+    @Override
+    public Void visit(Node node) {
+        super.visit(node);
+        node.setScope(currentScope());
+        return null;
     }
     
     public void resolve(AST ast) throws SemanticException {
@@ -44,7 +52,7 @@ public class LocalResolver extends Visitor {
         
         ast.setScope(toplevel);
     }
-
+    
     private void resolveFunctions(List<Function> funcs) {
         for(Function func : funcs) {
             pushScope(func.parameters());
@@ -53,7 +61,7 @@ public class LocalResolver extends Visitor {
         }
     }
 
-    private void resolve(StmtNode n) {
+    public void resolve(StmtNode n) {
         n.accept(this);
     }
 

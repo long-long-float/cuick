@@ -18,6 +18,7 @@ abstract public class Enumerable extends Node{
         this.forEachNode = forEachNode;
     }
     
+    @Deprecated
     public ForEachNode forEachNode() {
         return this.forEachNode;
     }

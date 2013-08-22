@@ -20,5 +20,7 @@ abstract public class Scope {
         children.add(s);
     }
     
+    abstract public boolean isDefinedVariable(String name);
+    
     abstract public Entity get(String name) throws SemanticException;
 }

@@ -24,12 +24,14 @@ import jp.long_long_float.cuick.ast.IfNode;
 import jp.long_long_float.cuick.ast.LiteralNode;
 import jp.long_long_float.cuick.ast.MemberNode;
 import jp.long_long_float.cuick.ast.OpAssignNode;
+import jp.long_long_float.cuick.ast.PowerOpNode;
 import jp.long_long_float.cuick.ast.PrefixOpNode;
 import jp.long_long_float.cuick.ast.PtrMemberNode;
 import jp.long_long_float.cuick.ast.RangeNode;
 import jp.long_long_float.cuick.ast.ReturnNode;
 import jp.long_long_float.cuick.ast.SizeofExprNode;
 import jp.long_long_float.cuick.ast.SizeofTypeNode;
+import jp.long_long_float.cuick.ast.StaticMemberNode;
 import jp.long_long_float.cuick.ast.StmtNode;
 import jp.long_long_float.cuick.ast.StringLiteralNode;
 import jp.long_long_float.cuick.ast.SuffixOpNode;
@@ -212,6 +214,12 @@ public class Visitor extends ASTVisitor<Void, Void> {
         visitExpr(n.right());
         return null;
     }
+    
+    public Void visit(PowerOpNode node) {
+        visitExpr(node.left());
+        visitExpr(node.right());
+        return null;
+    }
 
     public Void visit(UnaryOpNode node) {
         visitExpr(node.expr());
@@ -247,6 +255,10 @@ public class Visitor extends ASTVisitor<Void, Void> {
 
     public Void visit(PtrMemberNode node) {
         visitExpr(node.expr());
+        return null;
+    }
+    
+    public Void visit(StaticMemberNode node) {
         return null;
     }
 

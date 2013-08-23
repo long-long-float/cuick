@@ -54,7 +54,7 @@ public class BlockNode extends StmtNode {
     }
     
     protected void _dump(Dumper d) {
-        //d.printNodeList("variables", variables);
+        d.printNodeList("variables", variables);
         d.printNodeList("stmts", stmts);
     }
 
@@ -82,6 +82,9 @@ public class BlockNode extends StmtNode {
     
     @Override
     public boolean isDefinedVariable(String name) {
-        return variables.contains(name) || (parent != null && parent.isDefinedVariable(name));
+        for(Variable var : variables) {
+            if(var.name().equals(name)) return true;
+        }
+        return super.isDefinedVariable(name);
     }
 }

@@ -1,24 +1,36 @@
 package jp.long_long_float.cuick.ast;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
+import java.util.List;
 
 import jp.long_long_float.cuick.compiler.Acceptable;
-import jp.long_long_float.cuick.entity.Scope;
 
 abstract public class Node implements Dumpable, Acceptable{
     
-    private Scope scope;
+    //private Scope scope;
     
     protected Node parent;
     
     public Node(){
+    }
+    
+    public void setParents() {
         //System.out.println(getClass().getSimpleName());
         for(Field field : getClass().getDeclaredFields()) {
             //System.out.println("    " + field.getName());
             try {
                 field.setAccessible(true);
-                if(field.get(this) instanceof Node) {
-                    field.set(this, this);
+                Object child = field.get(this);
+                //JOptionPane.showMessageDialog(null, child);
+                if(child instanceof Node) {
+                    ((Node)child).setParent(this);
+                }
+                else if(child instanceof List) {
+                    for(Object item : (List<?>)child) {
+                        if(!(item instanceof Node)) break;
+                        
+                        ((Node)item).setParent(this);
+                    }
                 }
             } catch (IllegalArgumentException | IllegalAccessException e) {
                 // TODO 自動生成された catch ブロック
@@ -26,7 +38,7 @@ abstract public class Node implements Dumpable, Acceptable{
             }
         }
     }
-    
+    /*
     public Scope scope() {
         return scope;
     }
@@ -34,9 +46,14 @@ abstract public class Node implements Dumpable, Acceptable{
     public void setScope(Scope scope) {
         this.scope = scope;
     }
+    */
     
     public Node parent() {
         return parent;
+    }
+    
+    public void setParent(Node parent) {
+        this.parent = parent;
     }
     
     abstract public Location location();
@@ -52,6 +69,7 @@ abstract public class Node implements Dumpable, Acceptable{
     public void dump(Dumper d) {
         d.printClass(this, location());
         _dump(d);
+        if(parent != null) d.printMember("parent", parent.getClass().getSimpleName());
     }
     
     abstract protected void _dump(Dumper d);
@@ -59,19 +77,17 @@ abstract public class Node implements Dumpable, Acceptable{
     public <S, E> E accept(ASTVisitor<S, E> visitor) {
         return visitor.visit(this);
     }
-    
+    /*
     @Deprecated
     public String toString() {
-        throw new Error("toString() is deprecated!");
+        //throw new Error("toString() is deprecated!");
     }
-    
+    */
     public BlockNode parentBlockNode(int depth) {
         return parent != null ? parent.parentBlockNode(depth) : null;
     }
     
     public boolean isDefinedVariable(String name) {
-        if(parent == null) return false;
-        if(parent.isDefinedVariable(name)) return true;
-        return false;
+        return parent != null && parent.isDefinedVariable(name);
     }
 }

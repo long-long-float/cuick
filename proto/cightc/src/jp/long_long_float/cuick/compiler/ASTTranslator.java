@@ -1,5 +1,6 @@
 package jp.long_long_float.cuick.compiler;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,11 +23,14 @@ import jp.long_long_float.cuick.ast.SuffixOpNode;
 import jp.long_long_float.cuick.ast.TypeNode;
 import jp.long_long_float.cuick.ast.VariableNode;
 import jp.long_long_float.cuick.entity.Function;
+import jp.long_long_float.cuick.entity.Parameter;
+import jp.long_long_float.cuick.entity.Params;
 import jp.long_long_float.cuick.entity.Variable;
 import jp.long_long_float.cuick.foreach.PointerEnumerable;
 import jp.long_long_float.cuick.foreach.RangeEnumerable;
 import jp.long_long_float.cuick.foreach.VariableSetEnumerable;
 import jp.long_long_float.cuick.type.CInt;
+import jp.long_long_float.cuick.type.FunctionType;
 import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.ErrorHandler;
 import jp.long_long_float.cuick.utility.ListUtils;
@@ -37,26 +41,47 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
         super(h);
     }
     
+    private void updateParents(Node node) {
+        new ParentSetter(errorHandler).visit(node);
+    }
+    
     public void translate(AST ast) {
-        List<StmtNode> stmts = new ArrayList<StmtNode>(ast.stmts().size());
-        for(StmtNode stmt : ast.stmts()) {
-            stmts.add((StmtNode)stmt.accept(this));
-        }
-        ast.setStmt(stmts);
+        Params params = new Params(null, ListUtils.asList(
+                new Parameter(new TypeNode(new CInt()), "argc"),
+                new Parameter(new TypeNode(new CInt().increasePointer().increasePointer()), "argv")));
+        BlockNode body = new BlockNode(null, null, new ArrayList<StmtNode>(ast.moveStmts()));
+        body.variables().addAll(ast.vars());
+        updateParents(body);
+        
+        Function main = new Function(new TypeNode(new FunctionType(new CInt(), params.parametersType())), "main", params, body);
+        ast.addFunction(main);
+
         for(Function func : ast.funcs()) {
             func.body().accept(this);
         }
     }
-    /*
+    
     @Override
     public Node visit(Node node) {
-        Node ret = super.visit(node);
-        if(ret instanceof StmtNode) {
-            new LocalResolver(errorHandler).resolve((StmtNode)ret);
+        try {
+            return (Node) getClass().getMethod("visit", node.getClass()).invoke(this, node);
+        } catch (IllegalAccessException e) {
+            // TODO 自動生成された catch ブロック
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            // TODO 自動生成された catch ブロック
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            throw new Error(e.getCause());
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            // TODO 自動生成された catch ブロック
+            e.printStackTrace();
         }
-        return ret;
+        return node;
     }
-    */
+    
     public Node visit(DefvarNode node) {
         return node;
     }

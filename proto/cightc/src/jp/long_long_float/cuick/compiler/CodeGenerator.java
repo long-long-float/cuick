@@ -41,7 +41,6 @@ import jp.long_long_float.cuick.ast.StmtNode;
 import jp.long_long_float.cuick.ast.StringLiteralNode;
 import jp.long_long_float.cuick.ast.SuffixOpNode;
 import jp.long_long_float.cuick.ast.SwitchNode;
-import jp.long_long_float.cuick.ast.TypeNode;
 import jp.long_long_float.cuick.ast.UnaryOpNode;
 import jp.long_long_float.cuick.ast.VariableNode;
 import jp.long_long_float.cuick.ast.WhileNode;
@@ -50,13 +49,9 @@ import jp.long_long_float.cuick.cppStructure.ForStmt;
 import jp.long_long_float.cuick.cppStructure.Struct;
 import jp.long_long_float.cuick.entity.Function;
 import jp.long_long_float.cuick.entity.Parameter;
-import jp.long_long_float.cuick.entity.Params;
 import jp.long_long_float.cuick.entity.Variable;
-import jp.long_long_float.cuick.type.CInt;
-import jp.long_long_float.cuick.type.FunctionType;
 import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.ErrorHandler;
-import jp.long_long_float.cuick.utility.ListUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -85,13 +80,6 @@ public class CodeGenerator extends ASTVisitor<String, String> {
         deployBuiltInCodes(cb);
         deployTuples(cb);
         deployFunctions(cb, ast);
-        //main
-        Params params = new Params(null, ListUtils.asList(
-                new Parameter(new TypeNode(new CInt()), "argc"),
-                new Parameter(new TypeNode(new CInt().increasePointer().increasePointer()), "argv")));
-        BlockNode body = new BlockNode(null, null, ast.stmts());
-        Function main = new Function(new TypeNode(new FunctionType(new CInt(), params.parametersType())), "main", params, body);
-        cb.addLine(main.accept(this));
         
         return cb.toString();
     }

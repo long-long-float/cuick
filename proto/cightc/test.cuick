@@ -29,9 +29,9 @@ int ary[] = {1, 2, 3, 4, 5};
 for(i : ary : 2..4) puts(i);
 for(i : ary : 3) puts(i);*/
 
-int counter = 10;
+int counter0 = 10;
 for(i : ary){
     for(j : ary){
-        puts(counter);
+        puts(counter0);
     }
 }

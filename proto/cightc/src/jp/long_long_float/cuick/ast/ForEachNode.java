@@ -70,4 +70,5 @@ public class ForEachNode extends StmtNode {
         d.printMember("body", body);
         d.printMember("lastBody", lastBody);
     }
+
 }

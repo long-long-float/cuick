@@ -32,11 +32,6 @@ public class ToplevelScope extends Scope {
     public Scope parent() {
         return null;
     }
-
-    @Override
-    public boolean isDefinedVariable(String name) {
-        return false; //XXX
-    }
     
     @Override
     public Entity get(String name) throws SemanticException {

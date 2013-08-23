@@ -149,7 +149,6 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
                 varType = pointer.type();
             }
             
-            //TODO iを他とかぶらないようにする
             int id = 0;
             for(;node.isDefinedVariable("counter" + id);id++) ;
             VariableNode counterVar = new VariableNode(null, "counter" + id);

@@ -58,6 +58,10 @@ public final class Table {
         return ret;
     }
     
+    public String getRealTupleName(Type tuple) {
+        return "tuple" + getTuples().indexOf(tuple);
+    }
+    
     public List<Function> getFunctions() {
         return functions;
     }

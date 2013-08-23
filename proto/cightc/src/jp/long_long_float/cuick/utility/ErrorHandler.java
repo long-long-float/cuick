@@ -21,8 +21,8 @@ public class ErrorHandler {
         this.stream = new PrintStream(stream);
     }
 
-    public void error(Location location, String message) {
-        error(location + ": " + message);
+    public void error(Location loc, String message) {
+        error((loc != null ? loc : "???") + ": " + message);
     }
     
     public void error(String message) {

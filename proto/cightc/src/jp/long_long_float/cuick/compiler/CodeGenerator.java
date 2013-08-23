@@ -221,6 +221,7 @@ public class CodeGenerator extends ASTVisitor<String, String> {
     }
     */
     public String visit(DefvarNode node) {
+        System.err.println(node.type().toString());
         return node.type().toString() + " " + join(node.vars(), ", ") + ";";
     }
     

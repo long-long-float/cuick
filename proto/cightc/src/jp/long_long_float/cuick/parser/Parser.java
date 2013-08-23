@@ -68,9 +68,9 @@ public class Parser implements ParserConstants {
     <ONE_LINE: ("\n" | "\r\n" | "\r") (~["\n", "\r"])* ("\n" | "\r\n" | "\r")>
 }*/
 
-//�?�?
+//�?�?
 
-//ソース全�?
+//ソース全�?
   final public AST compilation_unit() throws ParseException {
     trace_call("compilation_unit");
     try {
@@ -199,7 +199,7 @@ public class Parser implements ParserConstants {
     }
   }
 
-//変数宣�?
+//変数宣�?
   final public DefvarNode defvars() throws ParseException {
     trace_call("defvars");
     try {
@@ -207,7 +207,7 @@ public class Parser implements ParserConstants {
     Variable var;
     //Type baseType;
     Type type;
-      //storage(staticなど)は無�?
+      //storage(staticなど)は無�?
           type = type();
       var = defvar(type);
                                    vars.add(var);
@@ -226,7 +226,7 @@ public class Parser implements ParserConstants {
                                                                             vars.add(var);
       }
       jj_consume_token(94);
-            {if (true) return new DefvarNode(type.location(), type, vars);}
+            {if (true) return new DefvarNode(type.location(), vars);}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("defvars");
@@ -239,7 +239,7 @@ public class Parser implements ParserConstants {
     String name;
     List<ExprNode> constructorArgs = null;
     boolean isArray = false;
-    ExprNode arraySize = null;
+    ExprNode ListUtilsize = null;
     List<ExprNode> init = new ArrayList<ExprNode>();
     ExprNode expr;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -295,7 +295,7 @@ public class Parser implements ParserConstants {
         case 133:
         case 134:
         case 135:
-          arraySize = expr();
+          ListUtilsize = expr();
           break;
         default:
           jj_la1[6] = jj_gen;
@@ -314,7 +314,7 @@ public class Parser implements ParserConstants {
         case 90:
           jj_consume_token(90);
           expr = expr();
-                                                                                                                             init.add(expr);
+                                                                                                                                init.add(expr);
           label_4:
           while (true) {
             switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -327,7 +327,7 @@ public class Parser implements ParserConstants {
             }
             jj_consume_token(93);
             expr = expr();
-                                                                                                                                                                  init.add(expr);
+                                                                                                                                                                     init.add(expr);
           }
           jj_consume_token(98);
           break;
@@ -347,7 +347,7 @@ public class Parser implements ParserConstants {
         case 134:
         case 135:
           expr = expr();
-                                                                                                                                                                                                           init.add(expr);
+                                                                                                                                                                                                              init.add(expr);
           break;
         default:
           jj_la1[9] = jj_gen;
@@ -359,7 +359,7 @@ public class Parser implements ParserConstants {
         jj_la1[10] = jj_gen;
         ;
       }
-            {if (true) return new Variable(new TypeNode(type), name, constructorArgs, isArray, arraySize, init);}
+            {if (true) return new Variable(new TypeNode(type), name, constructorArgs, isArray, ListUtilsize, init);}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("defvar");
@@ -465,7 +465,7 @@ public class Parser implements ParserConstants {
     Type type;
     String n;
     boolean isArray = false;
-    ExprNode arraySize = null;
+    ExprNode ListUtilsize = null;
     ExprNode defaultValue = null;
       type = type();
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -511,7 +511,7 @@ public class Parser implements ParserConstants {
         case 133:
         case 134:
         case 135:
-          arraySize = expr();
+          ListUtilsize = expr();
           break;
         default:
           jj_la1[15] = jj_gen;
@@ -532,7 +532,7 @@ public class Parser implements ParserConstants {
         jj_la1[17] = jj_gen;
         ;
       }
-        {if (true) return new Parameter(new TypeNode(type), n, isArray, arraySize, defaultValue);}
+        {if (true) return new Parameter(new TypeNode(type), n, isArray, ListUtilsize, defaultValue);}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("param");
@@ -643,7 +643,7 @@ public class Parser implements ParserConstants {
   }
 
 /*
-何もつ�?��な�?�??�?
+何もつ�?��な�?�??�?
 int
 vector<int, int>
 $T
@@ -695,7 +695,7 @@ $T
   }
 
 /*
-*�?が付いた型
+*�?が付いた型
 int*
 int&
 $T*
@@ -2038,11 +2038,11 @@ $T*
             break label_26;
           }
           jj_consume_token(92);
-                          t.increasePointer();
+                          t = t.increasePointer();
         }
         jj_consume_token(89);
         n = term();
-                                                                 {if (true) return new CastNode(t, n);}
+                                                                          {if (true) return new CastNode(t, n);}
       } else {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case SIZEOF:
@@ -2406,7 +2406,7 @@ $T*
       case INTEGER:
         t = jj_consume_token(INTEGER);
             //return integerNode(location(t), t.image);
-            {if (true) return new LiteralNode(location(t), new CInt(location(t)), t.image);} //TODO int以外�?も作る
+            {if (true) return new LiteralNode(location(t), new CInt(location(t)), t.image);} //TODO int以外�?も作る
 
         break;
       case CHARACTER:
@@ -2418,7 +2418,7 @@ $T*
         t = jj_consume_token(STRING);
             //return new StringLiteralNode(location(t), new PointerType(IntegerType.charRef()), stringValue(t.image));
             /*Type type = new BasicType("char", location(t));
-            type.addPointer();
+            type.increasePointer();
             return new LiteralNode(location(t), type, t.image);*/
             {if (true) return new StringLiteralNode(location(t), t.image);}
         break;
@@ -2830,12 +2830,6 @@ $T*
 
   private boolean jj_3R_203() {
     if (jj_scan_token(91)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_81() {
-    if (jj_scan_token(97)) return true;
-    if (jj_3R_40()) return true;
     return false;
   }
 
@@ -4200,6 +4194,11 @@ $T*
     return false;
   }
 
+  private boolean jj_3R_97() {
+    if (jj_3R_40()) return true;
+    return false;
+  }
+
   private boolean jj_3R_136() {
     if (jj_scan_token(124)) return true;
     if (jj_3R_135()) return true;
@@ -4262,11 +4261,6 @@ $T*
       xsp = jj_scanpos;
       if (jj_3R_145()) { jj_scanpos = xsp; break; }
     }
-    return false;
-  }
-
-  private boolean jj_3R_97() {
-    if (jj_3R_40()) return true;
     return false;
   }
 
@@ -4441,14 +4435,14 @@ $T*
     return false;
   }
 
-  private boolean jj_3R_43() {
-    if (jj_scan_token(92)) return true;
-    return false;
-  }
-
   private boolean jj_3R_105() {
     if (jj_scan_token(93)) return true;
     if (jj_3R_40()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_43() {
+    if (jj_scan_token(92)) return true;
     return false;
   }
 
@@ -4571,6 +4565,12 @@ $T*
     }
     }
     }
+    return false;
+  }
+
+  private boolean jj_3R_81() {
+    if (jj_scan_token(97)) return true;
+    if (jj_3R_40()) return true;
     return false;
   }
 

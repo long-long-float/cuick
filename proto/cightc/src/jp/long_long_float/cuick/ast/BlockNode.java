@@ -71,7 +71,7 @@ public class BlockNode extends StmtNode {
     }
     
     public void defineVariable(Variable var) {
-        addStmtFront(new DefvarNode(null, var.type(), ListUtils.asList(var)));
+        addStmtFront(new DefvarNode(null, ListUtils.asList(var)));
         variables.add(var);
     }
     

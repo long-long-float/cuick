@@ -226,7 +226,7 @@ public class Parser implements ParserConstants {
                                                                             vars.add(var);
       }
       jj_consume_token(94);
-            {if (true) return new DefvarNode(type.location(), vars);}
+            {if (true) return new DefvarNode(type.location(), type, vars);}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("defvars");
@@ -1555,6 +1555,7 @@ $T*
         expr = expr();
                           rhses.add(expr);
       }
+      jj_consume_token(94);
             {if (true) return new MultiplexAssignNode(lhses, rhses);}
     throw new Error("Missing return statement in function");
     } finally {
@@ -3005,6 +3006,7 @@ $T*
       xsp = jj_scanpos;
       if (jj_3R_190()) { jj_scanpos = xsp; break; }
     }
+    if (jj_scan_token(94)) return true;
     return false;
   }
 

@@ -15,11 +15,6 @@ public class ForEachNode extends StmtNode {
     
     public ForEachNode(Location loc, Type type, String name, boolean isFore, Enumerable enume, StmtNode body, StmtNode lastBody) {
         super(loc);
-        //TODO ここでtypeを確定しておく
-        /*if(type == null) {
-            type = enume.getVarType();
-            //type = new CInt();
-        }*/
         this.var = new Variable(new TypeNode(type), name, null, false, null, null);
         this.isFore = isFore;
         this.enumerable = enume;

@@ -174,7 +174,7 @@ public class CodeGenerator extends ASTVisitor<String, String> {
             ret += "(" + join(ent.constructorArgs(), ", ") + ")";
         }
         if(ent.isArray()) {
-            ret += "[" + (ent.ListUtilsize() != null ? ent.ListUtilsize() : "") + "]";
+            ret += "[" + (ent.arraySize() != null ? ent.arraySize() : "") + "]";
         }
         List<ExprNode> init = ent.init();
         if(!init.isEmpty()) {
@@ -220,8 +220,7 @@ public class CodeGenerator extends ASTVisitor<String, String> {
     }
     */
     public String visit(DefvarNode node) {
-        System.err.println(node.type().toString());
-        return node.type().toString() + " " + join(node.vars(), ", ") + ";";
+        return node.type() + " " + join(node.vars(), ", ") + ";";
     }
     
     public String visit(IfNode n) {

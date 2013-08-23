@@ -244,7 +244,7 @@ DefvarNode defvars():
     //storage(staticなど)は無し
     type=type() var=defvar(type) { vars.add(var); } ("," var=defvar(type) { vars.add(var); } )* ";"
         {
-            return new DefvarNode(type.location(), vars);
+            return new DefvarNode(type.location(), type, vars);
         }
 }
 
@@ -707,7 +707,7 @@ MultiplexAssignNode multiplex_assign():
     expr=term(){ lhses.add(expr); }
         ("," expr=term(){ lhses.add(expr); } )+
         "=" expr=expr(){ rhses.add(expr); }
-        ("," expr=expr(){ rhses.add(expr); })*
+        ("," expr=expr(){ rhses.add(expr); })* ";"
         {
             return new MultiplexAssignNode(lhses, rhses);
         }

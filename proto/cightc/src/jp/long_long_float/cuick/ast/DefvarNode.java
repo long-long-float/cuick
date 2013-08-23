@@ -10,7 +10,7 @@ public class DefvarNode extends StmtNode {
     protected List<Variable> vars;
     protected Type type;
     
-    public DefvarNode(Location loc, /*Type type, */List<Variable> vars) {
+    public DefvarNode(Location loc, Type type, List<Variable> vars) {
         super(loc);
         this.vars = vars;
         this.type = type;
@@ -21,7 +21,7 @@ public class DefvarNode extends StmtNode {
     }
     
     public Type type() {
-        return vars.get(0).type();
+        return type;
     }
 
     @Override

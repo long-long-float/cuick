@@ -59,7 +59,6 @@ public class TypeResolver extends Visitor {
     
     public Void visit(CondExprNode n) {
         super.visit(n);
-        System.out.println(n.thenExpr().type()); //TODO
         typeEqualCheck(n, n.thenExpr(), n.elseExpr());
         n.setType(n.thenExpr().type());
         return null;

@@ -18,7 +18,7 @@ public class BlockNode extends StmtNode {
     public BlockNode(Location loc, List<Variable> vars, List<StmtNode> stmts) {
         super(loc);
         this.variables = vars != null ? vars : new ArrayList<Variable>();
-        this.stmts = stmts;
+        this.stmts = stmts != null ? stmts : new ArrayList<StmtNode>();
     }
 
     public List<StmtNode> stmts() {
@@ -31,6 +31,13 @@ public class BlockNode extends StmtNode {
 
     public void setStmt(List<StmtNode> stmts) {
         this.stmts = stmts;
+    }
+    
+    /**
+     * targetの位置にstmtsを追加します
+     */
+    public void insertStmts(StmtNode target, List<StmtNode> stmts) {
+        this.stmts.addAll(this.stmts.indexOf(target), stmts);
     }
     
     @Override
@@ -70,8 +77,11 @@ public class BlockNode extends StmtNode {
         return scope;
     }
     
+    /**
+     * 変数を定義します。DefvarNodeをstmtsに追加し、variablesにも追加します
+     */
     public void defineVariable(Variable var) {
-        addStmtFront(new DefvarNode(null, ListUtils.asList(var)));
+        addStmtFront(new DefvarNode(null, var.type(), ListUtils.asList(var)));
         variables.add(var);
     }
     

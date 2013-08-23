@@ -23,6 +23,7 @@ import jp.long_long_float.cuick.ast.FuncallNode;
 import jp.long_long_float.cuick.ast.IfNode;
 import jp.long_long_float.cuick.ast.LiteralNode;
 import jp.long_long_float.cuick.ast.MemberNode;
+import jp.long_long_float.cuick.ast.MultiplexAssignNode;
 import jp.long_long_float.cuick.ast.OpAssignNode;
 import jp.long_long_float.cuick.ast.PowerOpNode;
 import jp.long_long_float.cuick.ast.PrefixOpNode;
@@ -79,6 +80,12 @@ public class Visitor extends ASTVisitor<Void, Void> {
     }
     
     //statements
+    
+    public Void visit(MultiplexAssignNode node) {
+        visitExprs(node.lhses());
+        visitExprs(node.rhses());
+        return null;
+    }
     
     public Void visit(DefvarNode node) {
         for(Variable var : node.vars()) {

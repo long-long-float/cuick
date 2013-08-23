@@ -11,6 +11,14 @@ public class MultiplexAssignNode extends StmtNode {
         this.lhses = lhses;
         this.rhses = rhses;
     }
+    
+    public List<ExprNode> lhses() {
+        return lhses;
+    }
+    
+    public List<ExprNode> rhses() {
+        return rhses;
+    }
 
     @Override
     protected void _dump(Dumper d) {

@@ -8,14 +8,17 @@ import java.util.List;
 import jp.long_long_float.cuick.ast.AST;
 import jp.long_long_float.cuick.ast.ASTVisitor;
 import jp.long_long_float.cuick.ast.ArefNode;
+import jp.long_long_float.cuick.ast.AssignNode;
 import jp.long_long_float.cuick.ast.BinaryOpNode;
 import jp.long_long_float.cuick.ast.BlockNode;
 import jp.long_long_float.cuick.ast.DefvarNode;
 import jp.long_long_float.cuick.ast.ExprNode;
+import jp.long_long_float.cuick.ast.ExprStmtNode;
 import jp.long_long_float.cuick.ast.ForEachNode;
 import jp.long_long_float.cuick.ast.ForNode;
 import jp.long_long_float.cuick.ast.FuncallNode;
 import jp.long_long_float.cuick.ast.LiteralNode;
+import jp.long_long_float.cuick.ast.MultiplexAssignNode;
 import jp.long_long_float.cuick.ast.Node;
 import jp.long_long_float.cuick.ast.PowerOpNode;
 import jp.long_long_float.cuick.ast.RangeNode;
@@ -81,9 +84,8 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
         } catch (InvocationTargetException e) {
             throw new Error(e.getCause());
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         } catch (SecurityException e) {
-            // TODO 自動生成された catch ブロック
             e.printStackTrace();
         }
         System.out.println(node.getClass().getSimpleName());
@@ -99,7 +101,10 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
                     List<?> childList = (List<?>) child;
                     if(childList.size() > 0 && childList.get(0) instanceof Node) {
                         List<Node> newList = new ArrayList<Node>(childList.size());
-                        for(Node item : (List<Node>)childList) newList.add(item.accept(this));
+                        for(int i = 0;i < childList.size();i++) {
+                            Node newItem = ((Node)childList.get(i)).accept(this);
+                            if(newItem != null) newList.add(newItem);
+                        }
                         field.set(node, newList);
                     }
                 }
@@ -110,26 +115,16 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
         }
         return node;
     }
-    
-    public Node visit(PowerOpNode node) {
-        return new FuncallNode(new StaticMemberNode(new VariableNode(null, "std"), "pow"), null, ListUtils.asList(node.left(), node.right()), null);
-    }
-    
-    public Node visit(DefvarNode node) {
-        return node;
-    }
-    
+
+    //statements
+    /*
     public Node visit(BlockNode node) {
         List<StmtNode> stmts = new ArrayList<StmtNode>(node.stmts().size());
         for(StmtNode stmt : node.stmts()) {
-            stmts.add((StmtNode)stmt.accept(this));
+            StmtNode newStmt = (StmtNode)stmt.accept(this);
+            if(newStmt != null) stmts.add(newStmt);
         }
         node.setStmt(stmts);
-        return node;
-    }
-    /*
-    public Node visit(ExprStmtNode node) {
-        node.setExpr((ExprNode)node.expr().accept(this));
         return node;
     }
     */
@@ -188,9 +183,7 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
                 varType = pointer.type();
             }
             
-            int id = 0;
-            for(;node.isDefinedVariable("counter" + id);id++) ;
-            VariableNode counterVar = new VariableNode(null, "counter" + id);
+            VariableNode counterVar = new VariableNode(null, node.getIdentityName("counter"));
             Variable var = new Variable(new TypeNode(varType.decreasePointer()), node.var().name(), null, false, null, ListUtils.asList((ExprNode)new ArefNode(pointer, counterVar)));
             
             BlockNode body = node.body().toBlockNode();
@@ -212,5 +205,35 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
             throw new Error(node.enumerable().getClass().getSimpleName() + " is not supported!");
         }
         return ret;
+    }
+    
+    //expressions
+    
+    public Node visit(MultiplexAssignNode node) {
+        //FIXME 下のように書き換える場合、無限ループになる
+        //BlockNode parentBlock = node.parentBlockNode(0);
+        BlockNode parentBlock = new BlockNode(null, null, null);
+        
+        Variable temp = new Variable(new TypeNode(node.rhses().get(0).type()), 
+                parentBlock.getIdentityName("temp"), null, true, 
+                new LiteralNode(null, new CInt(), Integer.toString(node.rhses().size())), node.rhses());
+        parentBlock.variables().add(temp);
+        List<StmtNode> stmts = new ArrayList<StmtNode>();
+        stmts.add(new DefvarNode(node.location(), temp.rawType(), ListUtils.asList(temp)));
+        for(int i = 0;i < node.rhses().size();i++){
+            //FIXME 理想
+            //stmts.add(temp.at(cint(i)).assign(node.rhses().get(0)).toStmt());
+            stmts.add(new ExprStmtNode(null, new AssignNode(
+                    node.lhses().get(i),
+                    new ArefNode(new VariableNode(null, temp.name()), new LiteralNode(null, new CInt(), Integer.toString(i))))));
+        }
+        //parentBlock.insertStmts(node, stmts);
+        parentBlock.stmts().addAll(stmts);
+        return parentBlock;
+        //return null;
+    }
+    
+    public Node visit(PowerOpNode node) {
+        return new FuncallNode(new StaticMemberNode(new VariableNode(null, "std"), "pow"), null, ListUtils.asList(node.left(), node.right()), null);
     }
 }

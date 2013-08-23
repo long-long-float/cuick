@@ -6,6 +6,7 @@ import java.util.List;
 import jp.long_long_float.cuick.ast.Dumper;
 import jp.long_long_float.cuick.ast.ExprNode;
 import jp.long_long_float.cuick.ast.TypeNode;
+import jp.long_long_float.cuick.type.Type;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -13,25 +14,34 @@ public class Variable extends Entity {
     
     protected List<ExprNode> constructorArgs = null;
     protected boolean isArray = false;
-    protected ExprNode ListUtilsize = null;
+    protected ExprNode arraySize = null;
     protected List<ExprNode> init;
     
-    public Variable(TypeNode typeNode, String name, List<ExprNode> constructorArgs, boolean isArray, ExprNode ListUtilsize, List<ExprNode> init) {
+    public Variable(TypeNode typeNode, String name, List<ExprNode> constructorArgs, boolean isArray, ExprNode arraySize, List<ExprNode> init) {
         super(typeNode, name);
-        if(isArray) this.setType(this.type().increasePointer());
         
         this.constructorArgs = (constructorArgs != null ? constructorArgs : new ArrayList<ExprNode>());
         this.isArray = isArray;
-        this.ListUtilsize = ListUtilsize;
+        this.arraySize = arraySize;
         this.init = (init != null ? init : new ArrayList<ExprNode>());
+    }
+    
+    @Override
+    public Type type() {
+        Type ret = super.type();
+        return isArray ? ret.increasePointer() : ret;
+    }
+    
+    public Type rawType() {
+        return super.type();
     }
     
     public boolean isArray() {
         return isArray;
     }
     
-    public ExprNode ListUtilsize() {
-        return ListUtilsize;
+    public ExprNode arraySize() {
+        return arraySize;
     }
     
     public List<ExprNode> init() {
@@ -49,7 +59,7 @@ public class Variable extends Entity {
             ret += "(" + StringUtils.join(constructorArgs, ", ") + ")";
         }
         if(isArray) {
-            ret += "[" + (ListUtilsize != null ? ListUtilsize : "") + "]";
+            ret += "[" + (arraySize != null ? arraySize : "") + "]";
         }
         if(!init.isEmpty()) {
             ret += " = ";

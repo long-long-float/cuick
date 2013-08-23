@@ -15,6 +15,12 @@ abstract public class StmtNode extends Node {
         return new BlockNode(location, null, ListUtils.asList(this));
     }
     
+    public String getIdentityName(String name) {
+        int id = 0;
+        for(;isDefinedVariable(name + id);id++) ;
+        return name;
+    }
+    
     @Override
     public Location location() {
         return location;

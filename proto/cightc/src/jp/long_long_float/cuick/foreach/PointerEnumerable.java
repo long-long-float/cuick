@@ -2,10 +2,8 @@ package jp.long_long_float.cuick.foreach;
 
 import jp.long_long_float.cuick.ast.Dumper;
 import jp.long_long_float.cuick.ast.ExprNode;
-import jp.long_long_float.cuick.ast.ForEachNode;
 import jp.long_long_float.cuick.ast.LiteralNode;
 import jp.long_long_float.cuick.ast.RangeNode;
-import jp.long_long_float.cuick.cppStructure.ForStmt;
 import jp.long_long_float.cuick.type.CInt;
 
 public class PointerEnumerable extends Enumerable {
@@ -28,18 +26,6 @@ public class PointerEnumerable extends Enumerable {
     
     public RangeNode range() {
         return range;
-    }
-
-    @Override
-    public String toString(ForEachNode forEachNode) {
-        String name = forEachNode.var().name();
-        //TODO iを他とかぶらないようにする
-        ForStmt forStmt = new ForStmt(
-                "int i = " + range.begin(), 
-                "i " + range.getOperator() + " " + range.end(), 
-                "i++");
-        //TODO ここでpointer.type() + "& " + name + " = " + pointer + "[i]";を追加する
-        return forStmt.toString();
     }
 
     @Override

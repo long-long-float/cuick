@@ -19,6 +19,4 @@ extend void $CONT.sort() {
     sort(this.begin(), this.end());
 }
 */
-
-tuple<int, int, int> a;
-tuple<int, int, int> b;
+assert(std::pow(2, 10) == 2 ** 10);

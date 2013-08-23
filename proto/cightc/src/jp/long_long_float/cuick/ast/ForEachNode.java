@@ -57,11 +57,6 @@ public class ForEachNode extends StmtNode {
     }
     
     @Override
-    public String toString() {
-        return enumerable.toString(this);
-    }
-    
-    @Override
     protected void _dump(Dumper d) {
         if(var.typeNode() != null) d.printMember("var.type", var.type());
         d.printMember("var.name", var.name());

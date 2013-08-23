@@ -23,9 +23,6 @@ abstract public class Enumerable extends Node{
         return this.forEachNode;
     }
 
-    @Deprecated
-    abstract public String toString(ForEachNode forEachNode);
-
     @Override
     public Location location() {
         return location;

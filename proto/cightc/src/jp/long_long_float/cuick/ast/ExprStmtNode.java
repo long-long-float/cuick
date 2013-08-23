@@ -23,4 +23,8 @@ public class ExprStmtNode extends StmtNode {
         return expr;
     }
 
+    public void setExpr(ExprNode expr) {
+        this.expr = expr;
+    }
+
 }

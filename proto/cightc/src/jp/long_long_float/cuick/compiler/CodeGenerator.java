@@ -29,7 +29,6 @@ import jp.long_long_float.cuick.ast.IfNode;
 import jp.long_long_float.cuick.ast.LiteralNode;
 import jp.long_long_float.cuick.ast.MemberNode;
 import jp.long_long_float.cuick.ast.OpAssignNode;
-import jp.long_long_float.cuick.ast.PowerOpNode;
 import jp.long_long_float.cuick.ast.PrefixOpNode;
 import jp.long_long_float.cuick.ast.PtrMemberNode;
 import jp.long_long_float.cuick.ast.RangeNode;
@@ -275,11 +274,6 @@ public class CodeGenerator extends ASTVisitor<String, String> {
     
     public String visit(BinaryOpNode node) {
         return "" + node.left().accept(this) + " " + node.operator() + " " + node.right().accept(this);
-    }
-    
-    public String visit(PowerOpNode node) {
-        //XXX ASTTranslatorでしたいっ…!
-        return "std::pow((double)" + node.left().accept(this) + ", (double)" + node.right().accept(this) + ")";
     }
     
     public String visit(SuffixOpNode node) {

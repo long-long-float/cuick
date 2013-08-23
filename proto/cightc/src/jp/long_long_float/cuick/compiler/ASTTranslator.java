@@ -1,5 +1,6 @@
 package jp.long_long_float.cuick.compiler;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,13 +12,15 @@ import jp.long_long_float.cuick.ast.BinaryOpNode;
 import jp.long_long_float.cuick.ast.BlockNode;
 import jp.long_long_float.cuick.ast.DefvarNode;
 import jp.long_long_float.cuick.ast.ExprNode;
-import jp.long_long_float.cuick.ast.ExprStmtNode;
 import jp.long_long_float.cuick.ast.ForEachNode;
 import jp.long_long_float.cuick.ast.ForNode;
+import jp.long_long_float.cuick.ast.FuncallNode;
 import jp.long_long_float.cuick.ast.LiteralNode;
 import jp.long_long_float.cuick.ast.Node;
+import jp.long_long_float.cuick.ast.PowerOpNode;
 import jp.long_long_float.cuick.ast.RangeNode;
 import jp.long_long_float.cuick.ast.SizeofExprNode;
+import jp.long_long_float.cuick.ast.StaticMemberNode;
 import jp.long_long_float.cuick.ast.StmtNode;
 import jp.long_long_float.cuick.ast.SuffixOpNode;
 import jp.long_long_float.cuick.ast.TypeNode;
@@ -64,7 +67,11 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
     @Override
     public Node visit(Node node) {
         try {
-            return (Node) getClass().getMethod("visit", node.getClass()).invoke(this, node);
+            Node ret = (Node) getClass().getMethod("visit", node.getClass()).invoke(this, node);
+            if(node != ret) {
+                updateParents(node.parent());
+            }
+            return ret;
         } catch (IllegalAccessException e) {
             // TODO 自動生成された catch ブロック
             e.printStackTrace();
@@ -79,7 +86,33 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
             // TODO 自動生成された catch ブロック
             e.printStackTrace();
         }
+        System.out.println(node.getClass().getSimpleName());
+        for(Field field : node.getClass().getDeclaredFields()) {
+            try {
+                field.setAccessible(true);
+                Object child = field.get(node);
+                if(child instanceof Node) {
+                    System.out.println("set " + field.getName());
+                    field.set(node, ((Node) child).accept(this));
+                }
+                else if(child instanceof List<?>) {
+                    List<?> childList = (List<?>) child;
+                    if(childList.size() > 0 && childList.get(0) instanceof Node) {
+                        List<Node> newList = new ArrayList<Node>(childList.size());
+                        for(Node item : (List<Node>)childList) newList.add(item.accept(this));
+                        field.set(node, newList);
+                    }
+                }
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                // TODO 自動生成された catch ブロック
+                e.printStackTrace();
+            }
+        }
         return node;
+    }
+    
+    public Node visit(PowerOpNode node) {
+        return new FuncallNode(new StaticMemberNode(new VariableNode(null, "std"), "pow"), null, ListUtils.asList(node.left(), node.right()), null);
     }
     
     public Node visit(DefvarNode node) {
@@ -94,11 +127,12 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
         node.setStmt(stmts);
         return node;
     }
-    
+    /*
     public Node visit(ExprStmtNode node) {
+        node.setExpr((ExprNode)node.expr().accept(this));
         return node;
     }
-    
+    */
     public Node visit(ForEachNode node) {
         Node ret = null;
         if(node.enumerable() instanceof VariableSetEnumerable) {
@@ -109,6 +143,8 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
                     error(node.location(), "Type is undefined! Please use \"as\" oerator.");
                 }
                 
+                //int型の変数
+                //TODO int型以外に対応
                 if(rightVar.type().hasType("int")) {
                     //VariableNode leftVar = new VariableNode(null, enume.forEachNode().var().name());
                     if(rightVar.type().isPointer()) {
@@ -125,6 +161,9 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
                         node.setEnumerable(new_enume);
                         ret = node.accept(this);
                     }
+                }
+                else {
+                    
                 }
             }
         }

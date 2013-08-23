@@ -31,13 +31,13 @@ public class LocalScope extends Scope{
     public Scope parent() {
         return this.parent;
     }
-    
+    /*
     @Override
     public boolean isDefinedVariable(String name) {
         if(variables.containsKey(name)) return true;
         return parent.isDefinedVariable(name);
     }
-
+    */
     @Override
     public Entity get(String name) throws SemanticException {
         Variable var = variables.get(name);

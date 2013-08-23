@@ -35,12 +35,22 @@ public class AST extends Node{
         return new ArrayList<StmtNode>(declarations.stmts);
     }
     
+    public List<StmtNode> moveStmts() {
+        List<StmtNode> ret = stmts();
+        declarations.stmts.clear();
+        return ret;
+    }
+    
     public void setStmt(List<StmtNode> stmts) {
         declarations.stmts = new LinkedHashSet<StmtNode>(stmts);
     }
     
     public List<Function> funcs() {
         return new ArrayList<Function>(declarations.funcs);
+    }
+    
+    public void addFunction(Function func) {
+        declarations.funcs.add(func);
     }
     
     public List<AtCommandNode> atCommands() {
@@ -66,6 +76,4 @@ public class AST extends Node{
         }
         toplevelScope = scope;
     }
-
-    
 }

@@ -54,7 +54,7 @@ public class BlockNode extends StmtNode {
     }
     
     protected void _dump(Dumper d) {
-        //d.printNodeList("variables", variables);
+        d.printNodeList("variables", variables);
         d.printNodeList("stmts", stmts);
     }
 
@@ -73,5 +73,18 @@ public class BlockNode extends StmtNode {
     public void defineVariable(Variable var) {
         addStmtFront(new DefvarNode(null, var.type(), ListUtils.asList(var)));
         variables.add(var);
+    }
+    
+    @Override
+    public BlockNode parentBlockNode(int depth) {
+        return depth == 0 ? this : parent.parentBlockNode(depth - 1);
+    }
+    
+    @Override
+    public boolean isDefinedVariable(String name) {
+        for(Variable var : variables) {
+            if(var.name().equals(name)) return true;
+        }
+        return super.isDefinedVariable(name);
     }
 }

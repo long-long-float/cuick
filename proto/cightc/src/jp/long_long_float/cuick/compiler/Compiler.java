@@ -45,22 +45,23 @@ public class Compiler {
     private void compile(String srcPath, String destPath, Options opts) throws CompileException{
         AST ast = parseFile(srcPath, opts);
         ast.dump();
-        System.out.println("===============================");
+        System.out.println("===============localResolve================");
         ast = localResolve(ast, opts);
         ast.dump();
-        System.out.println("===============================");
+        System.out.println("===============typeResolve================");
         ast = typeResolve(ast, opts);
         ast.dump();
-        System.out.println("===============================");
+        new ParentSetter(errorHandler).parentSet(ast);
+        System.out.println("===============ASTTranslator================");
         new ASTTranslator(errorHandler).translate(ast);
         ast.dump();
-        System.out.println("===============================");
+        System.out.println("===============localResolve================");
         ast = localResolve(ast, opts);
         ast.dump();
-        System.out.println("===============================");
+        System.out.println("===============typeResolve================");
         ast = typeResolve(ast, opts);
         ast.dump();
-        System.out.println("===============================");
+        System.out.println("===============rename================");
         ast = rename(ast, opts);
         ast.dump();
         
@@ -74,8 +75,8 @@ public class Compiler {
             writer = new BufferedWriter(new FileWriter(new File(path)));
             try {
                 //writer.write(cb.toString());
-                //System.out.println(codeGenerate(ast, opts));
-                writer.write(codeGenerate(ast, opts));
+                System.out.println(codeGenerate(ast, opts));
+                //writer.write(codeGenerate(ast, opts));
             }
             finally {
                 writer.close();

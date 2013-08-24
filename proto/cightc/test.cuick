@@ -19,4 +19,3 @@ extend void $CONT.sort() {
     sort(this.begin(), this.end());
 }
 */
-std::vector<int> vec;

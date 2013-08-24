@@ -47,7 +47,7 @@ public class ForNode extends StmtNode {
         return incr;
     }
 
-    public StmtNode body() {
+    public BlockNode body() {
         return body;
     }
 }

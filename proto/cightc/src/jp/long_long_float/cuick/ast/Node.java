@@ -15,13 +15,10 @@ abstract public class Node implements Dumpable, Acceptable{
     }
     
     public void setParents() {
-        //System.out.println(getClass().getSimpleName());
         for(Field field : getClass().getDeclaredFields()) {
-            //System.out.println("    " + field.getName());
             try {
                 field.setAccessible(true);
                 Object child = field.get(this);
-                //JOptionPane.showMessageDialog(null, child);
                 if(child instanceof Node) {
                     ((Node)child).setParent(this);
                 }

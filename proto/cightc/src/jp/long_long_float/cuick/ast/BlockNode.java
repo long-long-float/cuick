@@ -61,6 +61,7 @@ public class BlockNode extends StmtNode {
     }
     
     protected void _dump(Dumper d) {
+        System.out.println(variables);
         d.printNodeList("variables", variables);
         d.printNodeList("stmts", stmts);
     }
@@ -78,11 +79,10 @@ public class BlockNode extends StmtNode {
     }
     
     /**
-     * 変数を定義します。DefvarNodeをstmtsに追加し、variablesにも追加します
+     * 変数を定義します。DefvarNodeをstmtsに追加します
      */
     public void defineVariable(Variable var) {
         addStmtFront(new DefvarNode(null, var.type(), ListUtils.asList(var)));
-        variables.add(var);
     }
     
     @Override

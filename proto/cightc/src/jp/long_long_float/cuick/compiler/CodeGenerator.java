@@ -8,6 +8,7 @@ import java.util.Queue;
 
 import jp.long_long_float.cuick.ast.AST;
 import jp.long_long_float.cuick.ast.ASTVisitor;
+import jp.long_long_float.cuick.ast.AddressNode;
 import jp.long_long_float.cuick.ast.ArefNode;
 import jp.long_long_float.cuick.ast.AsOpNode;
 import jp.long_long_float.cuick.ast.AssignNode;
@@ -20,6 +21,7 @@ import jp.long_long_float.cuick.ast.CastNode;
 import jp.long_long_float.cuick.ast.CondExprNode;
 import jp.long_long_float.cuick.ast.ContinueNode;
 import jp.long_long_float.cuick.ast.DefvarNode;
+import jp.long_long_float.cuick.ast.DereferenceNode;
 import jp.long_long_float.cuick.ast.DoWhileNode;
 import jp.long_long_float.cuick.ast.ExprNode;
 import jp.long_long_float.cuick.ast.ExprStmtNode;
@@ -333,6 +335,14 @@ public class CodeGenerator extends ASTVisitor<String, String> {
     
     public String visit(StaticMemberNode node) {
         return node.expr().accept(this) + "::" + node.member();
+    }
+    
+    public String visit(DereferenceNode node) {
+        return "*" + node.expr().accept(this);
+    }
+
+    public String visit(AddressNode node) {
+        return "&" + node.expr().accept(this);
     }
 
     public String visit(CastNode node) {

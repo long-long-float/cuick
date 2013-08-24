@@ -17,7 +17,7 @@ public class TypeNode extends Node {
 
     @Override
     public Location location() {
-        return type.location();
+        return (type != null ? type.location() : null);
     }
 
     @Override

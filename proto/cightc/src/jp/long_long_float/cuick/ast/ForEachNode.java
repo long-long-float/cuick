@@ -10,7 +10,7 @@ public class ForEachNode extends StmtNode {
     protected Variable var;
     protected boolean isFore;
     protected Enumerable enumerable;
-    protected StmtNode body;
+    protected BlockNode body;
     protected StmtNode lastBody;
     
     public ForEachNode(Location loc, Type type, String name, boolean isFore, Enumerable enume, StmtNode body, StmtNode lastBody) {
@@ -19,7 +19,8 @@ public class ForEachNode extends StmtNode {
         this.isFore = isFore;
         this.enumerable = enume;
         this.enumerable.setForEachNode(this);
-        this.body = body;
+        this.body = body.toBlockNode();
+        this.body.variables().add(this.var);
         this.lastBody = lastBody;
     }
     
@@ -43,11 +44,11 @@ public class ForEachNode extends StmtNode {
         return lastBody;
     }
     
-    public StmtNode body() {
+    public BlockNode body() {
         return body;
     }
-    
-    public void setBody(StmtNode body) {
+
+    public void setBody(BlockNode body) {
         this.body = body;
     }
     

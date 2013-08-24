@@ -12,12 +12,14 @@ import jp.long_long_float.cuick.ast.AssignNode;
 import jp.long_long_float.cuick.ast.BinaryOpNode;
 import jp.long_long_float.cuick.ast.BlockNode;
 import jp.long_long_float.cuick.ast.DefvarNode;
+import jp.long_long_float.cuick.ast.DereferenceNode;
 import jp.long_long_float.cuick.ast.ExprNode;
 import jp.long_long_float.cuick.ast.ExprStmtNode;
 import jp.long_long_float.cuick.ast.ForEachNode;
 import jp.long_long_float.cuick.ast.ForNode;
 import jp.long_long_float.cuick.ast.FuncallNode;
 import jp.long_long_float.cuick.ast.LiteralNode;
+import jp.long_long_float.cuick.ast.MemberNode;
 import jp.long_long_float.cuick.ast.MultiplexAssignNode;
 import jp.long_long_float.cuick.ast.Node;
 import jp.long_long_float.cuick.ast.PowerOpNode;
@@ -36,8 +38,10 @@ import jp.long_long_float.cuick.entity.Variable;
 import jp.long_long_float.cuick.foreach.PointerEnumerable;
 import jp.long_long_float.cuick.foreach.RangeEnumerable;
 import jp.long_long_float.cuick.foreach.VariableSetEnumerable;
+import jp.long_long_float.cuick.type.CChar;
 import jp.long_long_float.cuick.type.CInt;
 import jp.long_long_float.cuick.type.FunctionType;
+import jp.long_long_float.cuick.type.NamedType;
 import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.ErrorHandler;
 import jp.long_long_float.cuick.utility.ListUtils;
@@ -55,7 +59,7 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
     public void translate(AST ast) {
         Params params = new Params(null, ListUtils.asList(
                 new Parameter(new TypeNode(new CInt()), "argc"),
-                new Parameter(new TypeNode(new CInt().increasePointer().increasePointer()), "argv")));
+                new Parameter(new TypeNode(new CChar().increasePointer().increasePointer()), "argv")));
         BlockNode body = new BlockNode(null, null, new ArrayList<StmtNode>(ast.moveStmts()));
         body.variables().addAll(ast.vars());
         updateParents(body);
@@ -159,9 +163,28 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
                     }
                 }
                 else {
+                    Type itrType = rightVar.type().clone();
+                    itrType.getDeepestChild().setChild(new NamedType("iterator", null));
+                    Variable itr = new Variable(new TypeNode(itrType), node.getIdentityName("itr"), null, false, null, 
+                            ListUtils.asList((ExprNode)new MemberNode(rightVar, "begin()")));
+                    VariableNode itrNode = new VariableNode(null, itr.name());
                     
-                    //ForNode forNode = new ForNode(node.location(), 
-                    //        new Variable(, name, constructorArgs, isArray, arraySize, init), cond, incr, body)
+                    Type varType = node.var().type();
+                    if(varType == null) {
+                        Type deepestChild = rightVar.type().getDeepestChild();
+                        if(deepestChild.getTemplateTypes().size() == 0) {
+                            error(rightVar.location(), "variable is not container!");
+                        }
+                        varType = deepestChild.getTemplateTypes().get(0);
+                    }
+                    Variable var = new Variable(new TypeNode(varType.setReference()), node.var().name(), 
+                            null, false, null, ListUtils.asList((ExprNode)new DereferenceNode(itrNode)));
+                    BlockNode body = node.body().toBlockNode();
+                    body.defineVariable(var);
+                    ForNode forNode = new ForNode(node.location(), itr,
+                                    new BinaryOpNode(itrNode, "!=", new MemberNode(rightVar, "end()")), 
+                                    new SuffixOpNode("++", itrNode), body);
+                    ret = forNode;
                 }
             }
         }
@@ -187,12 +210,12 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
             }
             
             VariableNode counterVar = new VariableNode(null, node.getIdentityName("counter"));
-            Variable var = new Variable(new TypeNode(varType.decreasePointer()), node.var().name(), null, false, null, ListUtils.asList((ExprNode)new ArefNode(pointer, counterVar)));
+            Variable var = new Variable(new TypeNode(varType.decreasePointer().setReference()), node.var().name(), null, false, null, ListUtils.asList((ExprNode)new ArefNode(pointer, counterVar)));
             
             BlockNode body = node.body().toBlockNode();
-            var.setType(var.type().setReference());
+            //var.setType(var.type().setReference());
             body.defineVariable(var);
-            node.setBody(body);
+            //node.setBody(body);
             
             RangeNode range = enume.range();
             
@@ -200,11 +223,10 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
                     new Variable(new TypeNode(new CInt()), counterVar.name(), null, false, null, ListUtils.asList(range.begin())), 
                     new BinaryOpNode(counterVar, range.getOperator(), range.end()), 
                     new SuffixOpNode("++", counterVar), 
-                    node.body());
+                    body);
             ret = forNode;
         }
-        
-        node.setBody((StmtNode)node.body().accept(this));
+        node.setBody((BlockNode)node.body().accept(this));
         if(ret == null) {
             throw new Error(node.enumerable().getClass().getSimpleName() + " is not supported!");
         }

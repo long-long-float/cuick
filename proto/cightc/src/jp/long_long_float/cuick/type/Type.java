@@ -1,5 +1,6 @@
 package jp.long_long_float.cuick.type;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jp.long_long_float.cuick.ast.Location;
@@ -13,7 +14,7 @@ public abstract class Type implements Cloneable{
     private Location location;
     private boolean isReference = false;
     private int pointerCount = 0;
-    private List<Type> templTypes = null;
+    private List<Type> templTypes = new ArrayList<Type>();
     
     private Type child;
     
@@ -27,6 +28,10 @@ public abstract class Type implements Cloneable{
 
     public void setChild(Type child) {
         this.child = child;
+    }
+    
+    public Type getDeepestChild() {
+        return child != null ? child.getDeepestChild() : this;
     }
     
     public Type setReference() {
@@ -52,12 +57,12 @@ public abstract class Type implements Cloneable{
     
     @Override
     public Type clone() {
-        Type ret;
+        Type ret = null;
         try {
             ret = (Type)super.clone();
+            if(child != null) ret.child = child.clone();
         }
         catch(CloneNotSupportedException ex) {
-            throw new RuntimeException("object#clone is not supported!");
         }
         return ret;
     }
@@ -75,7 +80,7 @@ public abstract class Type implements Cloneable{
     @Override
     public String toString() {
         String ret = typeString();
-        if(templTypes != null) {
+        if(templTypes.size() != 0) {
             ret += "<" + StringUtils.join(templTypes, ", ") + ">";
         }
         return ret + TextUtils.times("*", pointerCount) + (isReference ? "&" : "") + (child != null ? "::" + child : "");
@@ -108,6 +113,4 @@ public abstract class Type implements Cloneable{
     }
     
     public abstract boolean hasType(String typeStr);
-
-    
 }

@@ -18,7 +18,7 @@ abstract public class StmtNode extends Node {
     public String getIdentityName(String name) {
         int id = 0;
         for(;isDefinedVariable(name + id);id++) ;
-        return name;
+        return name + id;
     }
     
     @Override

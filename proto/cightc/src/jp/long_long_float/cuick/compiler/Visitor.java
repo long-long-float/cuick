@@ -3,6 +3,7 @@ package jp.long_long_float.cuick.compiler;
 import java.util.List;
 
 import jp.long_long_float.cuick.ast.ASTVisitor;
+import jp.long_long_float.cuick.ast.AddressNode;
 import jp.long_long_float.cuick.ast.ArefNode;
 import jp.long_long_float.cuick.ast.AsOpNode;
 import jp.long_long_float.cuick.ast.AssignNode;
@@ -14,6 +15,7 @@ import jp.long_long_float.cuick.ast.CastNode;
 import jp.long_long_float.cuick.ast.CondExprNode;
 import jp.long_long_float.cuick.ast.ContinueNode;
 import jp.long_long_float.cuick.ast.DefvarNode;
+import jp.long_long_float.cuick.ast.DereferenceNode;
 import jp.long_long_float.cuick.ast.DoWhileNode;
 import jp.long_long_float.cuick.ast.ExprNode;
 import jp.long_long_float.cuick.ast.ExprStmtNode;
@@ -269,7 +271,6 @@ public class Visitor extends ASTVisitor<Void, Void> {
         return null;
     }
 
-    /*
     public Void visit(DereferenceNode node) {
         visitExpr(node.expr());
         return null;
@@ -279,7 +280,6 @@ public class Visitor extends ASTVisitor<Void, Void> {
         visitExpr(node.expr());
         return null;
     }
-    */
 
     public Void visit(CastNode node) {
         visitExpr(node.expr());

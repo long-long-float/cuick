@@ -160,6 +160,8 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
                 }
                 else {
                     
+                    //ForNode forNode = new ForNode(node.location(), 
+                    //        new Variable(, name, constructorArgs, isArray, arraySize, init), cond, incr, body)
                 }
             }
         }
@@ -201,6 +203,7 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
                     node.body());
             ret = forNode;
         }
+        
         node.setBody((StmtNode)node.body().accept(this));
         if(ret == null) {
             throw new Error(node.enumerable().getClass().getSimpleName() + " is not supported!");
@@ -233,11 +236,11 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
             }
             return newNode;
         }
-        return node; //TODO Auto-Created Block
+        return node;
     }
     
     public Node visit(MultiplexAssignNode node) {
-        //FIXME 下のように書き換える場合、無限ループになる
+        //FIXME 下のように書き換えると無限ループになる
         //BlockNode parentBlock = node.parentBlockNode(0);
         BlockNode parentBlock = new BlockNode(null, null, null);
         

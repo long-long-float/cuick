@@ -361,11 +361,18 @@ Type type():
     Type type;
     List<Type> templ_types = null;
     //ParamTypeRefs params;
+    Type child_type;
 }
 {
     t=<DOLLAR> name=name()
   {
     return new FunctionTemplateType(name, location(t));
+  }
+  | LOOKAHEAD(type_base() [templ_types()] "::")
+    type=type_base() [templ_types=templ_types() { type.setTemplateTypes(templ_types); } ] "::" child_type=type()
+  {
+    type.setChild(child_type);
+    return type;
   }
   | type=type_base() [templ_types=templ_types() { type.setTemplateTypes(templ_types); } ]
   {

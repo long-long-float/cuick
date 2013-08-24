@@ -15,6 +15,8 @@ public abstract class Type implements Cloneable{
     private int pointerCount = 0;
     private List<Type> templTypes = null;
     
+    private Type child;
+    
     public Type(Location location) {
         this.location = location;
     }
@@ -23,6 +25,10 @@ public abstract class Type implements Cloneable{
         return location;
     }
 
+    public void setChild(Type child) {
+        this.child = child;
+    }
+    
     public Type setReference() {
         Type ret = this.clone();
         ret.isReference = true;
@@ -72,7 +78,7 @@ public abstract class Type implements Cloneable{
         if(templTypes != null) {
             ret += "<" + StringUtils.join(templTypes, ", ") + ">";
         }
-        return ret + TextUtils.times("*", pointerCount) + (isReference ? "&" : "");
+        return ret + TextUtils.times("*", pointerCount) + (isReference ? "&" : "") + (child != null ? "::" + child : "");
     }
     
     @Override
@@ -102,4 +108,6 @@ public abstract class Type implements Cloneable{
     }
     
     public abstract boolean hasType(String typeStr);
+
+    
 }

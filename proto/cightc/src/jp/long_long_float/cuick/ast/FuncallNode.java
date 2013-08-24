@@ -5,8 +5,6 @@ import java.util.List;
 
 import jp.long_long_float.cuick.type.Type;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class FuncallNode extends ExprNode {
     protected ExprNode expr;
     protected List<Type> templTypes;
@@ -39,19 +37,6 @@ public class FuncallNode extends ExprNode {
     
     public BlockNode block() {
         return block;
-    }
-    
-    @Override
-    public String toString() {
-        String ret = expr.toString();
-        if(templTypes.size() > 0) {
-            ret += "<" + StringUtils.join(templTypes, ", ") + ">";
-        }
-        ret += "(" + StringUtils.join(args, ", ") + ")";
-        if(block != null) {
-            ret += block.toString();
-        }
-        return ret;
     }
 
     @Override

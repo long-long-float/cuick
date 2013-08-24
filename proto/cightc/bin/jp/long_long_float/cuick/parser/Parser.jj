@@ -438,6 +438,7 @@ StmtNode stmt():
         t=";" { n = new NullStmt(location(t)); }
     |   t=<BUILT_IN_CODE> { n = new BuiltInCodeStmt(location(t), t.image); }
     |   LOOKAHEAD(term() ("," term())+ "=") n=multiplex_assign()
+    //|   n=print_stmt() //including puts
     |   n=expr_stmt()
     |   n=block()
     |   n=if_stmt()
@@ -456,7 +457,16 @@ StmtNode stmt():
             return n;
         }
 }
-
+/*
+PrintStmtNode print_stmt():
+{    Token name;
+    List<ExprNode> args;
+}
+{    name=("print" | "puts") ["("] args=args() [")"]
+    {        new PrintStmtNode(location(name), name.image, args);
+    }
+}
+*/
 ExprStmtNode expr_stmt():
 {    ExprNode expr;
 }

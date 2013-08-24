@@ -25,6 +25,7 @@ import jp.long_long_float.cuick.ast.RangeNode;
 import jp.long_long_float.cuick.ast.SizeofExprNode;
 import jp.long_long_float.cuick.ast.StaticMemberNode;
 import jp.long_long_float.cuick.ast.StmtNode;
+import jp.long_long_float.cuick.ast.StringLiteralNode;
 import jp.long_long_float.cuick.ast.SuffixOpNode;
 import jp.long_long_float.cuick.ast.TypeNode;
 import jp.long_long_float.cuick.ast.VariableNode;
@@ -208,6 +209,32 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
     }
     
     //expressions
+    
+    public Node visit(FuncallNode node) {
+        if(node.expr() instanceof VariableNode) {
+            String name = ((VariableNode)node.expr()).name();
+            if(!name.equals("print") && !name.equals("puts")) return node;
+            
+            boolean isPuts = name.equals("puts");
+            VariableNode std = new VariableNode(null, "std");
+            ExprNode endl = new StaticMemberNode(std, "endl");
+            ExprNode newNode = new StaticMemberNode(std, "cout");
+            for(ExprNode arg : node.args()) {
+                newNode = new BinaryOpNode(newNode, "<<", arg);
+                if(isPuts) {
+                    newNode = new BinaryOpNode(newNode, "<<", endl);
+                }
+                else {
+                    newNode = new BinaryOpNode(newNode, "<<", new StringLiteralNode(null, "\" \""));
+                }
+            }
+            if(!isPuts) {
+                newNode = new BinaryOpNode(newNode, "<<", endl);
+            }
+            return newNode;
+        }
+        return node; //TODO Auto-Created Block
+    }
     
     public Node visit(MultiplexAssignNode node) {
         //FIXME 下のように書き換える場合、無限ループになる

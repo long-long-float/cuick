@@ -18,7 +18,7 @@ public class LiteralNode extends ExprNode {
     static public LiteralNode cint(int n) {
         return new LiteralNode(null, new CInt(), Integer.toString(n));
     }
-    
+
     @Override
     public Location location() {
         return location;
@@ -41,5 +41,4 @@ public class LiteralNode extends ExprNode {
     protected void _dump(Dumper d) {
         d.printMember("value", value);
     }
-
 }

@@ -2466,7 +2466,7 @@ PrintStmtNode print_stmt():
             /*Type type = new BasicType("char", location(t));
             type.increasePointer();
             return new LiteralNode(location(t), type, t.image);*/
-            {if (true) return new StringLiteralNode(location(t), t.image);}
+            {if (true) return new StringLiteralNode(location(t), t.image.substring(1, t.image.length() - 1));}
         break;
       case IDENTIFIER:
         t = jj_consume_token(IDENTIFIER);

@@ -283,25 +283,44 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
     public Node visit(FuncallNode node) {
         if(node.expr() instanceof VariableNode) {
             String name = ((VariableNode)node.expr()).name();
-            if(!name.equals("print") && !name.equals("puts")) return visitDefault(node);
             
-            boolean isPuts = name.equals("puts");
             VariableNode std = new VariableNode(null, "std");
             ExprNode endl = new StaticMemberNode(std, "endl");
-            ExprNode newNode = new StaticMemberNode(std, "cout");
-            for(ExprNode arg : node.args()) {
-                newNode = new BinaryOpNode(newNode, "<<", (ExprNode)arg.accept(this));
-                if(isPuts) {
+            
+            switch(name) {
+            case "print":
+            case "puts": {
+                boolean isPuts = name.equals("puts");
+                ExprNode newNode = new StaticMemberNode(std, "cout");
+                for(ExprNode arg : node.args()) {
+                    newNode = new BinaryOpNode(newNode, "<<", (ExprNode)arg.accept(this));
+                    if(isPuts) {
+                        newNode = new BinaryOpNode(newNode, "<<", endl);
+                    }
+                    else {
+                        newNode = new BinaryOpNode(newNode, "<<", new StringLiteralNode(null, "\" \""));
+                    }
+                }
+                if(!isPuts) {
                     newNode = new BinaryOpNode(newNode, "<<", endl);
                 }
-                else {
-                    newNode = new BinaryOpNode(newNode, "<<", new StringLiteralNode(null, "\" \""));
+                return newNode;
+            }
+            case "var_dump": {
+                ExprNode newNode = new StaticMemberNode(std, "cout");
+                for(ExprNode arg : node.args()) {
+                    if(arg instanceof VariableNode) {
+                        VariableNode var = (VariableNode) arg;
+                        newNode = new BinaryOpNode(newNode, "<<", new StringLiteralNode(null, var.name() + " : "));
+                        newNode = new BinaryOpNode(newNode, "<<", (ExprNode)arg.accept(this));
+                        newNode = new BinaryOpNode(newNode, "<<", endl);
+                    }
                 }
+                return newNode;
             }
-            if(!isPuts) {
-                newNode = new BinaryOpNode(newNode, "<<", endl);
+            default:
+                    return visitDefault(node);
             }
-            return newNode;
         }
         return visitDefault(node);
     }

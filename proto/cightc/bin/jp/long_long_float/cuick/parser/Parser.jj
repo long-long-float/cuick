@@ -1013,7 +1013,7 @@ ExprNode primary():
             /*Type type = new BasicType("char", location(t));
             type.increasePointer();
             return new LiteralNode(location(t), type, t.image);*/
-            return new StringLiteralNode(location(t), t.image);
+            return new StringLiteralNode(location(t), t.image.substring(1, t.image.length() - 1));
         }
     /*|   r=range()
         {

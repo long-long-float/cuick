@@ -378,7 +378,7 @@ public class CodeGenerator extends ASTVisitor<String, String> {
     }
     
     public String visit(StringLiteralNode node) {
-        return node.value();
+        return '"' + node.value() + '"';
     }
     
     public String visit(RangeNode node) {

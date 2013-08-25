@@ -264,15 +264,14 @@ Function deffun():
 {
     //String modif = null;
     Type ret;
-    String n;
+    String name;
     Params ps = null;
     BlockNode body;
 }
 {
-    ret=type_with_suffix() n=name() "(" ps=params() ")" body=block()
+    ret=type_with_suffix() name=name() "(" ps=params() ")" body=block()
         {
-            Type type = new FunctionType(ret, ps != null ? ps.parametersType() : null);
-            return new Function(new TypeNode(type), n, ps, body);
+            return new Function(ret, name, ps, body);
         }
 }
 
@@ -281,16 +280,14 @@ Function def_extendfun():
     Token t;
     Type ret;
     Type receiver;
-    String n;
+    String name;
     Params ps;
     BlockNode body;
 }
 {
-    t=<EXTEND> ret=type_with_suffix() receiver=type_with_suffix() "." n=name() "(" ps=params() ")" body=block()
+    t=<EXTEND> ret=type_with_suffix() receiver=type_with_suffix() "." name=name() "(" ps=params() ")" body=block()
         {
-            ps.addParamFront(new Parameter(new TypeNode(receiver), "this"));
-            Type type = new FunctionType(ret, ps.parametersType());
-            return new Function(location(t), new TypeNode(type), n, ps, body);
+            return new Function(location(t), ret, receiver, name, ps, body);
         }
 }
 

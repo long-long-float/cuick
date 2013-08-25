@@ -38,6 +38,10 @@ public class BlockNode extends StmtNode {
         this.stmts.addAll(this.stmts.indexOf(target), stmts);
     }
     
+    public StmtNode getLastStmt() {
+        return stmts.isEmpty() ? null : stmts.get(stmts.size() - 1);
+    }
+    
     @Override
     public BlockNode toBlockNode() {
         return this;

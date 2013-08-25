@@ -30,6 +30,7 @@ import jp.long_long_float.cuick.ast.MultiplexAssignNode;
 import jp.long_long_float.cuick.ast.Node;
 import jp.long_long_float.cuick.ast.PowerOpNode;
 import jp.long_long_float.cuick.ast.RangeNode;
+import jp.long_long_float.cuick.ast.ReturnNode;
 import jp.long_long_float.cuick.ast.SizeofExprNode;
 import jp.long_long_float.cuick.ast.StaticMemberNode;
 import jp.long_long_float.cuick.ast.StmtNode;
@@ -47,7 +48,6 @@ import jp.long_long_float.cuick.foreach.RangeEnumerable;
 import jp.long_long_float.cuick.foreach.VariableSetEnumerable;
 import jp.long_long_float.cuick.type.CChar;
 import jp.long_long_float.cuick.type.CInt;
-import jp.long_long_float.cuick.type.FunctionType;
 import jp.long_long_float.cuick.type.NamedType;
 import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.ErrorHandler;
@@ -72,7 +72,7 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
             body.variables().addAll(ast.vars());
             updateParents(body);
             
-            Function main = new Function(new TypeNode(new FunctionType(new CInt(), params.parametersType())), "main", params, body);
+            Function main = new Function(new CInt(), "main", params, body);
             ast.addFunction(main);
         }
         else {
@@ -82,7 +82,12 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
         }
         
         for(Function func : ast.funcs()) {
-            func.body().accept(this);
+            BlockNode body = func.body();
+            body.accept(this);
+            if(!func.returnType().typeString().equals("void") && body.getLastStmt() instanceof ExprStmtNode) {
+                ExprStmtNode lastStmt = (ExprStmtNode) body.getLastStmt();
+                body.stmts().set(body.stmts().size() - 1, new ReturnNode(lastStmt.location(), lastStmt.expr()));
+            }
         }
     }
     

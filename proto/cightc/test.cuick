@@ -19,3 +19,4 @@ extend void $CONT.sort() {
     sort(this.begin(), this.end());
 }
 */
+int abs(int n){ n >= 0 ? n : -n; }

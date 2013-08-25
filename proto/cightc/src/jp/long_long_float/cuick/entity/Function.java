@@ -5,40 +5,36 @@ import java.util.List;
 import jp.long_long_float.cuick.ast.BlockNode;
 import jp.long_long_float.cuick.ast.Dumper;
 import jp.long_long_float.cuick.ast.Location;
-import jp.long_long_float.cuick.ast.StmtNode;
 import jp.long_long_float.cuick.ast.TypeNode;
 import jp.long_long_float.cuick.compiler.Table;
-import jp.long_long_float.cuick.cppStructure.CodeBuilder;
-import jp.long_long_float.cuick.cppStructure.CodeBuilder.BlockCallback;
-
-import org.apache.commons.lang3.StringUtils;
+import jp.long_long_float.cuick.type.FunctionType;
+import jp.long_long_float.cuick.type.Type;
 
 public class Function extends Entity{
     protected Params params;
     protected BlockNode body;
     protected LocalScope scope;
     
-    private Location loc = null; //for extend
+    private Location location = null; //for extend
     
-    public Function(TypeNode type, String name, Params params, BlockNode body) {
-        super(type, name);
-        this.params = params;
+    public Function(Type ret, String name, Params ps, BlockNode body) {
+        super(new TypeNode(new FunctionType(ret, ps != null ? ps.parametersType() : null)), name);
+        this.params = ps;
         this.body = body;
         
         Table.getInstance().entryFunction(this);
     }
     
     //for extend
-    public Function(Location loc, TypeNode type, String name, Params params, BlockNode body) {
-        this(type, name, params, body);
-        this.loc = loc;
+    public Function(Location location, Type ret, Type receiver, String name, Params ps, BlockNode body) {
+        this(ret, name, ps, body);
+        this.location = location;
+        this.params.addParamFront(new Parameter(new TypeNode(receiver), "this"));
     }
-    
-    /*
-    public Params params() {
-        return params;
+
+    public Type returnType() {
+        return ((FunctionType)type()).returnType();
     }
-    */
     
     public List<Parameter> parameters() {
         return params.parameters();
@@ -48,24 +44,10 @@ public class Function extends Entity{
         return body;
     }
     
-    public Location location() {
-        if(loc == null) return super.location();
-        else return loc;
-    }
-    
     @Override
-    public String toString() {
-        CodeBuilder cb = new CodeBuilder();
-        cb.addLine(type() + " " + name + "(" + StringUtils.join(params, ", ") + ")");
-        cb.block(new BlockCallback() {
-            @Override
-            public void call(CodeBuilder cb) {
-                for(StmtNode stmt : body.stmts()) {
-                    cb.addLine(stmt.toString());
-                }
-            }
-        }, false);
-        return cb.toString();
+    public Location location() {
+        if(location == null) return super.location();
+        else return location;
     }
     
     protected void _dump(Dumper d) {

@@ -371,17 +371,16 @@ public class Parser implements ParserConstants {
     try {
     //String modif = null;
     Type ret;
-    String n;
+    String name;
     Params ps = null;
     BlockNode body;
       ret = type_with_suffix();
-      n = name();
+      name = name();
       jj_consume_token(86);
       ps = params();
       jj_consume_token(87);
       body = block();
-            Type type = new FunctionType(ret, ps != null ? ps.parametersType() : null);
-            {if (true) return new Function(new TypeNode(type), n, ps, body);}
+            {if (true) return new Function(ret, name, ps, body);}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("deffun");
@@ -394,21 +393,21 @@ public class Parser implements ParserConstants {
     Token t;
     Type ret;
     Type receiver;
-    String n;
+    String name;
     Params ps;
     BlockNode body;
       t = jj_consume_token(EXTEND);
       ret = type_with_suffix();
       receiver = type_with_suffix();
       jj_consume_token(97);
-      n = name();
+      name = name();
       jj_consume_token(86);
       ps = params();
       jj_consume_token(87);
       body = block();
-            ps.addParamFront(new Parameter(new TypeNode(receiver), "this"));
-            Type type = new FunctionType(ret, ps.parametersType());
-            {if (true) return new Function(location(t), new TypeNode(type), n, ps, body);}
+            //ps.addParamFront(new Parameter(new TypeNode(receiver), "this"));
+            //Type type = new FunctionType(ret, ps.parametersType());
+            {if (true) return new Function(location(t), ret, receiver, name, ps, body);}
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("def_extendfun");
@@ -3151,13 +3150,13 @@ PrintStmtNode print_stmt():
     return false;
   }
 
-  private boolean jj_3R_234() {
-    if (jj_scan_token(103)) return true;
+  private boolean jj_3R_100() {
+    if (jj_3R_42()) return true;
     return false;
   }
 
-  private boolean jj_3R_100() {
-    if (jj_3R_42()) return true;
+  private boolean jj_3R_234() {
+    if (jj_scan_token(103)) return true;
     return false;
   }
 
@@ -3216,18 +3215,18 @@ PrintStmtNode print_stmt():
     return false;
   }
 
-  private boolean jj_3R_72() {
-    if (jj_scan_token(91)) return true;
-    if (jj_3R_71()) return true;
-    return false;
-  }
-
   private boolean jj_3R_82() {
     if (jj_scan_token(93)) return true;
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3R_100()) jj_scanpos = xsp;
     if (jj_scan_token(94)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_72() {
+    if (jj_scan_token(91)) return true;
+    if (jj_3R_71()) return true;
     return false;
   }
 
@@ -3432,17 +3431,6 @@ PrintStmtNode print_stmt():
     return false;
   }
 
-  private boolean jj_3R_188() {
-    if (jj_scan_token(SWITCH)) return true;
-    if (jj_scan_token(86)) return true;
-    if (jj_3R_42()) return true;
-    if (jj_scan_token(87)) return true;
-    if (jj_scan_token(88)) return true;
-    if (jj_3R_208()) return true;
-    if (jj_scan_token(96)) return true;
-    return false;
-  }
-
   private boolean jj_3R_153() {
     if (jj_3R_36()) return true;
     if (jj_3R_55()) return true;
@@ -3452,6 +3440,17 @@ PrintStmtNode print_stmt():
       if (jj_3R_157()) { jj_scanpos = xsp; break; }
     }
     if (jj_scan_token(92)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_188() {
+    if (jj_scan_token(SWITCH)) return true;
+    if (jj_scan_token(86)) return true;
+    if (jj_3R_42()) return true;
+    if (jj_scan_token(87)) return true;
+    if (jj_scan_token(88)) return true;
+    if (jj_3R_208()) return true;
+    if (jj_scan_token(96)) return true;
     return false;
   }
 
@@ -3466,12 +3465,6 @@ PrintStmtNode print_stmt():
     return false;
   }
 
-  private boolean jj_3R_113() {
-    if (jj_scan_token(91)) return true;
-    if (jj_3R_42()) return true;
-    return false;
-  }
-
   private boolean jj_3_3() {
     if (jj_3R_36()) return true;
     Token xsp;
@@ -3482,6 +3475,12 @@ PrintStmtNode print_stmt():
       if (jj_scan_token(90)) { jj_scanpos = xsp; break; }
     }
     if (jj_3R_34()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_113() {
+    if (jj_scan_token(91)) return true;
+    if (jj_3R_42()) return true;
     return false;
   }
 
@@ -3518,6 +3517,11 @@ PrintStmtNode print_stmt():
     return false;
   }
 
+  private boolean jj_3_1() {
+    if (jj_scan_token(EXTEND)) return true;
+    return false;
+  }
+
   private boolean jj_3R_107() {
     if (jj_3R_42()) return true;
     Token xsp;
@@ -3525,11 +3529,6 @@ PrintStmtNode print_stmt():
       xsp = jj_scanpos;
       if (jj_3R_113()) { jj_scanpos = xsp; break; }
     }
-    return false;
-  }
-
-  private boolean jj_3_1() {
-    if (jj_scan_token(EXTEND)) return true;
     return false;
   }
 
@@ -4580,14 +4579,14 @@ PrintStmtNode print_stmt():
     return false;
   }
 
-  private boolean jj_3R_61() {
-    if (jj_scan_token(107)) return true;
-    return false;
-  }
-
   private boolean jj_3R_108() {
     if (jj_scan_token(91)) return true;
     if (jj_3R_42()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_61() {
+    if (jj_scan_token(107)) return true;
     return false;
   }
 

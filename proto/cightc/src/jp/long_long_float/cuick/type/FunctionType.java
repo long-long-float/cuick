@@ -12,6 +12,10 @@ public class FunctionType extends Type{
         this.paramTypes = paramTypes;
     }
     
+    public Type returnType() {
+        return returnType;
+    }
+    
     @Override
     public String typeString() {
         return returnType.toString();

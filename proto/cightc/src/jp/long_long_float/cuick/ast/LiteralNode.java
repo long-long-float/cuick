@@ -1,5 +1,6 @@
 package jp.long_long_float.cuick.ast;
 
+import jp.long_long_float.cuick.type.CInt;
 import jp.long_long_float.cuick.type.Type;
 
 public class LiteralNode extends ExprNode {
@@ -12,6 +13,10 @@ public class LiteralNode extends ExprNode {
         this.location = loc;
         this.typeNode = new TypeNode(type);
         this.value = value;
+    }
+    
+    static public LiteralNode cint(int n) {
+        return new LiteralNode(null, new CInt(), Integer.toString(n));
     }
     
     @Override

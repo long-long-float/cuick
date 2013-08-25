@@ -443,9 +443,10 @@ StmtNode stmt():
 {
     (
         t=";" { n = new NullStmt(location(t)); }
-    |   t=<BUILT_IN_CODE> { n = new BuiltInCodeStmt(location(t), t.image); }
+    |   t=<BUILT_IN_CODE> { n = new BuiltInCodeStmt(location(t), t.image.substring(1, t.image.length() - 1)); }
     |   LOOKAHEAD(term() ("," term())+ "=") n=multiplex_assign()
     //|   n=print_stmt() //including puts
+    |   n=at_input()
     |   n=expr_stmt()
     |   n=block()
     |   n=if_stmt()
@@ -1024,7 +1025,7 @@ ExprNode primary():
             return new VariableNode(location(t), t.image);
         }
     |   t=<BUILT_IN_CODE>
-        {            return new BuiltInCode(location(t), t.image);
+        {            return new BuiltInCode(location(t), t.image.substring(1, t.image.length() - 1));
         }
     |   "(" n=expr() ")"
         {
@@ -1049,8 +1050,8 @@ AtCommandNode at_command():
     AtCommandNode atCommand;
 }
 {
-    atCommand = at_input() { return atCommand; }
-    |   atCommand = at_debug() { return atCommand; }
+    //@inputのみstatement
+    atCommand = at_debug() { return atCommand; }
     |   atCommand = at_memo() { return atCommand; }
     |   atCommand = at_while() { return atCommand; }
     |   atCommand = at_test() { return atCommand; }

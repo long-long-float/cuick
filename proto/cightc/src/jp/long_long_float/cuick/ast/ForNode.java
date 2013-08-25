@@ -17,7 +17,7 @@ public class ForNode extends StmtNode {
         this.cond = cond;
         this.incr = incr;//new ExprStmtNode(incr.location(), incr);
         this.body = body.toBlockNode();
-        this.body.variables().add(var);
+        if(!this.body.isDefinedVariable(var.name())) this.body.variables().add(var);
     }
     
     @Override

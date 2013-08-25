@@ -34,7 +34,6 @@ public class NamedType extends Type {
             boolean ret = new EqualsBuilder()
                     .append(name, other.name)
                     .isEquals();
-            //System.out.println(toString() + (ret ? " == " : " != ") + other.toString());
             return ret;
         }
         else {

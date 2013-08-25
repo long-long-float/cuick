@@ -197,6 +197,10 @@ public class CodeGenerator extends ASTVisitor<String, String> {
     
     //statements
     
+    public String visit(BuiltInCodeStmt node) {
+        return node.code();
+    }
+    
     public String visit(ExprStmtNode node) {
         return node.expr().accept(this) + ";";
     }

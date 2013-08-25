@@ -39,7 +39,6 @@ public class BasicType extends Type {
             boolean ret = new EqualsBuilder()
                     .append(basicTypes, other.basicTypes)
                     .isEquals();
-            //System.out.println(toString() + (ret ? " == " : " != ") + other.toString());
             return ret;
         }
         else {

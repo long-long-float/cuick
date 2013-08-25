@@ -9,8 +9,13 @@ import jp.long_long_float.cuick.ast.AST;
 import jp.long_long_float.cuick.ast.ASTVisitor;
 import jp.long_long_float.cuick.ast.ArefNode;
 import jp.long_long_float.cuick.ast.AssignNode;
+import jp.long_long_float.cuick.ast.AtInputAbstractVariableNode;
+import jp.long_long_float.cuick.ast.AtInputArrayVariableNode;
+import jp.long_long_float.cuick.ast.AtInputNode;
+import jp.long_long_float.cuick.ast.AtInputVariableNode;
 import jp.long_long_float.cuick.ast.BinaryOpNode;
 import jp.long_long_float.cuick.ast.BlockNode;
+import jp.long_long_float.cuick.ast.BuiltInCodeStmt;
 import jp.long_long_float.cuick.ast.DefvarNode;
 import jp.long_long_float.cuick.ast.DereferenceNode;
 import jp.long_long_float.cuick.ast.ExprNode;
@@ -57,15 +62,22 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
     }
     
     public void translate(AST ast) {
-        Params params = new Params(null, ListUtils.asList(
-                new Parameter(new TypeNode(new CInt()), "argc"),
-                new Parameter(new TypeNode(new CChar().increasePointer().increasePointer()), "argv")));
-        BlockNode body = new BlockNode(null, null, new ArrayList<StmtNode>(ast.moveStmts()));
-        body.variables().addAll(ast.vars());
-        updateParents(body);
-        
-        Function main = new Function(new TypeNode(new FunctionType(new CInt(), params.parametersType())), "main", params, body);
-        ast.addFunction(main);
+        if(!ast.isDefinedFunction("main")) {
+            Params params = new Params(null, ListUtils.asList(
+                    new Parameter(new TypeNode(new CInt()), "argc"),
+                    new Parameter(new TypeNode(new CChar().increasePointer().increasePointer()), "argv")));
+            BlockNode body = new BlockNode(null, null, new ArrayList<StmtNode>(ast.moveStmts()));
+            body.variables().addAll(ast.vars());
+            updateParents(body);
+            
+            Function main = new Function(new TypeNode(new FunctionType(new CInt(), params.parametersType())), "main", params, body);
+            ast.addFunction(main);
+        }
+        else {
+            if(!ast.stmts().isEmpty()) {
+                error(ast.location(), "Statements mustn't be out of \"main\" function.");
+            }
+        }
 
         for(Function func : ast.funcs()) {
             func.body().accept(this);
@@ -93,13 +105,11 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
         } catch (SecurityException e) {
             e.printStackTrace();
         }
-        System.out.println(node.getClass().getSimpleName());
         for(Field field : node.getClass().getDeclaredFields()) {
             try {
                 field.setAccessible(true);
                 Object child = field.get(node);
                 if(child instanceof Node) {
-                    System.out.println("set " + field.getName());
                     field.set(node, ((Node) child).accept(this));
                 }
                 else if(child instanceof List<?>) {
@@ -120,19 +130,33 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
         }
         return node;
     }
-
-    //statements
-    /*
-    public Node visit(BlockNode node) {
-        List<StmtNode> stmts = new ArrayList<StmtNode>(node.stmts().size());
-        for(StmtNode stmt : node.stmts()) {
-            StmtNode newStmt = (StmtNode)stmt.accept(this);
-            if(newStmt != null) stmts.add(newStmt);
+    
+    //at commands
+    
+    public Node visit(AtInputNode node) {
+        BlockNode block = new BlockNode(null, null, null);
+        for(AtInputAbstractVariableNode var : node.vars()) {
+            if(var instanceof AtInputArrayVariableNode) {
+                AtInputArrayVariableNode varNode = (AtInputArrayVariableNode) var;
+                ForEachNode forEachNode = new ForEachNode(null, null, "i", true, new RangeEnumerable(varNode.range()),
+                        new ExprStmtNode(null, new BinaryOpNode(new StaticMemberNode(
+                                new VariableNode(null, "std"), "cin"), ">>", new ArefNode(varNode.getVariableNode(), new VariableNode(null, "i")))), null);
+                forEachNode.setParent(block);
+                block.stmts().add((StmtNode)forEachNode.accept(this));
+            }
+            else if(var instanceof AtInputVariableNode) {
+                AtInputVariableNode varNode = (AtInputVariableNode) var;
+                block.stmts().add(new ExprStmtNode(null, new BinaryOpNode(new StaticMemberNode(new VariableNode(null, "std"), "cin"), ">>", varNode.getVariableNode())));
+                if(varNode.isZeroEnd()) {
+                    block.stmts().add(new BuiltInCodeStmt(null, "if(!" + varNode.varName() + ") break;"));
+                }
+            }
         }
-        node.setStmt(stmts);
-        return node;
+        return block;
     }
-    */
+    
+    //statements
+
     public Node visit(ForEachNode node) {
         Node ret = null;
         if(node.enumerable() instanceof VariableSetEnumerable) {

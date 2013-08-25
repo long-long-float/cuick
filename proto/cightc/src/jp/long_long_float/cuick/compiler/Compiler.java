@@ -58,9 +58,9 @@ public class Compiler {
         System.out.println("===============localResolve================");
         ast = localResolve(ast, opts);
         ast.dump();
-        System.out.println("===============typeResolve================");
+        /*System.out.println("===============typeResolve================");
         ast = typeResolve(ast, opts);
-        ast.dump();
+        ast.dump();*/
         System.out.println("===============rename================");
         ast = rename(ast, opts);
         ast.dump();

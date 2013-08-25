@@ -7,9 +7,11 @@ import jp.long_long_float.cuick.ast.AddressNode;
 import jp.long_long_float.cuick.ast.ArefNode;
 import jp.long_long_float.cuick.ast.AsOpNode;
 import jp.long_long_float.cuick.ast.AssignNode;
+import jp.long_long_float.cuick.ast.AtInputNode;
 import jp.long_long_float.cuick.ast.BinaryOpNode;
 import jp.long_long_float.cuick.ast.BlockNode;
 import jp.long_long_float.cuick.ast.BreakNode;
+import jp.long_long_float.cuick.ast.BuiltInCodeStmt;
 import jp.long_long_float.cuick.ast.CaseNode;
 import jp.long_long_float.cuick.ast.CastNode;
 import jp.long_long_float.cuick.ast.CondExprNode;
@@ -81,7 +83,18 @@ public class Visitor extends ASTVisitor<Void, Void> {
         enumerable.accept(this);
     }
     
+    //at commands
+    
+    public Void visit(AtInputNode node) {
+        
+        return null;
+    }
+    
     //statements
+    
+    public Void visit(BuiltInCodeStmt node) {
+        return null;
+    }
     
     public Void visit(MultiplexAssignNode node) {
         visitExprs(node.lhses());

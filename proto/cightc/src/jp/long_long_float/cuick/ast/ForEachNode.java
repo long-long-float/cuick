@@ -20,7 +20,7 @@ public class ForEachNode extends StmtNode {
         this.enumerable = enume;
         this.enumerable.setForEachNode(this);
         this.body = body.toBlockNode();
-        this.body.variables().add(this.var);
+        if(!this.body.isDefinedVariable(var.name())) this.body.variables().add(this.var);
         this.lastBody = lastBody;
     }
     

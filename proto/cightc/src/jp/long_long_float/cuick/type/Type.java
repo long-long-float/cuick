@@ -100,7 +100,6 @@ public abstract class Type implements Cloneable{
                     .append(pointerCount, other.pointerCount)
                     .append(templTypes, other.templTypes)
                     .isEquals();
-            //System.out.println(toString() + (ret ? " == " : " != ") + other.toString());
             return ret;
         }
         else {

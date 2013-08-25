@@ -13,14 +13,12 @@ public class BuiltInCodeStmt extends StmtNode {
         Table.getInstance().entryBuiltInCodeStmt(this);
     }
     
-    @Override
-    public String toString() {
-        return code.replace("`", "");
+    public String code() {
+        return code;
     }
 
     @Override
     protected void _dump(Dumper d) {
         d.printMember("code", code);
     }
-
 }

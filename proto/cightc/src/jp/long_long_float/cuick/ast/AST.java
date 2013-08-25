@@ -53,6 +53,13 @@ public class AST extends Node{
         declarations.funcs.add(func);
     }
     
+    public boolean isDefinedFunction(String name) {
+        for(Function func : declarations.funcs) {
+            if(func.name().equals(name)) return true;
+        }
+        return false;
+    }
+    
     public List<AtCommandNode> atCommands() {
         return new ArrayList<AtCommandNode>(declarations.atCommands);
     }
@@ -76,4 +83,5 @@ public class AST extends Node{
         }
         toplevelScope = scope;
     }
+
 }

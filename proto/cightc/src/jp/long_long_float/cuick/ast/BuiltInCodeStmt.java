@@ -2,6 +2,7 @@ package jp.long_long_float.cuick.ast;
 
 import jp.long_long_float.cuick.compiler.Table;
 
+@Deprecated
 public class BuiltInCodeStmt extends StmtNode {
 
     protected String code;

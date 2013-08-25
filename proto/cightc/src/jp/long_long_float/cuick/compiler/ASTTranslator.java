@@ -13,9 +13,10 @@ import jp.long_long_float.cuick.ast.AtInputAbstractVariableNode;
 import jp.long_long_float.cuick.ast.AtInputArrayVariableNode;
 import jp.long_long_float.cuick.ast.AtInputNode;
 import jp.long_long_float.cuick.ast.AtInputVariableNode;
+import jp.long_long_float.cuick.ast.AtWhileNode;
 import jp.long_long_float.cuick.ast.BinaryOpNode;
 import jp.long_long_float.cuick.ast.BlockNode;
-import jp.long_long_float.cuick.ast.BuiltInCodeStmt;
+import jp.long_long_float.cuick.ast.BuiltInCode;
 import jp.long_long_float.cuick.ast.DefvarNode;
 import jp.long_long_float.cuick.ast.DereferenceNode;
 import jp.long_long_float.cuick.ast.ExprNode;
@@ -36,6 +37,7 @@ import jp.long_long_float.cuick.ast.StringLiteralNode;
 import jp.long_long_float.cuick.ast.SuffixOpNode;
 import jp.long_long_float.cuick.ast.TypeNode;
 import jp.long_long_float.cuick.ast.VariableNode;
+import jp.long_long_float.cuick.ast.WhileNode;
 import jp.long_long_float.cuick.entity.Function;
 import jp.long_long_float.cuick.entity.Parameter;
 import jp.long_long_float.cuick.entity.Params;
@@ -78,10 +80,40 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
                 error(ast.location(), "Statements mustn't be out of \"main\" function.");
             }
         }
-
+        
         for(Function func : ast.funcs()) {
             func.body().accept(this);
         }
+    }
+    
+    public Node visitDefault(Node node) {
+        System.out.println(node.getClass().getSimpleName());
+        for(Field field : node.getClass().getDeclaredFields()) {
+            try {
+                System.out.println("    " + field.getName());
+                field.setAccessible(true);
+                Object child = field.get(node);
+                if(child instanceof Node) {
+                    field.set(node, ((Node) child).accept(this));
+                }
+                else if(child instanceof List<?>) {
+                    System.out.println("    *" + field.getName());
+                    List<?> childList = (List<?>) child;
+                    if(!childList.isEmpty() && childList.get(0) instanceof Node) {
+                        List<Node> newList = new ArrayList<Node>(childList.size());
+                        for(int i = 0;i < childList.size();i++) {
+                            Node newItem = ((Node)childList.get(i)).accept(this);
+                            if(newItem != null) newList.add(newItem);
+                        }
+                        field.set(node, newList);
+                    }
+                }
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                // TODO 自動生成された catch ブロック
+                e.printStackTrace();
+            }
+        }
+        return node;
     }
     
     @Override
@@ -105,33 +137,22 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
         } catch (SecurityException e) {
             e.printStackTrace();
         }
-        for(Field field : node.getClass().getDeclaredFields()) {
-            try {
-                field.setAccessible(true);
-                Object child = field.get(node);
-                if(child instanceof Node) {
-                    field.set(node, ((Node) child).accept(this));
-                }
-                else if(child instanceof List<?>) {
-                    List<?> childList = (List<?>) child;
-                    if(childList.size() > 0 && childList.get(0) instanceof Node) {
-                        List<Node> newList = new ArrayList<Node>(childList.size());
-                        for(int i = 0;i < childList.size();i++) {
-                            Node newItem = ((Node)childList.get(i)).accept(this);
-                            if(newItem != null) newList.add(newItem);
-                        }
-                        field.set(node, newList);
-                    }
-                }
-            } catch (IllegalArgumentException | IllegalAccessException e) {
-                // TODO 自動生成された catch ブロック
-                e.printStackTrace();
-            }
-        }
-        return node;
+        return visitDefault(node);
     }
     
     //at commands
+    
+    public Node visit(AtWhileNode node) {
+        BlockNode body = new BlockNode(null, null, null);
+        List<StmtNode> stmts = node.parentBlockNode(0).stmts();
+        int atWhilePos = stmts.indexOf(node);
+        for(int i = atWhilePos + 1;i < stmts.size();i++) {
+            body.stmts().add((StmtNode)stmts.get(i).accept(this));
+        }
+        for(int i = atWhilePos;i < stmts.size();i++) stmts.remove(atWhilePos);
+        WhileNode whileNode = new WhileNode(null, node.cond(), body);
+        return whileNode;
+    }
     
     public Node visit(AtInputNode node) {
         BlockNode block = new BlockNode(null, null, null);
@@ -148,7 +169,7 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
                 AtInputVariableNode varNode = (AtInputVariableNode) var;
                 block.stmts().add(new ExprStmtNode(null, new BinaryOpNode(new StaticMemberNode(new VariableNode(null, "std"), "cin"), ">>", varNode.getVariableNode())));
                 if(varNode.isZeroEnd()) {
-                    block.stmts().add(new BuiltInCodeStmt(null, "if(!" + varNode.varName() + ") break;"));
+                    block.stmts().add(new ExprStmtNode(null, new BuiltInCode(null, "if(!" + varNode.varName() + ") break;")));
                 }
             }
         }
@@ -262,14 +283,14 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
     public Node visit(FuncallNode node) {
         if(node.expr() instanceof VariableNode) {
             String name = ((VariableNode)node.expr()).name();
-            if(!name.equals("print") && !name.equals("puts")) return node;
+            if(!name.equals("print") && !name.equals("puts")) return visitDefault(node);
             
             boolean isPuts = name.equals("puts");
             VariableNode std = new VariableNode(null, "std");
             ExprNode endl = new StaticMemberNode(std, "endl");
             ExprNode newNode = new StaticMemberNode(std, "cout");
             for(ExprNode arg : node.args()) {
-                newNode = new BinaryOpNode(newNode, "<<", arg);
+                newNode = new BinaryOpNode(newNode, "<<", (ExprNode)arg.accept(this));
                 if(isPuts) {
                     newNode = new BinaryOpNode(newNode, "<<", endl);
                 }
@@ -282,7 +303,7 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
             }
             return newNode;
         }
-        return node;
+        return visitDefault(node);
     }
     
     public Node visit(MultiplexAssignNode node) {
@@ -301,7 +322,7 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
             //stmts.add(temp.at(cint(i)).assign(node.rhses().get(0)).toStmt());
             stmts.add(new ExprStmtNode(null, new AssignNode(
                     node.lhses().get(i),
-                    new ArefNode(new VariableNode(null, temp.name()), new LiteralNode(null, new CInt(), Integer.toString(i))))));
+                    new ArefNode(new VariableNode(null, temp.name()), LiteralNode.cint(i)))));
         }
         //parentBlock.insertStmts(node, stmts);
         parentBlock.stmts().addAll(stmts);

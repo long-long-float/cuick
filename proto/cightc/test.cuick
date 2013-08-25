@@ -19,10 +19,7 @@ extend void $CONT.sort() {
     sort(this.begin(), this.end());
 }
 */
-int a, b, c[1000], d[1000];
-@input{
-    a
-    b!
-    c[a]
-    d[a..b]
-}
+int n;
+@while(true)
+@input{ n! }
+puts(n ** 2);

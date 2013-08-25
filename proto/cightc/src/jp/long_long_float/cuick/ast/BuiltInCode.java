@@ -10,19 +10,17 @@ public class BuiltInCode extends ExprNode {
         this.code = code;
     }
     
-    @Override
-    public Location location() {
-        return location;
+    public String code() {
+        return code;
     }
     
     @Override
-    public String toString() {
-        return code.replace("`", "");
+    public Location location() {
+        return location;
     }
 
     @Override
     protected void _dump(Dumper d) {
         d.printMember("code", code);
     }
-
 }

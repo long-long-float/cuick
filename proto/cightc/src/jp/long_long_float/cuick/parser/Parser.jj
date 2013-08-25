@@ -104,7 +104,6 @@ TOKEN: {
   | <EXPLICIT : "explicit">
   | <EXPORT : "export">
   | <EXTERN : "extern">
-  | <FALSE : "false">
   | <FLOAT : "float">
   | <FOR : "for">
   | <FRIEND : "friend">
@@ -135,7 +134,6 @@ TOKEN: {
   | <TEMPLATE : "template">
  // | <THIS : "this">
   | <THROW : "throw">
-  | <TRUE : "true">
   | <TRY : "try">
   | <TYPEDEF : "typedef">
   | <TYPEID : "typeid">
@@ -447,6 +445,7 @@ StmtNode stmt():
     |   LOOKAHEAD(term() ("," term())+ "=") n=multiplex_assign()
     //|   n=print_stmt() //including puts
     |   n=at_input()
+    |   n=at_while()
     |   n=expr_stmt()
     |   n=block()
     |   n=if_stmt()
@@ -1050,10 +1049,9 @@ AtCommandNode at_command():
     AtCommandNode atCommand;
 }
 {
-    //@inputのみstatement
+    //@input, @whileはstatement
     atCommand = at_debug() { return atCommand; }
     |   atCommand = at_memo() { return atCommand; }
-    |   atCommand = at_while() { return atCommand; }
     |   atCommand = at_test() { return atCommand; }
 }
 

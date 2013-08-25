@@ -1,6 +1,6 @@
 package jp.long_long_float.cuick.ast;
 
-public class AtWhileNode extends AtCommandNode {
+public class AtWhileNode extends StmtNode {
 
     protected ExprNode cond;
     
@@ -12,6 +12,10 @@ public class AtWhileNode extends AtCommandNode {
     @Override
     protected void _dump(Dumper d) {
         d.printMember("cond", cond);
+    }
+
+    public ExprNode cond() {
+        return cond;
     }
 
 }

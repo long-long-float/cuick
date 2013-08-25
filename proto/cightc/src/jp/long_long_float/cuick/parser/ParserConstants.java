@@ -59,105 +59,101 @@ public interface ParserConstants {
   /** RegularExpression Id. */
   int EXTERN = 26;
   /** RegularExpression Id. */
-  int FALSE = 27;
+  int FLOAT = 27;
   /** RegularExpression Id. */
-  int FLOAT = 28;
+  int FOR = 28;
   /** RegularExpression Id. */
-  int FOR = 29;
+  int FRIEND = 29;
   /** RegularExpression Id. */
-  int FRIEND = 30;
+  int GOTO = 30;
   /** RegularExpression Id. */
-  int GOTO = 31;
+  int IF = 31;
   /** RegularExpression Id. */
-  int IF = 32;
+  int INLINE = 32;
   /** RegularExpression Id. */
-  int INLINE = 33;
+  int INT = 33;
   /** RegularExpression Id. */
-  int INT = 34;
+  int LAST = 34;
   /** RegularExpression Id. */
-  int LAST = 35;
+  int LONG = 35;
   /** RegularExpression Id. */
-  int LONG = 36;
+  int MUTABLE = 36;
   /** RegularExpression Id. */
-  int MUTABLE = 37;
+  int NAMESPACE = 37;
   /** RegularExpression Id. */
-  int NAMESPACE = 38;
+  int NEW = 38;
   /** RegularExpression Id. */
-  int NEW = 39;
+  int OPERATOR = 39;
   /** RegularExpression Id. */
-  int OPERATOR = 40;
+  int PRIVATE = 40;
   /** RegularExpression Id. */
-  int PRIVATE = 41;
+  int PROTECTED = 41;
   /** RegularExpression Id. */
-  int PROTECTED = 42;
+  int PUBLIC = 42;
   /** RegularExpression Id. */
-  int PUBLIC = 43;
+  int REGISTER = 43;
   /** RegularExpression Id. */
-  int REGISTER = 44;
+  int REINTERPRET_CAST = 44;
   /** RegularExpression Id. */
-  int REINTERPRET_CAST = 45;
+  int RETURN = 45;
   /** RegularExpression Id. */
-  int RETURN = 46;
+  int SHORT = 46;
   /** RegularExpression Id. */
-  int SHORT = 47;
+  int SIGNED = 47;
   /** RegularExpression Id. */
-  int SIGNED = 48;
+  int SIZEOF = 48;
   /** RegularExpression Id. */
-  int SIZEOF = 49;
+  int STATIC = 49;
   /** RegularExpression Id. */
-  int STATIC = 50;
+  int STATIC_CAST = 50;
   /** RegularExpression Id. */
-  int STATIC_CAST = 51;
+  int STRUCT = 51;
   /** RegularExpression Id. */
-  int STRUCT = 52;
+  int SWITCH = 52;
   /** RegularExpression Id. */
-  int SWITCH = 53;
+  int TEMPLATE = 53;
   /** RegularExpression Id. */
-  int TEMPLATE = 54;
+  int THROW = 54;
   /** RegularExpression Id. */
-  int THROW = 55;
+  int TRY = 55;
   /** RegularExpression Id. */
-  int TRUE = 56;
+  int TYPEDEF = 56;
   /** RegularExpression Id. */
-  int TRY = 57;
+  int TYPEID = 57;
   /** RegularExpression Id. */
-  int TYPEDEF = 58;
+  int TYPENAME = 58;
   /** RegularExpression Id. */
-  int TYPEID = 59;
+  int UNION = 59;
   /** RegularExpression Id. */
-  int TYPENAME = 60;
+  int UNSIGNED = 60;
   /** RegularExpression Id. */
-  int UNION = 61;
+  int USING = 61;
   /** RegularExpression Id. */
-  int UNSIGNED = 62;
+  int VIRTUAL = 62;
   /** RegularExpression Id. */
-  int USING = 63;
+  int VOID = 63;
   /** RegularExpression Id. */
-  int VIRTUAL = 64;
+  int VOLATILE = 64;
   /** RegularExpression Id. */
-  int VOID = 65;
+  int WCHAR_T = 65;
   /** RegularExpression Id. */
-  int VOLATILE = 66;
+  int WHILE = 66;
   /** RegularExpression Id. */
-  int WCHAR_T = 67;
+  int DOLLAR = 67;
   /** RegularExpression Id. */
-  int WHILE = 68;
+  int EXTEND = 68;
   /** RegularExpression Id. */
-  int DOLLAR = 69;
+  int AS = 69;
   /** RegularExpression Id. */
-  int EXTEND = 70;
+  int IDENTIFIER = 70;
   /** RegularExpression Id. */
-  int AS = 71;
+  int INTEGER = 71;
   /** RegularExpression Id. */
-  int IDENTIFIER = 72;
+  int CHARACTER = 76;
   /** RegularExpression Id. */
-  int INTEGER = 73;
+  int STRING = 81;
   /** RegularExpression Id. */
-  int CHARACTER = 78;
-  /** RegularExpression Id. */
-  int STRING = 83;
-  /** RegularExpression Id. */
-  int BUILT_IN_CODE = 87;
+  int BUILT_IN_CODE = 85;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -201,7 +197,6 @@ public interface ParserConstants {
     "\"explicit\"",
     "\"export\"",
     "\"extern\"",
-    "\"false\"",
     "\"float\"",
     "\"for\"",
     "\"friend\"",
@@ -230,7 +225,6 @@ public interface ParserConstants {
     "\"switch\"",
     "\"template\"",
     "\"throw\"",
-    "\"true\"",
     "\"try\"",
     "\"typedef\"",
     "\"typeid\"",
@@ -249,17 +243,17 @@ public interface ParserConstants {
     "<IDENTIFIER>",
     "<INTEGER>",
     "\"\\\'\"",
+    "<token of kind 73>",
+    "<token of kind 74>",
     "<token of kind 75>",
-    "<token of kind 76>",
-    "<token of kind 77>",
     "\"\\\'\"",
     "\"\\\"\"",
+    "<token of kind 78>",
+    "<token of kind 79>",
     "<token of kind 80>",
-    "<token of kind 81>",
-    "<token of kind 82>",
     "\"\\\"\"",
     "\"`\"",
-    "<token of kind 85>",
+    "<token of kind 83>",
     "\"\\\\`\"",
     "\"`\"",
     "\"(\"",

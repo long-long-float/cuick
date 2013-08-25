@@ -12,9 +12,12 @@ import jp.long_long_float.cuick.ast.AddressNode;
 import jp.long_long_float.cuick.ast.ArefNode;
 import jp.long_long_float.cuick.ast.AsOpNode;
 import jp.long_long_float.cuick.ast.AssignNode;
+import jp.long_long_float.cuick.ast.AtInputNode;
+import jp.long_long_float.cuick.ast.AtWhileNode;
 import jp.long_long_float.cuick.ast.BinaryOpNode;
 import jp.long_long_float.cuick.ast.BlockNode;
 import jp.long_long_float.cuick.ast.BreakNode;
+import jp.long_long_float.cuick.ast.BuiltInCode;
 import jp.long_long_float.cuick.ast.BuiltInCodeStmt;
 import jp.long_long_float.cuick.ast.CaseNode;
 import jp.long_long_float.cuick.ast.CastNode;
@@ -161,6 +164,15 @@ public class CodeGenerator extends ASTVisitor<String, String> {
         }
     }
     
+    //XXX 本来あってはいけない
+    public String visit(AtWhileNode node) {
+        return node.toString();
+    }
+    //XXX
+    public String visit(AtInputNode node) {
+        return node.toString();
+    }
+    
     //entities
     
     public String visit(Function ent) {
@@ -198,6 +210,10 @@ public class CodeGenerator extends ASTVisitor<String, String> {
     //statements
     
     public String visit(BuiltInCodeStmt node) {
+        return node.code();
+    }
+    
+    public String visit(BuiltInCode node) {
         return node.code();
     }
     

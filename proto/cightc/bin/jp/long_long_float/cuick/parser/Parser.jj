@@ -83,22 +83,17 @@ SPECIAL_TOKEN: {
 }
 
 TOKEN: {
-    <ASM : "asm">
-  | <AUTO : "auto">
-  | <BOOL : "bool">
-  | <BREAK : "break">
+  <BREAK : "break">
   | <CASE : "case">
   | <CATCH : "catch">
   | <CHAR : "char">
   | <CLASS : "class">
   | <CONST : "const">
-  | <CONST_CAST : "const_cast">
   | <CONTINUE : "continue">
   | <DEFAULT_ : "default">
   | <DELETE : "delete">
   | <DO : "do">
   | <DOUBLE : "double">
-  | <DYNAMIC_CAST : "dynamic_cast">
   | <ELSE : "else">
   | <ENUM : "enum">
   | <EXPLICIT : "explicit">
@@ -111,7 +106,6 @@ TOKEN: {
   | <IF : "if">
   | <INLINE : "inline">
   | <INT : "int">
-  //!
   | <LAST : "last">
   | <LONG : "long">
   | <MUTABLE : "mutable">
@@ -122,17 +116,14 @@ TOKEN: {
   | <PROTECTED : "protected">
   | <PUBLIC : "public">
   | <REGISTER : "register">
-  | <REINTERPRET_CAST : "reinterpret_cast">
   | <RETURN : "return">
   | <SHORT : "short">
   | <SIGNED : "signed">
   | <SIZEOF : "sizeof">
   | <STATIC : "static">
-  | <STATIC_CAST : "static_cast">
   | <STRUCT : "struct">
   | <SWITCH : "switch">
   | <TEMPLATE : "template">
- // | <THIS : "this">
   | <THROW : "throw">
   | <TRY : "try">
   | <TYPEDEF : "typedef">
@@ -144,7 +135,6 @@ TOKEN: {
   | <VIRTUAL : "virtual">
   | <VOID : "void">
   | <VOLATILE : "volatile">
-  | <WCHAR_T : "wchar_t">
   | <WHILE : "while">
   | <DOLLAR : "$">
   | <EXTEND : "extend">
@@ -1107,21 +1097,21 @@ AtWhileNode at_while():
 }
 
 AtTestNode at_test():
-{    Token t, t2, line;
-    List<Token> lines = new ArrayList<Token>();
+{    Token t, t2;
+    Token file_name;
+    String line;
+    List<String> lines = new ArrayList<String>();
     List<AtTestCase> inCases = new ArrayList<AtTestCase>();
     List<AtTestCase> outCases = new ArrayList<AtTestCase>();
 }
 {    t="@test" "{"
 	    (
-	        t2="in:"// ( line=<ONE_LINE> { lines.add(line); } )+
-	        {	           inCases.add(new AtTestCase(location(t2), lines));
-	           lines = new ArrayList<Token>();
+	        t2="in:" file_name=<STRING>
+	        {	           inCases.add(new AtTestCase(location(t2), file_name.image));
 	        }
-	        | t2="out:"//  ( line=<ONE_LINE> { lines.add(line); } )+
+	        | t2="out:" file_name=<STRING>
             {
-               outCases.add(new AtTestCase(location(t2), lines));
-               lines = new ArrayList<Token>();
+               outCases.add(new AtTestCase(location(t2), file_name.image));
             }
          )*
     "}"

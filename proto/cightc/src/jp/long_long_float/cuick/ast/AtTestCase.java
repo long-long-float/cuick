@@ -1,17 +1,18 @@
 package jp.long_long_float.cuick.ast;
 
-import java.util.List;
-
-import jp.long_long_float.cuick.parser.Token;
 
 public class AtTestCase extends Node {
 
-    Location location;
-    List<Token> lines;
+    private Location location;
+    private String fileName;
+
+    public AtTestCase(Location location, String fileName) {
+        this.location = location;
+        this.fileName = fileName;
+    }
     
-    public AtTestCase(Location loc, List<Token> lines) {
-        this.location = loc;
-        this.lines = lines;
+    public String fileName() {
+        return fileName;
     }
     
     @Override
@@ -21,7 +22,7 @@ public class AtTestCase extends Node {
 
     @Override
     protected void _dump(Dumper d) {
-        d.printMember("lines", lines);
+        d.printMember("fileName", fileName);
     }
 
 }

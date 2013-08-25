@@ -17,143 +17,127 @@ public interface ParserConstants {
   /** RegularExpression Id. */
   int LINE_COMMENT = 5;
   /** RegularExpression Id. */
-  int ASM = 6;
+  int BREAK = 6;
   /** RegularExpression Id. */
-  int AUTO = 7;
+  int CASE = 7;
   /** RegularExpression Id. */
-  int BOOL = 8;
+  int CATCH = 8;
   /** RegularExpression Id. */
-  int BREAK = 9;
+  int CHAR = 9;
   /** RegularExpression Id. */
-  int CASE = 10;
+  int CLASS = 10;
   /** RegularExpression Id. */
-  int CATCH = 11;
+  int CONST = 11;
   /** RegularExpression Id. */
-  int CHAR = 12;
+  int CONTINUE = 12;
   /** RegularExpression Id. */
-  int CLASS = 13;
+  int DEFAULT_ = 13;
   /** RegularExpression Id. */
-  int CONST = 14;
+  int DELETE = 14;
   /** RegularExpression Id. */
-  int CONST_CAST = 15;
+  int DO = 15;
   /** RegularExpression Id. */
-  int CONTINUE = 16;
+  int DOUBLE = 16;
   /** RegularExpression Id. */
-  int DEFAULT_ = 17;
+  int ELSE = 17;
   /** RegularExpression Id. */
-  int DELETE = 18;
+  int ENUM = 18;
   /** RegularExpression Id. */
-  int DO = 19;
+  int EXPLICIT = 19;
   /** RegularExpression Id. */
-  int DOUBLE = 20;
+  int EXPORT = 20;
   /** RegularExpression Id. */
-  int DYNAMIC_CAST = 21;
+  int EXTERN = 21;
   /** RegularExpression Id. */
-  int ELSE = 22;
+  int FLOAT = 22;
   /** RegularExpression Id. */
-  int ENUM = 23;
+  int FOR = 23;
   /** RegularExpression Id. */
-  int EXPLICIT = 24;
+  int FRIEND = 24;
   /** RegularExpression Id. */
-  int EXPORT = 25;
+  int GOTO = 25;
   /** RegularExpression Id. */
-  int EXTERN = 26;
+  int IF = 26;
   /** RegularExpression Id. */
-  int FLOAT = 27;
+  int INLINE = 27;
   /** RegularExpression Id. */
-  int FOR = 28;
+  int INT = 28;
   /** RegularExpression Id. */
-  int FRIEND = 29;
+  int LAST = 29;
   /** RegularExpression Id. */
-  int GOTO = 30;
+  int LONG = 30;
   /** RegularExpression Id. */
-  int IF = 31;
+  int MUTABLE = 31;
   /** RegularExpression Id. */
-  int INLINE = 32;
+  int NAMESPACE = 32;
   /** RegularExpression Id. */
-  int INT = 33;
+  int NEW = 33;
   /** RegularExpression Id. */
-  int LAST = 34;
+  int OPERATOR = 34;
   /** RegularExpression Id. */
-  int LONG = 35;
+  int PRIVATE = 35;
   /** RegularExpression Id. */
-  int MUTABLE = 36;
+  int PROTECTED = 36;
   /** RegularExpression Id. */
-  int NAMESPACE = 37;
+  int PUBLIC = 37;
   /** RegularExpression Id. */
-  int NEW = 38;
+  int REGISTER = 38;
   /** RegularExpression Id. */
-  int OPERATOR = 39;
+  int RETURN = 39;
   /** RegularExpression Id. */
-  int PRIVATE = 40;
+  int SHORT = 40;
   /** RegularExpression Id. */
-  int PROTECTED = 41;
+  int SIGNED = 41;
   /** RegularExpression Id. */
-  int PUBLIC = 42;
+  int SIZEOF = 42;
   /** RegularExpression Id. */
-  int REGISTER = 43;
+  int STATIC = 43;
   /** RegularExpression Id. */
-  int REINTERPRET_CAST = 44;
+  int STRUCT = 44;
   /** RegularExpression Id. */
-  int RETURN = 45;
+  int SWITCH = 45;
   /** RegularExpression Id. */
-  int SHORT = 46;
+  int TEMPLATE = 46;
   /** RegularExpression Id. */
-  int SIGNED = 47;
+  int THROW = 47;
   /** RegularExpression Id. */
-  int SIZEOF = 48;
+  int TRY = 48;
   /** RegularExpression Id. */
-  int STATIC = 49;
+  int TYPEDEF = 49;
   /** RegularExpression Id. */
-  int STATIC_CAST = 50;
+  int TYPEID = 50;
   /** RegularExpression Id. */
-  int STRUCT = 51;
+  int TYPENAME = 51;
   /** RegularExpression Id. */
-  int SWITCH = 52;
+  int UNION = 52;
   /** RegularExpression Id. */
-  int TEMPLATE = 53;
+  int UNSIGNED = 53;
   /** RegularExpression Id. */
-  int THROW = 54;
+  int USING = 54;
   /** RegularExpression Id. */
-  int TRY = 55;
+  int VIRTUAL = 55;
   /** RegularExpression Id. */
-  int TYPEDEF = 56;
+  int VOID = 56;
   /** RegularExpression Id. */
-  int TYPEID = 57;
+  int VOLATILE = 57;
   /** RegularExpression Id. */
-  int TYPENAME = 58;
+  int WHILE = 58;
   /** RegularExpression Id. */
-  int UNION = 59;
+  int DOLLAR = 59;
   /** RegularExpression Id. */
-  int UNSIGNED = 60;
+  int EXTEND = 60;
   /** RegularExpression Id. */
-  int USING = 61;
+  int AS = 61;
   /** RegularExpression Id. */
-  int VIRTUAL = 62;
+  int IDENTIFIER = 62;
   /** RegularExpression Id. */
-  int VOID = 63;
+  int INTEGER = 63;
   /** RegularExpression Id. */
-  int VOLATILE = 64;
+  int CHARACTER = 68;
   /** RegularExpression Id. */
-  int WCHAR_T = 65;
+  int STRING = 73;
   /** RegularExpression Id. */
-  int WHILE = 66;
-  /** RegularExpression Id. */
-  int DOLLAR = 67;
-  /** RegularExpression Id. */
-  int EXTEND = 68;
-  /** RegularExpression Id. */
-  int AS = 69;
-  /** RegularExpression Id. */
-  int IDENTIFIER = 70;
-  /** RegularExpression Id. */
-  int INTEGER = 71;
-  /** RegularExpression Id. */
-  int CHARACTER = 76;
-  /** RegularExpression Id. */
-  int STRING = 81;
-  /** RegularExpression Id. */
-  int BUILT_IN_CODE = 85;
+  int BUILT_IN_CODE = 77;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -176,22 +160,17 @@ public interface ParserConstants {
     "<token of kind 3>",
     "\"*/\"",
     "<LINE_COMMENT>",
-    "\"asm\"",
-    "\"auto\"",
-    "\"bool\"",
     "\"break\"",
     "\"case\"",
     "\"catch\"",
     "\"char\"",
     "\"class\"",
     "\"const\"",
-    "\"const_cast\"",
     "\"continue\"",
     "\"default\"",
     "\"delete\"",
     "\"do\"",
     "\"double\"",
-    "\"dynamic_cast\"",
     "\"else\"",
     "\"enum\"",
     "\"explicit\"",
@@ -214,13 +193,11 @@ public interface ParserConstants {
     "\"protected\"",
     "\"public\"",
     "\"register\"",
-    "\"reinterpret_cast\"",
     "\"return\"",
     "\"short\"",
     "\"signed\"",
     "\"sizeof\"",
     "\"static\"",
-    "\"static_cast\"",
     "\"struct\"",
     "\"switch\"",
     "\"template\"",
@@ -235,7 +212,6 @@ public interface ParserConstants {
     "\"virtual\"",
     "\"void\"",
     "\"volatile\"",
-    "\"wchar_t\"",
     "\"while\"",
     "\"$\"",
     "\"extend\"",
@@ -243,17 +219,17 @@ public interface ParserConstants {
     "<IDENTIFIER>",
     "<INTEGER>",
     "\"\\\'\"",
-    "<token of kind 73>",
-    "<token of kind 74>",
-    "<token of kind 75>",
+    "<token of kind 65>",
+    "<token of kind 66>",
+    "<token of kind 67>",
     "\"\\\'\"",
     "\"\\\"\"",
-    "<token of kind 78>",
-    "<token of kind 79>",
-    "<token of kind 80>",
+    "<token of kind 70>",
+    "<token of kind 71>",
+    "<token of kind 72>",
     "\"\\\"\"",
     "\"`\"",
-    "<token of kind 83>",
+    "<token of kind 75>",
     "\"\\\\`\"",
     "\"`\"",
     "\"(\"",

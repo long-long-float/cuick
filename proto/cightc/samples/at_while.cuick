@@ -1,0 +1,4 @@
+int n;
+@while(true)
+@input{ n! }
+puts(n ** 2);

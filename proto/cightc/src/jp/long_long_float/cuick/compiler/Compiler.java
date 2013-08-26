@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import jp.long_long_float.cuick.ast.AST;
+import jp.long_long_float.cuick.ast.AtTestCase;
 import jp.long_long_float.cuick.exception.CompileException;
 import jp.long_long_float.cuick.exception.FileException;
 import jp.long_long_float.cuick.exception.OptionParseError;
@@ -14,6 +15,7 @@ import jp.long_long_float.cuick.exception.SemanticException;
 import jp.long_long_float.cuick.exception.SyntaxException;
 import jp.long_long_float.cuick.parser.Parser;
 import jp.long_long_float.cuick.utility.ErrorHandler;
+import jp.long_long_float.cuick.utility.Pair;
 
 public class Compiler {
     static public void main(String[] args) {
@@ -30,6 +32,26 @@ public class Compiler {
         Options opts = parseOptions(args);
         try {
             build(args[0], opts);
+            
+            //c++ to binary
+            ProcessBuilder pb = new ProcessBuilder("g++", "-o", "test.exe", args[0].replaceFirst(".cuick$", ".cpp"));
+            try {
+                Process p = pb.start();
+                int i = p.waitFor();
+                System.out.println(i);
+            } catch (IOException | InterruptedException e) {
+                // TODO 自動生成された catch ブロック
+                e.printStackTrace();
+            }
+            
+            //auto test
+            Table table = Table.getInstance();
+            if(table.isEnabledTest()) {
+                for(Pair<AtTestCase, AtTestCase> testCase : table.getTestCases()) {
+                    testCase.getFirst().fileName();
+                }
+            }
+            
             System.exit(0);
         }
         catch (CompileException ex) {

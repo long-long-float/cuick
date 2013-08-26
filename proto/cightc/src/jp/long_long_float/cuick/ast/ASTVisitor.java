@@ -17,6 +17,10 @@ public abstract class ASTVisitor<T> {
         errorHandler.error(location, message);
     }
     
+    protected void error(String message) {
+        errorHandler.error(message);
+    }
+    
     protected void warn(Location location, String message) {
         errorHandler.warn(location, message);
     }

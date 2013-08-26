@@ -28,6 +28,10 @@ public class LocalResolver extends Visitor {
         ToplevelScope toplevel = new ToplevelScope();
         scopeStack.add(toplevel);
         
+        if(!Table.getInstance().equalsInCasesAndOutCases()) {
+            error("Number of in-case and out-case are diffirent!");
+        }
+        
         for(Entity ent : ast.definitions()) {
             toplevel.defineEntity(ent);
         }
@@ -44,7 +48,7 @@ public class LocalResolver extends Visitor {
         
         ast.setScope(toplevel);
     }
-    
+
     private void resolveFunctions(List<Function> funcs) {
         for(Function func : funcs) {
             pushScope(func.parameters());

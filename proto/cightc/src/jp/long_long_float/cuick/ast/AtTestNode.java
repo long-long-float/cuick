@@ -2,6 +2,8 @@ package jp.long_long_float.cuick.ast;
 
 import java.util.List;
 
+import jp.long_long_float.cuick.compiler.Table;
+
 public class AtTestNode extends AtCommandNode {
 
     protected List<AtTestCase> inCases, outCases;
@@ -10,6 +12,8 @@ public class AtTestNode extends AtCommandNode {
         super(loc);
         this.inCases = inCases;
         this.outCases = outCases;
+        
+        Table.getInstance().setTestCases(inCases, outCases);
     }
     
     @Override

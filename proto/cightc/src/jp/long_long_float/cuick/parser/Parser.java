@@ -12,12 +12,84 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import jp.long_long_float.cuick.ast.*;
-import jp.long_long_float.cuick.entity.*;
-import jp.long_long_float.cuick.exception.*;
-import jp.long_long_float.cuick.foreach.*;
-import jp.long_long_float.cuick.type.*;
-import jp.long_long_float.cuick.utility.*;
+import jp.long_long_float.cuick.ast.AST;
+import jp.long_long_float.cuick.ast.AddressNode;
+import jp.long_long_float.cuick.ast.ArefNode;
+import jp.long_long_float.cuick.ast.AsOpNode;
+import jp.long_long_float.cuick.ast.AssignNode;
+import jp.long_long_float.cuick.ast.AtCommandNode;
+import jp.long_long_float.cuick.ast.AtDebugNode;
+import jp.long_long_float.cuick.ast.AtInputAbstractVariableNode;
+import jp.long_long_float.cuick.ast.AtInputArrayVariableNode;
+import jp.long_long_float.cuick.ast.AtInputNode;
+import jp.long_long_float.cuick.ast.AtInputVariableNode;
+import jp.long_long_float.cuick.ast.AtMemoNode;
+import jp.long_long_float.cuick.ast.AtTestCase;
+import jp.long_long_float.cuick.ast.AtTestNode;
+import jp.long_long_float.cuick.ast.AtWhileNode;
+import jp.long_long_float.cuick.ast.BinaryOpNode;
+import jp.long_long_float.cuick.ast.BlockNode;
+import jp.long_long_float.cuick.ast.BreakNode;
+import jp.long_long_float.cuick.ast.BuiltInCode;
+import jp.long_long_float.cuick.ast.BuiltInCodeStmt;
+import jp.long_long_float.cuick.ast.CaseNode;
+import jp.long_long_float.cuick.ast.CastNode;
+import jp.long_long_float.cuick.ast.CondExprNode;
+import jp.long_long_float.cuick.ast.ContinueNode;
+import jp.long_long_float.cuick.ast.Declarations;
+import jp.long_long_float.cuick.ast.DefvarNode;
+import jp.long_long_float.cuick.ast.DereferenceNode;
+import jp.long_long_float.cuick.ast.DoWhileNode;
+import jp.long_long_float.cuick.ast.ExprNode;
+import jp.long_long_float.cuick.ast.ExprStmtNode;
+import jp.long_long_float.cuick.ast.ForEachNode;
+import jp.long_long_float.cuick.ast.ForNode;
+import jp.long_long_float.cuick.ast.FuncallNode;
+import jp.long_long_float.cuick.ast.IfNode;
+import jp.long_long_float.cuick.ast.LiteralNode;
+import jp.long_long_float.cuick.ast.Location;
+import jp.long_long_float.cuick.ast.MemberNode;
+import jp.long_long_float.cuick.ast.MultiplexAssignNode;
+import jp.long_long_float.cuick.ast.NullStmt;
+import jp.long_long_float.cuick.ast.OpAssignNode;
+import jp.long_long_float.cuick.ast.PowerOpNode;
+import jp.long_long_float.cuick.ast.PrefixOpNode;
+import jp.long_long_float.cuick.ast.PtrMemberNode;
+import jp.long_long_float.cuick.ast.RangeNode;
+import jp.long_long_float.cuick.ast.ReturnNode;
+import jp.long_long_float.cuick.ast.SharpDirectiveNode;
+import jp.long_long_float.cuick.ast.SharpIncludeNode;
+import jp.long_long_float.cuick.ast.SizeofExprNode;
+import jp.long_long_float.cuick.ast.SizeofTypeNode;
+import jp.long_long_float.cuick.ast.StaticMemberNode;
+import jp.long_long_float.cuick.ast.StmtNode;
+import jp.long_long_float.cuick.ast.StringLiteralNode;
+import jp.long_long_float.cuick.ast.SuffixOpNode;
+import jp.long_long_float.cuick.ast.SwitchNode;
+import jp.long_long_float.cuick.ast.TypeNode;
+import jp.long_long_float.cuick.ast.TypedefNode;
+import jp.long_long_float.cuick.ast.UnaryOpNode;
+import jp.long_long_float.cuick.ast.VariableNode;
+import jp.long_long_float.cuick.ast.WhileNode;
+import jp.long_long_float.cuick.entity.Function;
+import jp.long_long_float.cuick.entity.Parameter;
+import jp.long_long_float.cuick.entity.Params;
+import jp.long_long_float.cuick.entity.Variable;
+import jp.long_long_float.cuick.exception.FileException;
+import jp.long_long_float.cuick.exception.SemanticException;
+import jp.long_long_float.cuick.exception.SyntaxException;
+import jp.long_long_float.cuick.foreach.Enumerable;
+import jp.long_long_float.cuick.foreach.PointerEnumerable;
+import jp.long_long_float.cuick.foreach.RangeEnumerable;
+import jp.long_long_float.cuick.foreach.VariableSetEnumerable;
+import jp.long_long_float.cuick.type.BasicType;
+import jp.long_long_float.cuick.type.CChar;
+import jp.long_long_float.cuick.type.CInt;
+import jp.long_long_float.cuick.type.FunctionTemplateType;
+import jp.long_long_float.cuick.type.NamedType;
+import jp.long_long_float.cuick.type.Type;
+import jp.long_long_float.cuick.utility.ErrorHandler;
+import jp.long_long_float.cuick.utility.TextUtils;
 
 public class Parser implements ParserConstants {
         private String sourceName;
@@ -68,9 +140,9 @@ public class Parser implements ParserConstants {
     <ONE_LINE: ("\n" | "\r\n" | "\r") (~["\n", "\r"])* ("\n" | "\r\n" | "\r")>
 }*/
 
-//�?�?
+//�?�?
 
-//ソース全�?
+//ソース全�?
   final public AST compilation_unit() throws ParseException {
     trace_call("compilation_unit");
     try {
@@ -260,7 +332,7 @@ public class Parser implements ParserConstants {
     }
   }
 
-//変数宣�?
+//変数宣�?
   final public DefvarNode defvars() throws ParseException {
     trace_call("defvars");
     try {
@@ -268,7 +340,7 @@ public class Parser implements ParserConstants {
     Variable var;
     //Type baseType;
     Type type;
-      //storage(staticなど)は無�?
+      //storage(staticなど)は無�?
           type = type();
       var = defvar(type);
                                    vars.add(var);
@@ -707,7 +779,7 @@ public class Parser implements ParserConstants {
   }
 
 /*
-何もつ�?��な�?�??�?
+何もつ�?��な�?�??�?
 int
 vector<int, int>
 $T
@@ -782,7 +854,7 @@ $T
   }
 
 /*
-*�?が付いた型
+*�?が付いた型
 int*
 int&
 $T*
@@ -2525,7 +2597,7 @@ PrintStmtNode print_stmt():
       case INTEGER:
         t = jj_consume_token(INTEGER);
             //return integerNode(location(t), t.image);
-            {if (true) return new LiteralNode(location(t), new CInt(location(t)), t.image);} //TODO int以外�?も作る
+            {if (true) return new LiteralNode(location(t), new CInt(location(t)), t.image);} //TODO int以外�?も作る
 
         break;
       case CHARACTER:

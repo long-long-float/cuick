@@ -6,7 +6,6 @@ import jp.long_long_float.cuick.ast.BlockNode;
 import jp.long_long_float.cuick.ast.Dumper;
 import jp.long_long_float.cuick.ast.Location;
 import jp.long_long_float.cuick.ast.TypeNode;
-import jp.long_long_float.cuick.compiler.Table;
 import jp.long_long_float.cuick.type.FunctionType;
 import jp.long_long_float.cuick.type.Type;
 
@@ -21,8 +20,6 @@ public class Function extends Entity{
         super(new TypeNode(new FunctionType(ret, ps != null ? ps.parametersType() : null)), name);
         this.params = ps;
         this.body = body;
-        
-        Table.getInstance().entryFunction(this);
     }
     
     //for extend

@@ -90,6 +90,10 @@ public class ASTTranslator extends ASTVisitor<Node> {
                 ExprStmtNode lastStmt = (ExprStmtNode) body.getLastStmt();
                 body.stmts().set(body.stmts().size() - 1, new ReturnNode(lastStmt.location(), lastStmt.expr()));
             }
+            
+            if(func.name().equals("main") && !(body.getLastStmt() instanceof ReturnNode)) {
+                body.stmts().add(new ReturnNode(null, LiteralNode.cint(0)));
+            }
         }
     }
     

@@ -12,8 +12,6 @@ import jp.long_long_float.cuick.ast.AddressNode;
 import jp.long_long_float.cuick.ast.ArefNode;
 import jp.long_long_float.cuick.ast.AsOpNode;
 import jp.long_long_float.cuick.ast.AssignNode;
-import jp.long_long_float.cuick.ast.AtInputNode;
-import jp.long_long_float.cuick.ast.AtWhileNode;
 import jp.long_long_float.cuick.ast.BinaryOpNode;
 import jp.long_long_float.cuick.ast.BlockNode;
 import jp.long_long_float.cuick.ast.BreakNode;
@@ -49,7 +47,6 @@ import jp.long_long_float.cuick.ast.UnaryOpNode;
 import jp.long_long_float.cuick.ast.VariableNode;
 import jp.long_long_float.cuick.ast.WhileNode;
 import jp.long_long_float.cuick.cppStructure.CodeBuilder;
-import jp.long_long_float.cuick.cppStructure.ForStmt;
 import jp.long_long_float.cuick.cppStructure.Struct;
 import jp.long_long_float.cuick.entity.Function;
 import jp.long_long_float.cuick.entity.Parameter;
@@ -156,30 +153,22 @@ public class CodeGenerator extends ASTVisitor<String, String> {
     }
     
     private void deployFunctions(CodeBuilder cb, AST ast) {
-        /*for(jp.long_long_float.cuick.entity.Function func : Table.getInstance().getFunctions()) {
-            cb.addLine(func.toString());
-        }*/
         for(Function func : ast.funcs()) {
             cb.addLine(func.accept(this));
         }
     }
     
-    //XXX 本来あってはいけない
-    public String visit(AtWhileNode node) {
-        return node.toString();
-    }
-    //XXX
-    public String visit(AtInputNode node) {
-        return node.toString();
-    }
-    
     //entities
     
     public String visit(Function ent) {
+        /*
+        //ms記法
         CodeBuilder cb = new CodeBuilder();
         cb.addLine(ent.type() + " " + ent.name() + "(" + join(ent.parameters(), ", ") + ")");
         cb.addLine(ent.body().accept(this));
         return cb.toString();
+        */
+        return ent.type() + " " + ent.name() + "(" + join(ent.parameters(), ", ") + ")" + ent.body().accept(this);
     }
     
     public String visit(Variable ent) {
@@ -232,15 +221,10 @@ public class CodeGenerator extends ASTVisitor<String, String> {
     }
     
     public String visit(ForNode node) {
-        ForStmt forStmt = new ForStmt(node.var().type() + " " + node.var().accept(this), node.cond().accept(this), node.incr().accept(this));
-        forStmt.setBody(node.body().accept(this));
-        return forStmt.toString();
+        String ret = node.var().type() + " " + node.var().accept(this) + ";" + node.cond().accept(this) + ";" + node.incr().accept(this);
+        return ret;
     }
-    /*
-    public String visit(ForEachNode node) {
-        return node.enumerable().accept(this);
-    }
-    */
+
     public String visit(DefvarNode node) {
         return node.type() + " " + join(node.vars(), ", ") + ";";
     }

@@ -4,13 +4,23 @@ package jp.long_long_float.cuick.cppStructure;
 public class CodeBuilder {
     private StringBuilder sb = new StringBuilder();
     
+    public CodeBuilder add(String str, boolean withIndent) {
+        sb.append((withIndent ? CodeContext.getInstance().getTabSpace() : "") + str);
+        return this;
+    }
+    
     public CodeBuilder add(String str) {
-        sb.append(CodeContext.getInstance().getTabSpace() + str);
+        add(str, true);
+        return this;
+    }
+    
+    public CodeBuilder addLine(String line, boolean withIndent) {
+        add(line + System.getProperty("line.separator"), withIndent);
         return this;
     }
     
     public CodeBuilder addLine(String line) {
-        sb.append(CodeContext.getInstance().getTabSpace() + line + System.getProperty("line.separator"));
+        addLine(line, true);
         return this;
     }
     
@@ -29,7 +39,7 @@ public class CodeBuilder {
     }
     
     public void beginBlock() {
-        addLine("{");
+        addLine("{", false);
         CodeContext.getInstance().indent();
     }
     

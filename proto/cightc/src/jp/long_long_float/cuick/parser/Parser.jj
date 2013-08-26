@@ -106,7 +106,6 @@ TOKEN: {
   | <IF : "if">
   | <INLINE : "inline">
   | <INT : "int">
-  | <LAST : "last">
   | <LONG : "long">
   | <MUTABLE : "mutable">
   | <NAMESPACE : "namespace">
@@ -136,6 +135,8 @@ TOKEN: {
   | <VOID : "void">
   | <VOLATILE : "volatile">
   | <WHILE : "while">
+  //cuick
+  | <LAST : "last">
   | <DOLLAR : "$">
   | <EXTEND : "extend">
   | <AS : "as">
@@ -191,8 +192,6 @@ AST compilation_unit():
     Declarations decls = new Declarations();
 
     Function func;
-    //List<Variable> vars;
-    //TypedefNode typedef;
     DefvarNode defvar;
     AtCommandNode at_command;
     StmtNode stmt;
@@ -431,6 +430,7 @@ StmtNode stmt():
     |   t=<BUILT_IN_CODE> { n = new BuiltInCodeStmt(location(t), t.image.substring(1, t.image.length() - 1)); }
     |   LOOKAHEAD(term() ("," term())+ "=") n=multiplex_assign()
     //|   n=print_stmt() //including puts
+    |   n=sharp_include()
     |   n=at_input()
     |   n=at_while()
     |   n=expr_stmt()
@@ -461,6 +461,12 @@ PrintStmtNode print_stmt():
     }
 }
 */
+
+SharpIncludeStmtNode sharp_include():
+{
+}
+{    "#include"
+
 ExprStmtNode expr_stmt():
 {    ExprNode expr;
 }

@@ -135,6 +135,7 @@ TOKEN: {
   | <VOID : "void">
   | <VOLATILE : "volatile">
   | <WHILE : "while">
+  | <SHARP_INCLUDE : "#include">
   //cuick
   | <LAST : "last">
   | <DOLLAR : "$">
@@ -195,6 +196,7 @@ AST compilation_unit():
     DefvarNode defvar;
     AtCommandNode at_command;
     StmtNode stmt;
+    SharpDirectiveNode sharp_directive;
 }
 {
     {
@@ -202,19 +204,56 @@ AST compilation_unit():
     }
     (
         LOOKAHEAD(<EXTEND>/* type_with_suffix() type_with_suffix()*/)
-        func=def_extendfun() { decls.funcs.add(func); }
+        func=def_extendfun() { decls.funcs().add(func); }
     |   LOOKAHEAD(type_with_suffix() name() "(" params() ")" "{")
-        func=deffun() { decls.funcs.add(func); }
+        func=deffun() { decls.funcs().add(func); }
     |   LOOKAHEAD(type() ["&"] ("*")* name()) defvar=defvars()
         {
-            decls.stmts.add(defvar);
-            decls.vars.addAll(defvar.vars());
+            decls.stmts().add(defvar);
+            decls.vars().addAll(defvar.vars());
         }
-    |   stmt=stmt() { decls.stmts.add(stmt); }
-    |   at_command=at_command() { decls.atCommands.add(at_command); }
+    |   stmt=stmt() { decls.stmts().add(stmt); }
+    |   at_command=at_command() { decls.atCommands().add(at_command); }
+    |   sharp_directive=sharp_directive()  { decls.sharpDirectives().add(sharp_directive); }
     )* <EOF>
     {
         return new AST(location(t), decls);
+    }
+}
+
+SharpDirectiveNode sharp_directive():
+{    SharpDirectiveNode node;
+}
+{    node=sharp_include()
+    {        return node;
+    }
+}
+
+JAVACODE String angle_bracket_string()
+{
+    String ret = "";
+    String token;
+    while(true)
+    {
+        token = getNextToken().image;
+        ret += token;
+        if(token.equals(">")) break;
+    }
+    return ret;
+}
+
+SharpIncludeNode sharp_include():
+{
+    Token t;
+    String name;
+}
+{
+    t=<SHARP_INCLUDE>
+    (      LOOKAHEAD("<") name=angle_bracket_string()
+    | name=<STRING>.image
+    )
+    {
+        return new SharpIncludeNode(location(t), name);
     }
 }
 
@@ -430,7 +469,6 @@ StmtNode stmt():
     |   t=<BUILT_IN_CODE> { n = new BuiltInCodeStmt(location(t), t.image.substring(1, t.image.length() - 1)); }
     |   LOOKAHEAD(term() ("," term())+ "=") n=multiplex_assign()
     //|   n=print_stmt() //including puts
-    |   n=sharp_include()
     |   n=at_input()
     |   n=at_while()
     |   n=expr_stmt()
@@ -461,11 +499,6 @@ PrintStmtNode print_stmt():
     }
 }
 */
-
-SharpIncludeStmtNode sharp_include():
-{
-}
-{    "#include"
 
 ExprStmtNode expr_stmt():
 {    ExprNode expr;

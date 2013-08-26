@@ -36,6 +36,7 @@ import jp.long_long_float.cuick.ast.PrefixOpNode;
 import jp.long_long_float.cuick.ast.PtrMemberNode;
 import jp.long_long_float.cuick.ast.RangeNode;
 import jp.long_long_float.cuick.ast.ReturnNode;
+import jp.long_long_float.cuick.ast.SharpIncludeNode;
 import jp.long_long_float.cuick.ast.SizeofExprNode;
 import jp.long_long_float.cuick.ast.SizeofTypeNode;
 import jp.long_long_float.cuick.ast.StaticMemberNode;
@@ -97,6 +98,10 @@ public class Visitor extends ASTVisitor<Void, Void> {
     }
     
     //statements
+    
+    public Void visit(SharpIncludeNode node) {
+        return null;
+    }
     
     public Void visit(BuiltInCodeStmt node) {
         return null;

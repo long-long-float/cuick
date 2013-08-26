@@ -63,81 +63,83 @@ public interface ParserConstants {
   /** RegularExpression Id. */
   int INT = 28;
   /** RegularExpression Id. */
-  int LAST = 29;
+  int LONG = 29;
   /** RegularExpression Id. */
-  int LONG = 30;
+  int MUTABLE = 30;
   /** RegularExpression Id. */
-  int MUTABLE = 31;
+  int NAMESPACE = 31;
   /** RegularExpression Id. */
-  int NAMESPACE = 32;
+  int NEW = 32;
   /** RegularExpression Id. */
-  int NEW = 33;
+  int OPERATOR = 33;
   /** RegularExpression Id. */
-  int OPERATOR = 34;
+  int PRIVATE = 34;
   /** RegularExpression Id. */
-  int PRIVATE = 35;
+  int PROTECTED = 35;
   /** RegularExpression Id. */
-  int PROTECTED = 36;
+  int PUBLIC = 36;
   /** RegularExpression Id. */
-  int PUBLIC = 37;
+  int REGISTER = 37;
   /** RegularExpression Id. */
-  int REGISTER = 38;
+  int RETURN = 38;
   /** RegularExpression Id. */
-  int RETURN = 39;
+  int SHORT = 39;
   /** RegularExpression Id. */
-  int SHORT = 40;
+  int SIGNED = 40;
   /** RegularExpression Id. */
-  int SIGNED = 41;
+  int SIZEOF = 41;
   /** RegularExpression Id. */
-  int SIZEOF = 42;
+  int STATIC = 42;
   /** RegularExpression Id. */
-  int STATIC = 43;
+  int STRUCT = 43;
   /** RegularExpression Id. */
-  int STRUCT = 44;
+  int SWITCH = 44;
   /** RegularExpression Id. */
-  int SWITCH = 45;
+  int TEMPLATE = 45;
   /** RegularExpression Id. */
-  int TEMPLATE = 46;
+  int THROW = 46;
   /** RegularExpression Id. */
-  int THROW = 47;
+  int TRY = 47;
   /** RegularExpression Id. */
-  int TRY = 48;
+  int TYPEDEF = 48;
   /** RegularExpression Id. */
-  int TYPEDEF = 49;
+  int TYPEID = 49;
   /** RegularExpression Id. */
-  int TYPEID = 50;
+  int TYPENAME = 50;
   /** RegularExpression Id. */
-  int TYPENAME = 51;
+  int UNION = 51;
   /** RegularExpression Id. */
-  int UNION = 52;
+  int UNSIGNED = 52;
   /** RegularExpression Id. */
-  int UNSIGNED = 53;
+  int USING = 53;
   /** RegularExpression Id. */
-  int USING = 54;
+  int VIRTUAL = 54;
   /** RegularExpression Id. */
-  int VIRTUAL = 55;
+  int VOID = 55;
   /** RegularExpression Id. */
-  int VOID = 56;
+  int VOLATILE = 56;
   /** RegularExpression Id. */
-  int VOLATILE = 57;
+  int WHILE = 57;
   /** RegularExpression Id. */
-  int WHILE = 58;
+  int SHARP_INCLUDE = 58;
   /** RegularExpression Id. */
-  int DOLLAR = 59;
+  int LAST = 59;
   /** RegularExpression Id. */
-  int EXTEND = 60;
+  int DOLLAR = 60;
   /** RegularExpression Id. */
-  int AS = 61;
+  int EXTEND = 61;
   /** RegularExpression Id. */
-  int IDENTIFIER = 62;
+  int AS = 62;
   /** RegularExpression Id. */
-  int INTEGER = 63;
+  int IDENTIFIER = 63;
   /** RegularExpression Id. */
-  int CHARACTER = 68;
+  int INTEGER = 64;
   /** RegularExpression Id. */
-  int STRING = 73;
+  int CHARACTER = 69;
   /** RegularExpression Id. */
-  int BUILT_IN_CODE = 77;
+  int STRING = 74;
+  /** RegularExpression Id. */
+  int BUILT_IN_CODE = 78;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -183,7 +185,6 @@ public interface ParserConstants {
     "\"if\"",
     "\"inline\"",
     "\"int\"",
-    "\"last\"",
     "\"long\"",
     "\"mutable\"",
     "\"namespace\"",
@@ -213,23 +214,25 @@ public interface ParserConstants {
     "\"void\"",
     "\"volatile\"",
     "\"while\"",
+    "\"#include\"",
+    "\"last\"",
     "\"$\"",
     "\"extend\"",
     "\"as\"",
     "<IDENTIFIER>",
     "<INTEGER>",
     "\"\\\'\"",
-    "<token of kind 65>",
     "<token of kind 66>",
     "<token of kind 67>",
+    "<token of kind 68>",
     "\"\\\'\"",
     "\"\\\"\"",
-    "<token of kind 70>",
     "<token of kind 71>",
     "<token of kind 72>",
+    "<token of kind 73>",
     "\"\\\"\"",
     "\"`\"",
-    "<token of kind 75>",
+    "<token of kind 76>",
     "\"\\\\`\"",
     "\"`\"",
     "\"(\"",
@@ -237,6 +240,7 @@ public interface ParserConstants {
     "\"{\"",
     "\"&\"",
     "\"*\"",
+    "\"<\"",
     "\",\"",
     "\";\"",
     "\"[\"",
@@ -248,7 +252,6 @@ public interface ParserConstants {
     "\"-\"",
     "\":\"",
     "\">\"",
-    "\"<\"",
     "\"...\"",
     "\"..\"",
     "\"+=\"",

@@ -1,7 +1,6 @@
 package jp.long_long_float.cuick.ast;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 import jp.long_long_float.cuick.entity.Entity;
@@ -22,46 +21,50 @@ public class AST extends Node{
     
     public List<Entity> definitions() {
         List<Entity> result = new ArrayList<Entity>();
-        result.addAll(declarations.vars);
-        result.addAll(declarations.funcs);
+        result.addAll(declarations.vars());
+        result.addAll(declarations.funcs());
         return result;
     }
     
     public List<Variable> vars() {
-        return new ArrayList<Variable>(declarations.vars);
+        return declarations.vars();
     }
     
     public List<StmtNode> stmts() {
-        return new ArrayList<StmtNode>(declarations.stmts);
+        return declarations.stmts();
     }
     
     public List<StmtNode> moveStmts() {
-        List<StmtNode> ret = stmts();
-        declarations.stmts.clear();
+        List<StmtNode> ret = new ArrayList<StmtNode>(stmts());
+        declarations.stmts().clear();
         return ret;
     }
-    
+    /*
     public void setStmt(List<StmtNode> stmts) {
         declarations.stmts = new LinkedHashSet<StmtNode>(stmts);
     }
-    
+    */
     public List<Function> funcs() {
-        return new ArrayList<Function>(declarations.funcs);
+        return declarations.funcs();
     }
     
     public void addFunction(Function func) {
-        declarations.funcs.add(func);
+        declarations.funcs().add(func);
     }
     
     public boolean isDefinedFunction(String name) {
-        for(Function func : declarations.funcs) {
+        for(Function func : declarations.funcs()) {
             if(func.name().equals(name)) return true;
         }
         return false;
     }
     
     public List<AtCommandNode> atCommands() {
-        return new ArrayList<AtCommandNode>(declarations.atCommands);
+        return new ArrayList<AtCommandNode>(declarations.atCommands());
+    }
+    
+    public List<SharpDirectiveNode> sharpDirectives() {
+        return declarations.sharpDirectives();
     }
     
     public Location location() {
@@ -83,5 +86,4 @@ public class AST extends Node{
         }
         toplevelScope = scope;
     }
-
 }

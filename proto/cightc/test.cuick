@@ -21,8 +21,8 @@ extend void $CONT.sort() {
 */
 //入力を二乗して出力するプログラム
 @test {
-in: "in.txt"
-out: "out.txt"
+    in: "in.txt"
+    out: "out.txt"
 }
 int n;
 @while(true)

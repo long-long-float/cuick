@@ -1,6 +1,8 @@
 package jp.long_long_float.cuick.ast;
 
 
+
+
 public class AtTestCase extends Node {
 
     private Location location;

@@ -68,7 +68,7 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
             Params params = new Params(null, ListUtils.asList(
                     new Parameter(new TypeNode(new CInt()), "argc"),
                     new Parameter(new TypeNode(new CChar().increasePointer().increasePointer()), "argv")));
-            BlockNode body = new BlockNode(null, null, new ArrayList<StmtNode>(ast.moveStmts()));
+            BlockNode body = new BlockNode(null, null, ast.moveStmts());
             body.variables().addAll(ast.vars());
             updateParents(body);
             

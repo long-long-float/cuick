@@ -36,6 +36,8 @@ import jp.long_long_float.cuick.ast.PrefixOpNode;
 import jp.long_long_float.cuick.ast.PtrMemberNode;
 import jp.long_long_float.cuick.ast.RangeNode;
 import jp.long_long_float.cuick.ast.ReturnNode;
+import jp.long_long_float.cuick.ast.SharpDirectiveNode;
+import jp.long_long_float.cuick.ast.SharpIncludeNode;
 import jp.long_long_float.cuick.ast.SizeofExprNode;
 import jp.long_long_float.cuick.ast.SizeofTypeNode;
 import jp.long_long_float.cuick.ast.StaticMemberNode;
@@ -77,6 +79,9 @@ public class CodeGenerator extends ASTVisitor<String, String> {
     
     public String visit(AST ast) {
         CodeBuilder cb = new CodeBuilder();
+        for(SharpDirectiveNode node : ast.sharpDirectives()) {
+            cb.addLine(node.accept(this));
+        }
         deployHeaders(cb);
         deployBuiltInCodes(cb);
         deployTuples(cb);
@@ -197,6 +202,10 @@ public class CodeGenerator extends ASTVisitor<String, String> {
     }
     
     //statements
+    
+    public String visit(SharpIncludeNode node) {
+        return "#include" + node.name();
+    }
     
     public String visit(BuiltInCodeStmt node) {
         return node.code();

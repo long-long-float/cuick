@@ -6,8 +6,11 @@ public class IfNode extends StmtNode {
     protected StmtNode thenBody;
     protected StmtNode elseBody;
     
-    public IfNode(Location loc, ExprNode c, StmtNode t, StmtNode e) {
+    private boolean isIf;
+    
+    public IfNode(Location loc, String name, ExprNode c, StmtNode t, StmtNode e) {
         super(loc);
+        this.isIf = name.equals("if");
         this.cond = c;
         this.thenBody = t;
         this.elseBody = e;
@@ -23,6 +26,10 @@ public class IfNode extends StmtNode {
     public ExprNode cond() {
         return cond;
     }
+    
+    public void setCond(ExprNode cond) {
+        this.cond = cond;
+    }
 
     public StmtNode thenBody() {
         return thenBody;
@@ -32,4 +39,7 @@ public class IfNode extends StmtNode {
         return elseBody;
     }
 
+    public boolean isUnless() {
+        return !isIf;
+    }
 }

@@ -54,7 +54,7 @@ import jp.long_long_float.cuick.foreach.RangeEnumerable;
 import jp.long_long_float.cuick.foreach.VariableSetEnumerable;
 import jp.long_long_float.cuick.utility.ErrorHandler;
 
-public class Visitor extends ASTVisitor<Void, Void> {
+public class Visitor extends ASTVisitor<Void> {
     
     protected Visitor(ErrorHandler h) {
         super(h);

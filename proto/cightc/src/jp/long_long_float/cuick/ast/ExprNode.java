@@ -7,6 +7,8 @@ public abstract class ExprNode extends Node {
     //式の型
     private Type type;
     
+    private boolean isSurrounded = false;
+    
     public ExprNode() {
         super();
     }
@@ -23,6 +25,16 @@ public abstract class ExprNode extends Node {
     
     public Type type() {
         return type;
+    }
+
+    public boolean isSurrounded() {
+        return isSurrounded;
+    }
+    
+    public ExprNode setIsSurrounded(boolean b) {
+        //TODO cloneする
+        this.isSurrounded = b;
+        return this;
     }
 
 }

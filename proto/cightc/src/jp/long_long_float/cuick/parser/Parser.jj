@@ -141,6 +141,7 @@ TOKEN: {
   | <DOLLAR : "$">
   | <EXTEND : "extend">
   | <AS : "as">
+  | <UNLESS : "unless">
 }
 
 TOKEN: {
@@ -515,10 +516,10 @@ IfNode if_stmt():
     StmtNode thenBody, elseBody = null;
 }
 {
-    t=<IF> "(" cond=expr() ")" thenBody=stmt()
+    (t=<IF> | t=<UNLESS>) "(" cond=expr() ")" thenBody=stmt()
         [ LOOKAHEAD(1) <ELSE> elseBody=stmt() ]
         {
-            return new IfNode(location(t), cond, thenBody, elseBody);
+            return new IfNode(location(t), t.image, cond, thenBody, elseBody);
         }
 }
 
@@ -910,7 +911,7 @@ ExprNode term():
     ExprNode n;
 }
 {
-      LOOKAHEAD("(" type())
+      LOOKAHEAD("(" type() ("*")* ")" term())
       "(" t=type() ("*" { t = t.increasePointer(); })* ")" n=term()     { return new CastNode(t, n); }
     | n=unary()                     { return n; }
 }
@@ -1054,7 +1055,7 @@ ExprNode primary():
         }
     |   "(" n=expr() ")"
         {
-            return n;
+            return n.setIsSurrounded(true);
         }
 }
 

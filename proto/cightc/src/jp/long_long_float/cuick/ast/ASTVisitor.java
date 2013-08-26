@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import jp.long_long_float.cuick.entity.Entity;
 import jp.long_long_float.cuick.utility.ErrorHandler;
 
-public abstract class ASTVisitor<S, E> {
+public abstract class ASTVisitor<T> {
 
     protected final ErrorHandler errorHandler;
     
@@ -21,10 +21,9 @@ public abstract class ASTVisitor<S, E> {
         errorHandler.warn(location, message);
     }
     
-    public E visit(Node node) {
-        String nodeName = node.getClass().getSimpleName();
+    public T visit(Node node) {
         try {
-            return (E) getClass().getMethod("visit", node.getClass()).invoke(this, node);
+            return (T) getClass().getMethod("visit", node.getClass()).invoke(this, node);
         } catch (IllegalAccessException e) {
             // TODO 自動生成された catch ブロック
             e.printStackTrace();
@@ -43,10 +42,9 @@ public abstract class ASTVisitor<S, E> {
         return null;
     }
 
-    public E visit(Entity entity) {
-        String nodeName = entity.getClass().getSimpleName();
+    public T visit(Entity entity) {
         try {
-            return (E) getClass().getMethod("visit", entity.getClass()).invoke(this, entity);
+            return (T) getClass().getMethod("visit", entity.getClass()).invoke(this, entity);
         } catch (IllegalAccessException e) {
             // TODO 自動生成された catch ブロック
             e.printStackTrace();

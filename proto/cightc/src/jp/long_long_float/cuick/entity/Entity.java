@@ -59,7 +59,7 @@ abstract public class Entity implements Dumpable, Acceptable{
         return true;
     }
     
-    public <S, E> E accept(ASTVisitor<S, E> visitor) {
+    public <T> T accept(ASTVisitor<T> visitor) {
         return visitor.visit(this);
     }
     

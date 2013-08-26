@@ -24,6 +24,7 @@ import jp.long_long_float.cuick.ast.ExprStmtNode;
 import jp.long_long_float.cuick.ast.ForEachNode;
 import jp.long_long_float.cuick.ast.ForNode;
 import jp.long_long_float.cuick.ast.FuncallNode;
+import jp.long_long_float.cuick.ast.IfNode;
 import jp.long_long_float.cuick.ast.LiteralNode;
 import jp.long_long_float.cuick.ast.MemberNode;
 import jp.long_long_float.cuick.ast.MultiplexAssignNode;
@@ -37,6 +38,7 @@ import jp.long_long_float.cuick.ast.StmtNode;
 import jp.long_long_float.cuick.ast.StringLiteralNode;
 import jp.long_long_float.cuick.ast.SuffixOpNode;
 import jp.long_long_float.cuick.ast.TypeNode;
+import jp.long_long_float.cuick.ast.UnaryOpNode;
 import jp.long_long_float.cuick.ast.VariableNode;
 import jp.long_long_float.cuick.ast.WhileNode;
 import jp.long_long_float.cuick.entity.Function;
@@ -53,7 +55,7 @@ import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.ErrorHandler;
 import jp.long_long_float.cuick.utility.ListUtils;
 
-public class ASTTranslator extends ASTVisitor<Node, Node> {
+public class ASTTranslator extends ASTVisitor<Node> {
 
     public ASTTranslator(ErrorHandler h) {
         super(h);
@@ -326,6 +328,13 @@ public class ASTTranslator extends ASTVisitor<Node, Node> {
             default:
                     return visitDefault(node);
             }
+        }
+        return visitDefault(node);
+    }
+    
+    public Node visit(IfNode node) {
+        if(node.isUnless()) {
+            node.setCond(new UnaryOpNode("!", node.cond().setIsSurrounded(true)));
         }
         return visitDefault(node);
     }

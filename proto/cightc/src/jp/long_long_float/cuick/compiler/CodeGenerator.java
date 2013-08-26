@@ -31,6 +31,7 @@ import jp.long_long_float.cuick.ast.FuncallNode;
 import jp.long_long_float.cuick.ast.IfNode;
 import jp.long_long_float.cuick.ast.LiteralNode;
 import jp.long_long_float.cuick.ast.MemberNode;
+import jp.long_long_float.cuick.ast.Node;
 import jp.long_long_float.cuick.ast.OpAssignNode;
 import jp.long_long_float.cuick.ast.PrefixOpNode;
 import jp.long_long_float.cuick.ast.PtrMemberNode;
@@ -58,7 +59,7 @@ import jp.long_long_float.cuick.utility.ErrorHandler;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class CodeGenerator extends ASTVisitor<String, String> {
+public class CodeGenerator extends ASTVisitor<String> {
 
     public CodeGenerator(ErrorHandler h) {
         super(h);
@@ -88,6 +89,14 @@ public class CodeGenerator extends ASTVisitor<String, String> {
         deployFunctions(cb, ast);
         
         return cb.toString();
+    }
+    
+    @Override
+    public String visit(Node node) {
+        if(node instanceof ExprNode && ((ExprNode)node).isSurrounded()) {
+            return "(" + super.visit(node) + ")";
+        }
+        return super.visit(node);
     }
     
     private void deployHeaders(CodeBuilder cb) {

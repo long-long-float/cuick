@@ -71,15 +71,10 @@ abstract public class Node implements Dumpable, Acceptable{
     
     abstract protected void _dump(Dumper d);
     
-    public <S, E> E accept(ASTVisitor<S, E> visitor) {
+    public <T> T accept(ASTVisitor<T> visitor) {
         return visitor.visit(this);
     }
-    /*
-    @Deprecated
-    public String toString() {
-        //throw new Error("toString() is deprecated!");
-    }
-    */
+
     public BlockNode parentBlockNode(int depth) {
         return parent != null ? parent.parentBlockNode(depth) : null;
     }

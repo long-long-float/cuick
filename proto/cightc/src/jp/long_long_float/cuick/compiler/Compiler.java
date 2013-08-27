@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,13 +19,9 @@ import jp.long_long_float.cuick.exception.SyntaxException;
 import jp.long_long_float.cuick.parser.Parser;
 import jp.long_long_float.cuick.utility.ErrorHandler;
 import jp.long_long_float.cuick.utility.FileUtils;
-import jp.long_long_float.cuick.utility.InputPipe;
+import jp.long_long_float.cuick.utility.InputStream;
 import jp.long_long_float.cuick.utility.Pair;
 
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecuteResultHandler;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.ExampleMode;
@@ -96,7 +92,7 @@ public class Compiler {
     private Tuple3<String, String, Integer> exec(String[] args, String input) {
         //StringBuilder stdout = new StringBuilder(), stderr = new StringBuilder();
         
-        DefaultExecutor exec = new DefaultExecutor();
+        //DefaultExecutor exec = new DefaultExecutor();
         /*
         PipedOutputStream pos = new PipedOutputStream();
         PipedOutputStream poserr = new PipedOutputStream();
@@ -107,6 +103,7 @@ public class Compiler {
         PipedInputStream pis1 = null, piserr = null;
         PipedOutputStream pos1 = null;
         */
+        /*
         DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
         CommandLine commandLine = new CommandLine(args[0]);
         if(args.length >= 1) {
@@ -114,15 +111,31 @@ public class Compiler {
         }
 
         String out = "", err = "";
-        try (InputPipe stdout = new InputPipe();
-                InputPipe stderr = new InputPipe()) {
-            PumpStreamHandler streamHandler = new PumpStreamHandler(
-                    stdout.getPipedOutputStream(), stderr.getPipedOutputStream());
+        try (InputPipe stdout = new InputPipe(); InputPipe stderr = new InputPipe(); 
+                OutputPipe stdin = new OutputPipe()) {
+            
+            PumpStreamHandler streamHandler = null;
+            if(input != null) {
+                streamHandler = new PumpStreamHandler(
+                    stdout.getPipedOutputStream(), stderr.getPipedOutputStream(),
+                    stdin.getPipedInputStream());
+            }
+            else {
+                streamHandler = new PumpStreamHandler(
+                        stdout.getPipedOutputStream(), stderr.getPipedOutputStream());
+            }
             exec.setStreamHandler(streamHandler);
             
             exec.execute(commandLine, resultHandler);
             
+            if(input != null) {
+                stdin.write(input);
+                
+            }
+            
             resultHandler.waitFor();
+            
+            
 
             String sepa = System.getProperty("line.separator");
             out = StringUtils.join(stdout, sepa);
@@ -139,7 +152,7 @@ public class Compiler {
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
-        }
+        }*/
         /*
         BufferedReader br = null, brerr = null;
         try {
@@ -179,9 +192,39 @@ public class Compiler {
             }
         }
         */
-        int code = resultHandler.getExitValue();
+        //int code = resultHandler.getExitValue();
         
         //return new Tuple3<String, String, Integer>(stdout.toString(), stderr.toString(), code);
+        //return new Tuple3<String, String, Integer>(out, err, code);
+        
+        ProcessBuilder pb = new ProcessBuilder(args);
+        
+        String out = "", err = "";
+        int code;
+        try {
+            Process process = pb.start();
+            if(input != null) {
+                OutputStream pos = process.getOutputStream();
+                pos.write(input.getBytes());
+            }
+            process.waitFor();
+            try (InputStream stdout = new InputStream(process.getInputStream());
+                    InputStream stderr = new InputStream(process.getErrorStream())) {
+                String sepa = System.getProperty("line.separator");
+                out = StringUtils.join(stdout, sepa);
+                err = StringUtils.join(stderr, sepa);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+            code = process.exitValue();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } catch (InterruptedException e) {
+            errorHandler.error("interrupted!");
+            return null;
+        } 
         return new Tuple3<String, String, Integer>(out, err, code);
     }
     
@@ -197,12 +240,13 @@ public class Compiler {
         Config config = cl.load(constants);
         
         if(opts.isWithCompileFlag()) {
-            Tuple3<String, String, Integer> ret = exec(config.compiler, "");
+            Tuple3<String, String, Integer> ret = exec(config.compiler, null);
             if(ret == null) return;
             if(!ret._1().isEmpty()) System.out.println(ret._1());
             if(!ret._2().isEmpty()) System.err.println(ret._2());
             if(ret._3() != 0) {
                 errorHandler.error(config.compiler[0] + " returned " + ret._3());
+                return;
             }
         }
         
@@ -220,10 +264,10 @@ public class Compiler {
                     e.printStackTrace();
                     continue;
                 }
-                //Tuple3<String, String, Integer> ret = exec(new String[] {config.test.exefile}, input);
-                //if(ret == null) continue;
+                Tuple3<String, String, Integer> ret = exec(new String[] {config.test.exefile, "<", testCase.getFirst().fileName()}, null);
+                if(ret == null) continue;
                 
-                //System.out.println(ret._1());
+                System.out.println(ret._1());
             }
         }
     }

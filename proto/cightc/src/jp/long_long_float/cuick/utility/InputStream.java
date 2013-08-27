@@ -3,20 +3,17 @@ package jp.long_long_float.cuick.utility;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.util.Iterator;
 
 import lombok.Getter;
 
 @Getter
-public class InputPipe implements AutoCloseable, Iterable<String>{
-    private PipedOutputStream pipedOutputStream;
+public class InputStream implements AutoCloseable, Iterable<String>{
     private BufferedReader bufferedReader;
+    private java.io.InputStream inputStream;
     
-    public InputPipe() throws IOException {
-        pipedOutputStream = new PipedOutputStream();
-        bufferedReader = new BufferedReader(new InputStreamReader(new PipedInputStream(pipedOutputStream)));
+    public InputStream(java.io.InputStream is) throws IOException {
+        bufferedReader = new BufferedReader(new InputStreamReader(is));
     }
 
     @Override

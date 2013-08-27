@@ -20,6 +20,10 @@ public class Function extends Entity{
         super(new TypeNode(new FunctionType(ret, ps != null ? ps.parametersType() : null)), name);
         this.params = ps;
         this.body = body;
+        
+        for(Parameter param : ps) {
+            body.variables().add(param);
+        }
     }
     
     //for extend

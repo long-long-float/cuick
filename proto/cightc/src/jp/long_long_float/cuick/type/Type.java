@@ -46,9 +46,9 @@ public abstract class Type implements Cloneable{
         return ret;
     }
     
-    public Type decreasePointer() {
+    public Type decreasePointer() throws DecreasePointerException {
         if(!isPointer()) {
-            throw new RuntimeException("This is not a pointer!");
+            throw new DecreasePointerException("This is not a pointer!");
         }
         Type ret = this.clone();
         ret.pointerCount--;

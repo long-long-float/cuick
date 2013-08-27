@@ -20,11 +20,14 @@ extend void $CONT.sort() {
 }
 */
 //入力を二乗して出力するプログラム
+
 @test {
     in: "in.txt"
     out: "out.txt"
 }
 int n;
-@while(true)
-@input { n! }
-puts(j ** 2);
+while(true) {
+    puts("a");
+    @input { n! }
+    puts(n ** 2);
+}

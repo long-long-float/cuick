@@ -40,6 +40,6 @@ public class Location implements Cloneable {
     }
     
     public String toString() {
-        return sourceName + ":" + token.lineno();
+        return sourceName + ":" + token.lineno() + ":" + token.column();
     }
 }

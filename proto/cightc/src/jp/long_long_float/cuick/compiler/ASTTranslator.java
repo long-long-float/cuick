@@ -26,6 +26,7 @@ import jp.long_long_float.cuick.ast.ForNode;
 import jp.long_long_float.cuick.ast.FuncallNode;
 import jp.long_long_float.cuick.ast.IfNode;
 import jp.long_long_float.cuick.ast.LiteralNode;
+import jp.long_long_float.cuick.ast.Location;
 import jp.long_long_float.cuick.ast.MemberNode;
 import jp.long_long_float.cuick.ast.MultiplexAssignNode;
 import jp.long_long_float.cuick.ast.Node;
@@ -45,11 +46,13 @@ import jp.long_long_float.cuick.entity.Function;
 import jp.long_long_float.cuick.entity.Parameter;
 import jp.long_long_float.cuick.entity.Params;
 import jp.long_long_float.cuick.entity.Variable;
+import jp.long_long_float.cuick.exception.SemanticException;
 import jp.long_long_float.cuick.foreach.PointerEnumerable;
 import jp.long_long_float.cuick.foreach.RangeEnumerable;
 import jp.long_long_float.cuick.foreach.VariableSetEnumerable;
 import jp.long_long_float.cuick.type.CChar;
 import jp.long_long_float.cuick.type.CInt;
+import jp.long_long_float.cuick.type.DecreasePointerException;
 import jp.long_long_float.cuick.type.NamedType;
 import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.ErrorHandler;
@@ -65,7 +68,7 @@ public class ASTTranslator extends ASTVisitor<Node> {
         new ParentSetter(errorHandler).visit(node);
     }
     
-    public void translate(AST ast) {
+    public void translate(AST ast) throws SemanticException {
         if(!ast.isDefinedFunction("main")) {
             Params params = new Params(null, ListUtils.asList(
                     new Parameter(new TypeNode(new CInt()), "argc"),
@@ -75,6 +78,7 @@ public class ASTTranslator extends ASTVisitor<Node> {
             updateParents(body);
             
             Function main = new Function(new CInt(), "main", params, body);
+            //new TypeResolver(errorHandler).visit(main.body());
             ast.addFunction(main);
         }
         else {
@@ -95,6 +99,18 @@ public class ASTTranslator extends ASTVisitor<Node> {
                 body.stmts().add(new ReturnNode(null, LiteralNode.cint(0)));
             }
         }
+        
+        if(errorHandler.errorOccured()) {
+            throw new SemanticException("compile failed!");
+        }
+    }
+    
+    private Type selectType(Location loc, Type... types) {
+        for(Type type : types) {
+            if(type != null) return type;
+        }
+        error(loc, "Type is undefined! Please use \"as\" oerator.");
+        return null;
     }
     
     public Node visitDefault(Node node) {
@@ -192,8 +208,8 @@ public class ASTTranslator extends ASTVisitor<Node> {
             VariableSetEnumerable enume = (VariableSetEnumerable)node.enumerable();
             if(enume.exprs().size() == 1) {
                 ExprNode rightVar = enume.exprs().get(0);
-                if(rightVar.type() == null) {
-                    error(node.location(), "Type is undefined! Please use \"as\" oerator.");
+                if(selectType(node.location(), rightVar.type()) == null) {
+                    return node;
                 }
                 
                 //int型の変数
@@ -257,13 +273,22 @@ public class ASTTranslator extends ASTVisitor<Node> {
             PointerEnumerable enume = (PointerEnumerable) node.enumerable();
             
             ExprNode pointer = enume.pointer();
+            
             Type varType = node.var().type();
             if(varType == null) {
-                varType = pointer.type();
+                varType = selectType(node.location(), pointer.type());
+                if(varType == null) {
+                    return node;
+                }
+                try {
+                    varType = varType.decreasePointer();
+                } catch(DecreasePointerException e) {
+                    error(pointer.location(), "right value is not pointer.");
+                }
             }
             
             VariableNode counterVar = new VariableNode(null, node.getIdentityName("counter"));
-            Variable var = new Variable(new TypeNode(varType.decreasePointer().setReference()), node.var().name(), null, false, null, ListUtils.asList((ExprNode)new ArefNode(pointer, counterVar)));
+            Variable var = new Variable(new TypeNode(varType.setReference()), node.var().name(), null, false, null, ListUtils.asList((ExprNode)new ArefNode(pointer, counterVar)));
             
             BlockNode body = node.body().toBlockNode();
             //var.setType(var.type().setReference());

@@ -40,4 +40,8 @@ public class Renamer extends Visitor {
         return null;
     }
     
+    public Void visit(Parameter ent) {
+        return null;
+    }
+    
 }

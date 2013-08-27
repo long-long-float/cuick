@@ -1,6 +1,6 @@
 options {
 	STATIC = false;
-	//DEBUG_PARSER = true;
+	DEBUG_PARSER = true;
 	UNICODE_INPUT = true;
 }
 
@@ -69,6 +69,10 @@ public class Parser {
 
 	protected Location location(Token t) {        return new Location(sourceName, t);
 	}
+
+	private String trim(String str) {
+        return str.substring(1, str.length() - 1);
+    }
 }
 PARSER_END(Parser)
 
@@ -206,9 +210,9 @@ AST compilation_unit():
     (
         LOOKAHEAD(<EXTEND>/* type_with_suffix() type_with_suffix()*/)
         func=def_extendfun() { decls.funcs().add(func); }
-    |   LOOKAHEAD(type_with_suffix() name() "(" params() ")" "{")
+    |   LOOKAHEAD(type_with_suffix() name() "(" [type() ["&"] ("*")* name() ["[" [expr()] "]"] ["=" expr()] ("," type() ["&"] ("*")* name() ["[" [expr()] "]"] ["=" expr()])* ] ")" "{")
         func=deffun() { decls.funcs().add(func); }
-    |   LOOKAHEAD(type() ["&"] ("*")* name()) defvar=defvars()
+    |   LOOKAHEAD(type() defvar() ("," defvar())*/*["&"] ("*")* name()*/) defvar=defvars()
         {
             decls.stmts().add(defvar);
             decls.vars().addAll(defvar.vars());
@@ -467,7 +471,7 @@ StmtNode stmt():
 {
     (
         t=";" { n = new NullStmt(location(t)); }
-    |   t=<BUILT_IN_CODE> { n = new BuiltInCodeStmt(location(t), t.image.substring(1, t.image.length() - 1)); }
+    |   t=<BUILT_IN_CODE> { n = new BuiltInCodeStmt(location(t), trim(t.image)); }
     |   LOOKAHEAD(term() ("," term())+ "=") n=multiplex_assign()
     //|   n=print_stmt() //including puts
     |   n=at_input()
@@ -1032,7 +1036,7 @@ ExprNode primary():
     |   t=<CHARACTER>
         {
             //return new IntegerLiteralNode(location(t), IntegerType.charRef(), characterCode(t.image));
-            return new LiteralNode(location(t), new CChar(location(t)), t.image);
+            return new LiteralNode(location(t), new CChar(location(t)), trim(t.image));
         }
     |   t=<STRING>
         {
@@ -1040,7 +1044,7 @@ ExprNode primary():
             /*Type type = new BasicType("char", location(t));
             type.increasePointer();
             return new LiteralNode(location(t), type, t.image);*/
-            return new StringLiteralNode(location(t), t.image.substring(1, t.image.length() - 1));
+            return new StringLiteralNode(location(t), trim(t.image));
         }
     /*|   r=range()
         {
@@ -1051,7 +1055,7 @@ ExprNode primary():
             return new VariableNode(location(t), t.image);
         }
     |   t=<BUILT_IN_CODE>
-        {            return new BuiltInCode(location(t), t.image.substring(1, t.image.length() - 1));
+        {            return new BuiltInCode(location(t), trim(t.image));
         }
     |   "(" n=expr() ")"
         {
@@ -1147,11 +1151,11 @@ AtTestNode at_test():
 {    t="@test" "{"
 	    (
 	        t2="in:" file_name=<STRING>
-	        {	           inCases.add(new AtTestCase(location(t2), file_name.image));
+	        {	           inCases.add(new AtTestCase(location(t2), trim(file_name.image)));
 	        }
 	        | t2="out:" file_name=<STRING>
             {
-               outCases.add(new AtTestCase(location(t2), file_name.image));
+               outCases.add(new AtTestCase(location(t2), trim(file_name.image)));
             }
          )*
     "}"

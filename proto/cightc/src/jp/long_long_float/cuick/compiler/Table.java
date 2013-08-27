@@ -1,11 +1,13 @@
 package jp.long_long_float.cuick.compiler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import jp.long_long_float.cuick.ast.AtTestCase;
 import jp.long_long_float.cuick.ast.BuiltInCodeStmt;
+import jp.long_long_float.cuick.ast.Location;
 import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.Pair;
 
@@ -27,6 +29,7 @@ public final class Table {
     private List<Type> tuples = new ArrayList<Type>();
     private List<BuiltInCodeStmt> builtInCodes = new ArrayList<BuiltInCodeStmt>();
     private Pair<List<AtTestCase>, List<AtTestCase>> testCases = null;
+    private Location testCaseLocation;
     
     public void entryTuple(Type tuple) {
         //この時点では完全な型ではないので(templateがない)
@@ -62,7 +65,8 @@ public final class Table {
         return builtInCodes;
     }
 
-    public void setTestCases(List<AtTestCase> inCases, List<AtTestCase> outCases) {
+    public void setTestCases(Location loc, List<AtTestCase> inCases, List<AtTestCase> outCases) {
+        testCaseLocation = loc;
         testCases = new Pair<List<AtTestCase>, List<AtTestCase>>(inCases, outCases);
     }
     
@@ -74,6 +78,10 @@ public final class Table {
         return testCases != null;
     }
     
+    public Location getTestCaseLocation() {
+        return testCaseLocation;
+    }
+    
     public List<Pair<AtTestCase, AtTestCase>> getTestCases() {
         if(!equalsInCasesAndOutCases()) return null;
         
@@ -83,5 +91,13 @@ public final class Table {
             ret.add(new Pair<AtTestCase, AtTestCase>(inItr.next(), outItr.next()));
         }
         return ret;
+    }
+
+    public boolean isDefinedWord(String name) {
+        return Arrays.asList(
+                "true",
+                "false",
+                "puts"
+                ).contains(name);
     }
 }

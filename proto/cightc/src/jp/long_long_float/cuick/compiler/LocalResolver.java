@@ -29,7 +29,7 @@ public class LocalResolver extends Visitor {
         scopeStack.add(toplevel);
         
         if(!Table.getInstance().equalsInCasesAndOutCases()) {
-            error("Number of in-case and out-case are diffirent!");
+            error(Table.getInstance().getTestCaseLocation(), "Number of in-case and out-case are diffirent!");
         }
         
         for(Entity ent : ast.definitions()) {
@@ -87,6 +87,11 @@ public class LocalResolver extends Visitor {
             if(ent != null) {
                 ent.refered();
                 node.setEntity(ent);
+            }
+            else {
+                if(!Table.getInstance().isDefinedWord(node.name())) {;
+                    warn(node.location(), node.name() + " is not defined.");
+                }
             }
         }
         catch (SemanticException ex) {

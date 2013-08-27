@@ -27,4 +27,4 @@ extend void $CONT.sort() {
 int n;
 @while(true)
 @input { n! }
-puts(n ** 2);
+puts(j ** 2);

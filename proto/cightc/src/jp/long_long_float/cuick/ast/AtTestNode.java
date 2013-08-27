@@ -13,7 +13,7 @@ public class AtTestNode extends AtCommandNode {
         this.inCases = inCases;
         this.outCases = outCases;
         
-        Table.getInstance().setTestCases(inCases, outCases);
+        Table.getInstance().setTestCases(loc, inCases, outCases);
     }
     
     @Override

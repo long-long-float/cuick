@@ -7,8 +7,6 @@ import jp.long_long_float.cuick.compiler.Acceptable;
 
 abstract public class Node implements Dumpable, Acceptable{
     
-    //private Scope scope;
-    
     protected Node parent;
     
     public Node(){
@@ -35,15 +33,6 @@ abstract public class Node implements Dumpable, Acceptable{
             }
         }
     }
-    /*
-    public Scope scope() {
-        return scope;
-    }
-    
-    public void setScope(Scope scope) {
-        this.scope = scope;
-    }
-    */
     
     public Node parent() {
         return parent;
@@ -56,7 +45,7 @@ abstract public class Node implements Dumpable, Acceptable{
     abstract public Location location();
     
     public void dump() {
-        dump(System.out);
+        //dump(System.out);
     }
     
     public void dump(PrintStream ps) {

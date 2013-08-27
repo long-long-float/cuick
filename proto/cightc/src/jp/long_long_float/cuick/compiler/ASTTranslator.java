@@ -98,17 +98,14 @@ public class ASTTranslator extends ASTVisitor<Node> {
     }
     
     public Node visitDefault(Node node) {
-        System.out.println(node.getClass().getSimpleName());
         for(Field field : node.getClass().getDeclaredFields()) {
             try {
-                System.out.println("    " + field.getName());
                 field.setAccessible(true);
                 Object child = field.get(node);
                 if(child instanceof Node) {
                     field.set(node, ((Node) child).accept(this));
                 }
                 else if(child instanceof List<?>) {
-                    System.out.println("    *" + field.getName());
                     List<?> childList = (List<?>) child;
                     if(!childList.isEmpty() && childList.get(0) instanceof Node) {
                         List<Node> newList = new ArrayList<Node>(childList.size());

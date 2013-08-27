@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,10 +18,19 @@ import jp.long_long_float.cuick.exception.SemanticException;
 import jp.long_long_float.cuick.exception.SyntaxException;
 import jp.long_long_float.cuick.parser.Parser;
 import jp.long_long_float.cuick.utility.ErrorHandler;
+import jp.long_long_float.cuick.utility.FileUtils;
+import jp.long_long_float.cuick.utility.InputPipe;
 import jp.long_long_float.cuick.utility.Pair;
 
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecuteResultHandler;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.ExampleMode;
+
+import scala.Tuple3;
 
 public class Compiler {
     static public void main(String[] args) throws FileException {
@@ -83,6 +93,98 @@ public class Compiler {
         System.exit(0);
     }
     
+    private Tuple3<String, String, Integer> exec(String[] args, String input) {
+        //StringBuilder stdout = new StringBuilder(), stderr = new StringBuilder();
+        
+        DefaultExecutor exec = new DefaultExecutor();
+        /*
+        PipedOutputStream pos = new PipedOutputStream();
+        PipedOutputStream poserr = new PipedOutputStream();
+        PipedInputStream pis = new PipedInputStream();
+        PumpStreamHandler streamHandler = new PumpStreamHandler(pos, poserr, pis);
+        exec.setStreamHandler(streamHandler);
+        
+        PipedInputStream pis1 = null, piserr = null;
+        PipedOutputStream pos1 = null;
+        */
+        DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+        CommandLine commandLine = new CommandLine(args[0]);
+        if(args.length >= 1) {
+            commandLine.addArguments(Arrays.copyOfRange(args, 1, args.length));
+        }
+
+        String out = "", err = "";
+        try (InputPipe stdout = new InputPipe();
+                InputPipe stderr = new InputPipe()) {
+            PumpStreamHandler streamHandler = new PumpStreamHandler(
+                    stdout.getPipedOutputStream(), stderr.getPipedOutputStream());
+            exec.setStreamHandler(streamHandler);
+            
+            exec.execute(commandLine, resultHandler);
+            
+            resultHandler.waitFor();
+
+            String sepa = System.getProperty("line.separator");
+            out = StringUtils.join(stdout, sepa);
+            err = StringUtils.join(stderr, sepa);
+
+            resultHandler.waitFor();
+            
+        }  catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        } catch (InterruptedException e) {
+            errorHandler.error("interrupted!");
+            return null;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        /*
+        BufferedReader br = null, brerr = null;
+        try {
+            exec.execute(commandLine, resultHandler);
+            //pis1 = new PipedInputStream(pos);
+            br = new BufferedReader(new InputStreamReader(new PipedInputStream(pos)));
+            piserr = new PipedInputStream(poserr);
+            brerr = new BufferedReader(new InputStreamReader(piserr));
+            
+            resultHandler.waitFor();
+            
+            String sepa = System.getProperty("line.separator");
+            while(br.ready()) {
+                stdout.append(br.readLine() + sepa);
+            }
+            while(brerr.ready()) {
+                stderr.append(brerr.readLine() + sepa);
+            }
+            
+            resultHandler.waitFor();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        } catch (InterruptedException e) {
+            errorHandler.error("interrupted!");
+            return null;
+        } finally {
+            try {
+                pis1.close();
+                br.close();
+            } catch (IOException e) {
+            }
+            try {
+                piserr.close();
+                brerr.close();
+            }catch (IOException e) {
+            }
+        }
+        */
+        int code = resultHandler.getExitValue();
+        
+        //return new Tuple3<String, String, Integer>(stdout.toString(), stderr.toString(), code);
+        return new Tuple3<String, String, Integer>(out, err, code);
+    }
+    
     private void build(String sourceFile, Options opts, ConfigLoader cl) throws CompileException {
         String destFile = sourceFile.replaceFirst(".cuick$", ".cpp");
         
@@ -95,15 +197,12 @@ public class Compiler {
         Config config = cl.load(constants);
         
         if(opts.isWithCompileFlag()) {
-            //c++ to binary
-            ProcessBuilder pb = new ProcessBuilder(config.compiler);
-            try {
-                Process p = pb.start();
-                int i = p.waitFor();
-                System.out.println(i);
-            } catch (IOException | InterruptedException e) {
-                // TODO 自動生成された catch ブロック
-                e.printStackTrace();
+            Tuple3<String, String, Integer> ret = exec(config.compiler, "");
+            if(ret == null) return;
+            if(!ret._1().isEmpty()) System.out.println(ret._1());
+            if(!ret._2().isEmpty()) System.err.println(ret._2());
+            if(ret._3() != 0) {
+                errorHandler.error(config.compiler[0] + " returned " + ret._3());
             }
         }
         
@@ -111,7 +210,20 @@ public class Compiler {
         Table table = Table.getInstance();
         if(table.isEnabledTest()) {
             for(Pair<AtTestCase, AtTestCase> testCase : table.getTestCases()) {
-                testCase.getFirst().fileName();
+                System.out.println(config.test.exefile);
+                String input = "", output = "";
+                try {
+                    input = FileUtils.readFromFile(testCase.getFirst().fileName());
+                    output = FileUtils.readFromFile(testCase.getSecond().fileName());
+                } catch (IOException e) {
+                    // TODO 自動生成された catch ブロック
+                    e.printStackTrace();
+                    continue;
+                }
+                //Tuple3<String, String, Integer> ret = exec(new String[] {config.test.exefile}, input);
+                //if(ret == null) continue;
+                
+                //System.out.println(ret._1());
             }
         }
     }
@@ -129,10 +241,10 @@ public class Compiler {
         System.out.println("===============ASTTranslator================");
         new ASTTranslator(errorHandler).translate(ast);
         ast.dump();
-        System.out.println("===============localResolve================");
+        /*System.out.println("===============localResolve================");
         ast = localResolve(ast, opts);
         ast.dump();
-        /*System.out.println("===============typeResolve================");
+        System.out.println("===============typeResolve================");
         ast = typeResolve(ast, opts);
         ast.dump();*/
         System.out.println("===============rename================");

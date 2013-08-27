@@ -1,7 +1,5 @@
 package jp.long_long_float.cuick.compiler;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -9,8 +7,10 @@ import java.util.regex.Pattern;
 
 import jp.long_long_float.cuick.exception.ConfigException;
 import jp.long_long_float.cuick.utility.ErrorHandler;
+import jp.long_long_float.cuick.utility.FileUtils;
 
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.error.YAMLException;
 
 public class ConfigLoader {
     private ErrorHandler errorHandler;
@@ -18,18 +18,7 @@ public class ConfigLoader {
     
     public ConfigLoader(ErrorHandler errorHandler) throws IOException {
         this.errorHandler = errorHandler;
-        
-        FileInputStream fis = null;
-        try {
-            File file = new File(Config.FILE_NAME);
-            fis = new FileInputStream(file);
-            byte[] buf = new byte[(int) file.length()];
-            fis.read(buf);
-            yamlData = new String(buf);
-        }
-        finally {
-            if(fis != null) fis.close();
-        }
+        yamlData = FileUtils.readFromFile(Config.FILE_NAME);
     }
 
     public Config load(Map<String, String> constants) {
@@ -41,10 +30,18 @@ public class ConfigLoader {
         //置換されてないものはエラー
         Matcher m = Pattern.compile("@\\{([a-zA-Z\\-_]*)\\}").matcher(replacedData);
         while(m.find()) {
-            errorHandler.error(Config.FILE_NAME + " : undefined constant \"" + m.group(1) + "\"");
+            errorHandler.error(Config.FILE_NAME + ": undefined constant \"" + m.group(1) + "\"");
             throw new ConfigException("config error");
         }
-        return (Config) new Yaml().load(replacedData);
+        Config ret = null;
+        try {
+            ret = (Config) new Yaml().load(replacedData);
+        } 
+        catch (YAMLException ex) {
+            errorHandler.error(Config.FILE_NAME + ": " + ex.getMessage());
+            throw new ConfigException("load error");
+        }
+        return ret;
     }
 
 }

@@ -1,0 +1,2 @@
+!!jp.long_long_float.cuick.compiler.Config
+compiler: [g++, -o, @{FILE_BASENAME}.exe, @{DEST_FILE}]

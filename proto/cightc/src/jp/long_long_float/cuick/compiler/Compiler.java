@@ -247,8 +247,8 @@ public class Compiler {
         }
         
         String sepa = System.getProperty("line.separator");
-        String out = StringUtils.join(outThread.getBuffer(), sepa);
-        String err = StringUtils.join(errThread.getBuffer(), sepa);
+        String out = StringUtils.join(outThread.getBuffer(), sepa) + sepa;
+        String err = StringUtils.join(errThread.getBuffer(), sepa) + sepa;
         int code = process.exitValue();
         return new Tuple3<String, String, Integer>(out, err, code);
     }
@@ -328,8 +328,8 @@ public class Compiler {
         //auto test
         Table table = Table.getInstance();
         if(table.isEnabledTest()) {
+            int id = 1;
             for(Pair<AtTestCase, AtTestCase> testCase : table.getTestCases()) {
-                System.out.println(config.test.exefile);
                 String input = "", output = "";
                 try {
                     input = FileUtils.readFromFile(testCase.getFirst().fileName());
@@ -341,10 +341,16 @@ public class Compiler {
                 }
                 Tuple3<String, String, Integer> ret = exec(new String[] {config.test.exefile}, input);
                 if(ret == null) continue;
-                
-                System.out.println("stdout => " + ret._1());
-                System.err.println("stderr => " + ret._2());
-                System.err.println("exit value => " + ret._3());
+                if(ret._1().equals(output)) {
+                    System.out.println("test case" + id + ": ok!");
+                }
+                else {
+                    System.err.println("test case" + id + ": fail! expected");
+                    System.err.println(output);
+                    System.err.println("but");
+                    System.err.println(ret._1());
+                }
+                id++;
             }
         }
     }

@@ -11,7 +11,7 @@ int main(int argc, char** argv){
             if(!n) break;;
         }
 
-        std::cout << std::pow(n, 2) << std::endl;
+        std::cout << (int)std::pow(n, 2) << std::endl;
     }
 
     return 0;

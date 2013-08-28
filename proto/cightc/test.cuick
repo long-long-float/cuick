@@ -19,14 +19,3 @@ extend void $CONT.sort() {
     sort(this.begin(), this.end());
 }
 */
-//入力を二乗して出力するプログラム
-
-@test {
-    in: "in.txt"
-    out: "out.txt"
-}
-int n;
-while(true) {
-    @input { n! }
-    puts(n ** 2);
-}

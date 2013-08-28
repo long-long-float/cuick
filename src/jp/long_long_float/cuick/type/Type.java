@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jp.long_long_float.cuick.ast.Location;
-import jp.long_long_float.cuick.utility.TextUtils;
+import lombok.Getter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+@Getter
 public abstract class Type implements Cloneable{
     private Location location;
     private boolean isReference = false;
@@ -73,10 +74,6 @@ public abstract class Type implements Cloneable{
         return this;
     }
     
-    public List<Type> getTemplateTypes() {
-        return templTypes;
-    }
-    
     abstract public String typeString();
     
     @Override
@@ -85,7 +82,7 @@ public abstract class Type implements Cloneable{
         if(templTypes.size() != 0) {
             ret += "<" + StringUtils.join(templTypes, ", ") + ">";
         }
-        return ret + TextUtils.times("*", pointerCount) + (isReference ? "&" : "") + (child != null ? "::" + child : "");
+        return ret + /*TextUtils.times("*", pointerCount) + (isReference ? "&" : "") +*/ (child != null ? "::" + child : "");
     }
     
     @Override
@@ -122,9 +119,5 @@ public abstract class Type implements Cloneable{
     public Type setIsStatic(boolean b) {
         isStatic = b;
         return this;
-    }
-    
-    public boolean isStatic() {
-        return isStatic;
     }
 }

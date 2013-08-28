@@ -60,7 +60,13 @@ public class Compiler {
         
         if(opts.isVarsionFlag()) {
             System.out.println("cuick 1.0");
+            System.out.println("created by long_long_float");
             System.exit(0);
+        }
+        
+        if(opts.getSourceFiles().isEmpty()) {
+            errorHandler.error("source file is empty!");
+            System.exit(1);
         }
         
         ConfigLoader cl = null;
@@ -132,6 +138,9 @@ public class Compiler {
     
     private void build(String sourceFile, Options opts, ConfigLoader cl) throws CompileException {
         String destFile = sourceFile.replaceFirst(".cuick$", ".cpp");
+        if(opts.getOutputFile() != null) {
+            destFile = opts.getOutputFile().getPath();
+        }
         
         compile(sourceFile, destFile, opts);
         
@@ -184,26 +193,26 @@ public class Compiler {
 
     private void compile(String srcPath, String destPath, Options opts) throws CompileException{
         AST ast = parseFile(srcPath, opts);
-        ast.dump();
-        System.out.println("===============localResolve================");
+        //ast.dump();
+        //System.out.println("===============localResolve================");
         ast = localResolve(ast, opts);
-        ast.dump();
-        System.out.println("===============typeResolve================");
+        //ast.dump();
+        //System.out.println("===============typeResolve================");
         ast = typeResolve(ast, opts);
-        ast.dump();
+        //ast.dump();
         new ParentSetter(errorHandler).parentSet(ast);
-        System.out.println("===============ASTTranslator================");
+        //System.out.println("===============ASTTranslator================");
         new ASTTranslator(errorHandler).translate(ast);
-        ast.dump();
+        //ast.dump();
         /*System.out.println("===============localResolve================");
         ast = localResolve(ast, opts);
         ast.dump();
         System.out.println("===============typeResolve================");
         ast = typeResolve(ast, opts);
         ast.dump();*/
-        System.out.println("===============rename================");
+        //System.out.println("===============rename================");
         ast = rename(ast, opts);
-        ast.dump();
+        //ast.dump();
         
         
         writeFile(destPath, ast, opts);

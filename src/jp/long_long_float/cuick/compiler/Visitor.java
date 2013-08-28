@@ -16,6 +16,7 @@ import jp.long_long_float.cuick.ast.BuiltInCode;
 import jp.long_long_float.cuick.ast.BuiltInCodeStmt;
 import jp.long_long_float.cuick.ast.CaseNode;
 import jp.long_long_float.cuick.ast.CastNode;
+import jp.long_long_float.cuick.ast.CharLiteralNode;
 import jp.long_long_float.cuick.ast.CondExprNode;
 import jp.long_long_float.cuick.ast.ContinueNode;
 import jp.long_long_float.cuick.ast.DefvarNode;
@@ -333,6 +334,10 @@ public class Visitor extends ASTVisitor<Void> {
     */
     
     public Void visit(LiteralNode node) {
+        return null;
+    }
+    
+    public Void visit(CharLiteralNode node) {
         return null;
     }
     

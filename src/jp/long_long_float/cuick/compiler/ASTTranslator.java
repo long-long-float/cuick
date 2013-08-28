@@ -255,10 +255,10 @@ public class ASTTranslator extends ASTVisitor<Node> {
                     Type varType = node.var().type();
                     if(varType == null) {
                         Type deepestChild = rightVar.type().getDeepestChild();
-                        if(deepestChild.getTemplateTypes().size() == 0) {
+                        if(deepestChild.getTemplTypes().size() == 0) {
                             error(rightVar.location(), "variable is not container!");
                         }
-                        varType = deepestChild.getTemplateTypes().get(0);
+                        varType = deepestChild.getTemplTypes().get(0);
                     }
                     Variable var = new Variable(new TypeNode(varType.setReference()), node.var().name(), 
                             null, false, null, ListUtils.asList((ExprNode)new DereferenceNode(itrNode)));
@@ -339,17 +339,24 @@ public class ASTTranslator extends ASTVisitor<Node> {
             case "puts": {
                 boolean isPuts = name.equals("puts");
                 ExprNode newNode = new StaticMemberNode(std, "cout");
+                int i = 0;
                 for(ExprNode arg : node.args()) {
                     newNode = new BinaryOpNode(newNode, "<<", (ExprNode)arg.accept(this));
-                    if(isPuts) {
-                        newNode = new BinaryOpNode(newNode, "<<", endl);
+                    if(i != node.args().size() - 1) {
+                        if(isPuts) {
+                            newNode = new BinaryOpNode(newNode, "<<", endl);
+                        }
+                        else {
+                            newNode = new BinaryOpNode(newNode, "<<", new StringLiteralNode(null, " "));
+                        }
                     }
-                    else {
-                        newNode = new BinaryOpNode(newNode, "<<", new StringLiteralNode(null, "\" \""));
-                    }
+                    i++;
+                }
+                if(isPuts) {
+                    newNode = new BinaryOpNode(newNode, "<<", endl);
                 }
                 if(!isPuts) {
-                    newNode = new BinaryOpNode(newNode, "<<", endl);
+                    //newNode = new BinaryOpNode(newNode, "<<", endl);
                 }
                 return newNode;
             }

@@ -97,7 +97,8 @@ public final class Table {
         return Arrays.asList(
                 "true",
                 "false",
-                "puts"
+                "puts",
+                "print"
                 ).contains(name);
     }
 }

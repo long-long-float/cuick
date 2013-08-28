@@ -19,6 +19,7 @@ import jp.long_long_float.cuick.ast.BuiltInCode;
 import jp.long_long_float.cuick.ast.BuiltInCodeStmt;
 import jp.long_long_float.cuick.ast.CaseNode;
 import jp.long_long_float.cuick.ast.CastNode;
+import jp.long_long_float.cuick.ast.CharLiteralNode;
 import jp.long_long_float.cuick.ast.CondExprNode;
 import jp.long_long_float.cuick.ast.ContinueNode;
 import jp.long_long_float.cuick.ast.DefvarNode;
@@ -57,6 +58,7 @@ import jp.long_long_float.cuick.entity.Parameter;
 import jp.long_long_float.cuick.entity.Variable;
 import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.ErrorHandler;
+import jp.long_long_float.cuick.utility.TextUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -123,7 +125,7 @@ public class CodeGenerator extends ASTVisitor<String> {
             parentNums.add(0);
         }
         for(int tupleID = 0;tupleID < tuples.size();tupleID++) {
-            for(Type member : tuples.get(tupleID).getTemplateTypes()) {
+            for(Type member : tuples.get(tupleID).getTemplTypes()) {
                 int index;
                 if((index = tuples.indexOf(member)) != -1) {
                     tupleTree.get(tupleID).add(index);
@@ -153,7 +155,7 @@ public class CodeGenerator extends ASTVisitor<String> {
         for(int i = deployedTupleIDs.size() - 1;i >= 0;i--) {
             int tupleID = deployedTupleIDs.get(i);
             Struct struct = new Struct("tuple" + tupleID);
-            List<Type> templTypes = tuples.get(tupleID).getTemplateTypes();
+            List<Type> templTypes = tuples.get(tupleID).getTemplTypes();
             for(int memberID = 0;memberID < templTypes.size();memberID++) {
                 Type member = templTypes.get(memberID);
                 String name = member.toString();
@@ -188,7 +190,7 @@ public class CodeGenerator extends ASTVisitor<String> {
     }
     
     public String visit(Variable ent) {
-        String ret = ent.name();
+        String ret = (ent.type().isReference() ? "&" : "") + TextUtils.times("*", ent.rawType().getPointerCount()) + ent.name();
         if(!ent.constructorArgs().isEmpty()) {
             ret += "(" + join(ent.constructorArgs(), ", ") + ")";
         }
@@ -209,7 +211,7 @@ public class CodeGenerator extends ASTVisitor<String> {
     }
     
     public String visit(Parameter ent) {
-        return ent.type() + " " + ent.name();
+        return ent.type() + " " + (ent.type().isReference() ? "&" : "") + TextUtils.times("*", ent.rawType().getPointerCount()) + ent.name();
     }
     
     //other
@@ -247,7 +249,7 @@ public class CodeGenerator extends ASTVisitor<String> {
     }
     
     public String visit(ForNode node) {
-        String ret = node.var().type() + " " + node.var().accept(this) + ";" + node.cond().accept(this) + ";" + node.incr().accept(this);
+        String ret = "for(" + node.var().type() + " " + node.var().accept(this) + ";" + node.cond().accept(this) + ";" + node.incr().accept(this) + ")" + node.body().accept(this);
         return ret;
     }
 
@@ -385,6 +387,10 @@ public class CodeGenerator extends ASTVisitor<String> {
 
     public String visit(SizeofTypeNode node) {
         return "sizeof" + "(" + node.type() + ")";
+    }
+    
+    public String visit(CharLiteralNode node) {
+        return "'" + node.value() + "'";
     }
     
     public String visit(StringLiteralNode node) {

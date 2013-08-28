@@ -1,6 +1,6 @@
 options {
 	STATIC = false;
-	DEBUG_PARSER = true;
+	DEBUG_PARSER = false;
 	UNICODE_INPUT = true;
 }
 
@@ -1077,7 +1077,7 @@ ExprNode primary():
     |   t=<CHARACTER>
         {
             //return new IntegerLiteralNode(location(t), IntegerType.charRef(), characterCode(t.image));
-            return new LiteralNode(location(t), new CChar(location(t)), trim(t.image));
+            return new CharLiteralNode(location(t), trim(t.image));
         }
     |   t=<STRING>
         {

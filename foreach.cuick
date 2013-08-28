@@ -1,0 +1,23 @@
+int ary[] = {1, 2, 3, 4, 5};
+for(i : ary) puts(i);           //ポインタではない配列は範囲を省略できます
+for(i : ary : 2..4) puts(i);    //範囲を指定できます
+for(i : ary : 3) puts(i);       //0から3の範囲です
+
+int *ptr = ary;
+for(i : ptr : 5) puts(i);       //ポインタの場合は範囲の指定は必須です
+
+for(i : ary){
+    for(j : ary){
+        print(i * j, "");      //入れ子も可能
+    }
+    puts();
+}
+
+for(i : 1..3) puts(i);          //配列だけでなく範囲も指定可能です
+for(i : 10) puts(i);            //0から10の範囲です
+
+std::vector<int> vec;
+vec.push_back(10);
+vec.push_back(20);
+vec.push_back(30);
+for(itr : vec) puts(itr);       //vectorもok

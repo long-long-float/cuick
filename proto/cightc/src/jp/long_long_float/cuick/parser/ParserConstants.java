@@ -139,11 +139,13 @@ public interface ParserConstants {
   /** RegularExpression Id. */
   int INTEGER = 66;
   /** RegularExpression Id. */
-  int CHARACTER = 71;
+  int FLOAT_LITERAL = 67;
   /** RegularExpression Id. */
-  int STRING = 76;
+  int CHARACTER = 72;
   /** RegularExpression Id. */
-  int BUILT_IN_CODE = 80;
+  int STRING = 77;
+  /** RegularExpression Id. */
+  int BUILT_IN_CODE = 81;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -227,18 +229,19 @@ public interface ParserConstants {
     "\"memorize\"",
     "<IDENTIFIER>",
     "<INTEGER>",
+    "<FLOAT_LITERAL>",
     "\"\\\'\"",
-    "<token of kind 68>",
     "<token of kind 69>",
     "<token of kind 70>",
+    "<token of kind 71>",
     "\"\\\'\"",
     "\"\\\"\"",
-    "<token of kind 73>",
     "<token of kind 74>",
     "<token of kind 75>",
+    "<token of kind 76>",
     "\"\\\"\"",
     "\"`\"",
-    "<token of kind 78>",
+    "<token of kind 79>",
     "\"\\\\`\"",
     "\"`\"",
     "\"(\"",

@@ -19,7 +19,4 @@ extend void $CONT.sort() {
     sort(this.begin(), this.end());
 }
 */
-memorize(n, 1000, -1) int fact(int n){
-    n > 0 ? n * fact(n - 1) : 1;
-}
-puts(fact(10));
+puts(1.0e2);

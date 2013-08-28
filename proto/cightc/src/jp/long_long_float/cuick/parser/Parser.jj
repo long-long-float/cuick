@@ -150,7 +150,7 @@ TOKEN: {
 }
 
 TOKEN: {
-	<IDENTIFIER: ["a"-"z", "A"-"Z", "_"](["a"-"z", "A"-"Z", "_", "0"-"9"])*>
+	<IDENTIFIER: ["a"-"z", "A"-"Z", "_"](["a"-"z", "A"-"Z", "_", "0"-"9"])* >
 }
 
 //数値
@@ -160,6 +160,10 @@ TOKEN: {
 		| "0" (["0"-"7"])* ("U")? ("L")?
 		| "0" (["b", "B"]) (["0"-"1"])+ ("U")? ("L")?
 		>
+}
+
+TOKEN: {
+    <FLOAT_LITERAL : ["1"-"9"](["0"-"9"])* "." ["0"-"9"](["0"-"9"])* (["e", "E"] (["+", "-"])? ["0"-"9"](["0"-"9"])*)? (["f", "F"])?>
 }
 
 MORE: { <"'"> : IN_CHARACTER }
@@ -1040,7 +1044,11 @@ ExprNode primary():
     ExprNode n;
 }
 {
-    t=<INTEGER>
+    t=<FLOAT_LITERAL>
+        {
+            return new LiteralNode(location(t), new CFloat(location(t)), t.image);
+        }
+    |   t=<INTEGER>
         {
             //return integerNode(location(t), t.image);
             return new LiteralNode(location(t), new CInt(location(t)), t.image); //TODO int以外のも作る

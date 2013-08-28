@@ -4,7 +4,7 @@
 #include<algorithm>
 #include<cmath>
 int main(int argc, char** argv){
-    std::cout << 1.0e2 << std::endl;
+    std::cout << 148 << std::endl;
     return 0;
 }
 

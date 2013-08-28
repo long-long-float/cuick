@@ -19,4 +19,4 @@ extend void $CONT.sort() {
     sort(this.begin(), this.end());
 }
 */
-puts(1.0e2);
+puts(0b10010100);

@@ -1,19 +1,14 @@
 package jp.long_long_float.cuick.compiler;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import jp.long_long_float.cuick.ast.AST;
@@ -97,113 +92,6 @@ public class Compiler {
     }
     
     private Tuple3<String, String, Integer> exec(String[] commands, String input) {
-        //StringBuilder stdout = new StringBuilder(), stderr = new StringBuilder();
-        
-        //DefaultExecutor exec = new DefaultExecutor();
-        /*
-        PipedOutputStream pos = new PipedOutputStream();
-        PipedOutputStream poserr = new PipedOutputStream();
-        PipedInputStream pis = new PipedInputStream();
-        PumpStreamHandler streamHandler = new PumpStreamHandler(pos, poserr, pis);
-        exec.setStreamHandler(streamHandler);
-        
-        PipedInputStream pis1 = null, piserr = null;
-        PipedOutputStream pos1 = null;
-        */
-        /*
-        DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-        CommandLine commandLine = new CommandLine(args[0]);
-        if(args.length >= 1) {
-            commandLine.addArguments(Arrays.copyOfRange(args, 1, args.length));
-        }
-
-        String out = "", err = "";
-        try (InputPipe stdout = new InputPipe(); InputPipe stderr = new InputPipe(); 
-                OutputPipe stdin = new OutputPipe()) {
-            
-            PumpStreamHandler streamHandler = null;
-            if(input != null) {
-                streamHandler = new PumpStreamHandler(
-                    stdout.getPipedOutputStream(), stderr.getPipedOutputStream(),
-                    stdin.getPipedInputStream());
-            }
-            else {
-                streamHandler = new PumpStreamHandler(
-                        stdout.getPipedOutputStream(), stderr.getPipedOutputStream());
-            }
-            exec.setStreamHandler(streamHandler);
-            
-            exec.execute(commandLine, resultHandler);
-            
-            if(input != null) {
-                stdin.write(input);
-                
-            }
-            
-            resultHandler.waitFor();
-            
-            
-
-            String sepa = System.getProperty("line.separator");
-            out = StringUtils.join(stdout, sepa);
-            err = StringUtils.join(stderr, sepa);
-
-            resultHandler.waitFor();
-            
-        }  catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        } catch (InterruptedException e) {
-            errorHandler.error("interrupted!");
-            return null;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
-        }*/
-        /*
-        BufferedReader br = null, brerr = null;
-        try {
-            exec.execute(commandLine, resultHandler);
-            //pis1 = new PipedInputStream(pos);
-            br = new BufferedReader(new InputStreamReader(new PipedInputStream(pos)));
-            piserr = new PipedInputStream(poserr);
-            brerr = new BufferedReader(new InputStreamReader(piserr));
-            
-            resultHandler.waitFor();
-            
-            String sepa = System.getProperty("line.separator");
-            while(br.ready()) {
-                stdout.append(br.readLine() + sepa);
-            }
-            while(brerr.ready()) {
-                stderr.append(brerr.readLine() + sepa);
-            }
-            
-            resultHandler.waitFor();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        } catch (InterruptedException e) {
-            errorHandler.error("interrupted!");
-            return null;
-        } finally {
-            try {
-                pis1.close();
-                br.close();
-            } catch (IOException e) {
-            }
-            try {
-                piserr.close();
-                brerr.close();
-            }catch (IOException e) {
-            }
-        }
-        */
-        //int code = resultHandler.getExitValue();
-        
-        //return new Tuple3<String, String, Integer>(stdout.toString(), stderr.toString(), code);
-        //return new Tuple3<String, String, Integer>(out, err, code);
-        
         ProcessBuilder pb = new ProcessBuilder(commands);
         
         Process process = null;
@@ -226,17 +114,7 @@ public class Compiler {
             pw.println(input);
             pw.close();
         }
-        /*
-        try (InputStream stdout = new InputStream(process.getInputStream());
-                InputStream stderr = new InputStream(process.getErrorStream())) {
-            String sepa = System.getProperty("line.separator");
-            out = StringUtils.join(stdout, sepa);
-            err = StringUtils.join(stderr, sepa);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        */
+
         try {
             process.waitFor();
             outThread.join();
@@ -251,56 +129,6 @@ public class Compiler {
         String err = StringUtils.join(errThread.getBuffer(), sepa) + sepa;
         int code = process.exitValue();
         return new Tuple3<String, String, Integer>(out, err, code);
-    }
-    
-    public void sample() {
-
-        String command = "test.exe";
-
-        List<String> args = new LinkedList<String>();
-
-        args.add("1");
-        args.add("2");
-        args.add("0");
-
-        ProcessBuilder pb = new ProcessBuilder(command);
-        java.lang.Process process = null;
-
-        try {
-            process = pb.start();
-        } catch (IOException ex) {
-            //--
-        }
-        OutputStream os = process.getOutputStream();
-        PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)));
-
-        final InputStream is = process.getInputStream();
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    BufferedReader br = new BufferedReader(new InputStreamReader(is));
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        System.out.println(line);
-                    }
-                } catch (java.io.IOException e) {
-                }
-            }
-        }).start();
-
-        for (String arg : args) {
-            pw.println(arg);
-        }
-
-        pw.close();
-
-        int returnCode = -1;
-        try {
-            returnCode = process.waitFor();
-        } catch (InterruptedException ex) {
-            //--
-        }
-        System.out.println(returnCode);
     }
     
     private void build(String sourceFile, Options opts, ConfigLoader cl) throws CompileException {

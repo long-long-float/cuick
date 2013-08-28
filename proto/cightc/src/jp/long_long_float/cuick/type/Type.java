@@ -26,8 +26,9 @@ public abstract class Type implements Cloneable{
         return location;
     }
 
-    public void setChild(Type child) {
+    public Type setChild(Type child) {
         this.child = child;
+        return this;
     }
     
     public Type getDeepestChild() {
@@ -67,8 +68,9 @@ public abstract class Type implements Cloneable{
         return ret;
     }
 
-    public void setTemplateTypes(List<Type> templTypes) {
+    public Type setTemplateTypes(List<Type> templTypes) {
         this.templTypes = templTypes;
+        return this;
     }
     
     public List<Type> getTemplateTypes() {
@@ -79,7 +81,7 @@ public abstract class Type implements Cloneable{
     
     @Override
     public String toString() {
-        String ret = typeString();
+        String ret = (isStatic ? "static " : "") + typeString();
         if(templTypes.size() != 0) {
             ret += "<" + StringUtils.join(templTypes, ", ") + ">";
         }
@@ -112,4 +114,17 @@ public abstract class Type implements Cloneable{
     }
     
     public abstract boolean hasType(String typeStr);
+
+    //FIXME 一般化する
+    
+    private boolean isStatic;
+    
+    public Type setIsStatic(boolean b) {
+        isStatic = b;
+        return this;
+    }
+    
+    public boolean isStatic() {
+        return isStatic;
+    }
 }

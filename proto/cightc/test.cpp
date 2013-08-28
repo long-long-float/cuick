@@ -3,17 +3,14 @@
 #include<map>
 #include<algorithm>
 #include<cmath>
+int fact(int n){
+    static std::vector<int> fact_memo0(1000, -1);
+    if(fact_memo0[n] != -1)return fact_memo0[n];
+    return n > 0 ? n * fact(n - 1) : 1;
+}
+
 int main(int argc, char** argv){
-    int n;
-    while(true){
-        {
-            std::cin >> n;
-            if(!n) break;;
-        }
-
-        std::cout << (int)std::pow(n, 2) << std::endl;
-    }
-
+    std::cout << fact(10) << std::endl;
     return 0;
 }
 

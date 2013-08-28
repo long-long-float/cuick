@@ -28,7 +28,7 @@ public final class Table {
     
     private List<Type> tuples = new ArrayList<Type>();
     private List<BuiltInCodeStmt> builtInCodes = new ArrayList<BuiltInCodeStmt>();
-    private Pair<List<AtTestCase>, List<AtTestCase>> testCases = null;
+    private Pair<List<AtTestCase>, List<AtTestCase>> testCases = new Pair<List<AtTestCase>, List<AtTestCase>>(new ArrayList<AtTestCase>(), new ArrayList<AtTestCase>());
     private Location testCaseLocation;
     
     public void entryTuple(Type tuple) {

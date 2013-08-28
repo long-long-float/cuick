@@ -28,6 +28,7 @@ import jp.long_long_float.cuick.ast.IfNode;
 import jp.long_long_float.cuick.ast.LiteralNode;
 import jp.long_long_float.cuick.ast.Location;
 import jp.long_long_float.cuick.ast.MemberNode;
+import jp.long_long_float.cuick.ast.MemorizeNode;
 import jp.long_long_float.cuick.ast.MultiplexAssignNode;
 import jp.long_long_float.cuick.ast.Node;
 import jp.long_long_float.cuick.ast.PowerOpNode;
@@ -77,7 +78,7 @@ public class ASTTranslator extends ASTVisitor<Node> {
             body.variables().addAll(ast.vars());
             updateParents(body);
             
-            Function main = new Function(new CInt(), "main", params, body);
+            Function main = new Function(new CInt(), "main", params, body, null);
             //new TypeResolver(errorHandler).visit(main.body());
             ast.addFunction(main);
         }
@@ -90,13 +91,26 @@ public class ASTTranslator extends ASTVisitor<Node> {
         for(Function func : ast.funcs()) {
             BlockNode body = func.body();
             body.accept(this);
-            if(!func.returnType().typeString().equals("void") && body.getLastStmt() instanceof ExprStmtNode) {
-                ExprStmtNode lastStmt = (ExprStmtNode) body.getLastStmt();
-                body.stmts().set(body.stmts().size() - 1, new ReturnNode(lastStmt.location(), lastStmt.expr()));
+            
+            MemorizeNode memorize = func.memorize();
+            if(memorize != null) {
+                Variable memoVar = new Variable(
+                        new TypeNode(new NamedType("std").setChild(new NamedType("vector").setTemplateTypes(ListUtils.asList(func.returnType()))).setIsStatic(true)), 
+                        body.getIdentityName(func.name() + "_memo"), ListUtils.asList(memorize.getMax(), memorize.getInit()), false, null, null);
+                ArefNode memoVarNode = new ArefNode(new VariableNode(null, memoVar.name()), memorize.getHash());
+                body.addStmtFront(new IfNode(null, "if", 
+                        new BinaryOpNode(memoVarNode, "!=", memorize.getInit()), 
+                        new ReturnNode(null, memoVarNode), null));
+                body.defineVariable(memoVar);
+                body.variables().add(memoVar);
             }
             
             if(func.name().equals("main") && !(body.getLastStmt() instanceof ReturnNode)) {
                 body.stmts().add(new ReturnNode(null, LiteralNode.cint(0)));
+            }
+            else if(!func.returnType().typeString().equals("void") && body.getLastStmt() instanceof ExprStmtNode) {
+                ExprStmtNode lastStmt = (ExprStmtNode) body.getLastStmt();
+                body.stmts().set(body.stmts().size() - 1, new ReturnNode(lastStmt.location(), lastStmt.expr()));
             }
         }
         

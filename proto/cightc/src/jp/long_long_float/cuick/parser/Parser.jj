@@ -146,6 +146,7 @@ TOKEN: {
   | <EXTEND : "extend">
   | <AS : "as">
   | <UNLESS : "unless">
+  | <MEMORIZE : "memorize">
 }
 
 TOKEN: {
@@ -210,7 +211,7 @@ AST compilation_unit():
     (
         LOOKAHEAD(<EXTEND>/* type_with_suffix() type_with_suffix()*/)
         func=def_extendfun() { decls.funcs().add(func); }
-    |   LOOKAHEAD(type_with_suffix() name() "(" [type() ["&"] ("*")* name() ["[" [expr()] "]"] ["=" expr()] ("," type() ["&"] ("*")* name() ["[" [expr()] "]"] ["=" expr()])* ] ")" "{")
+    |   LOOKAHEAD([<MEMORIZE> "(" expr() "," expr() "," expr() ")"] type_with_suffix() name() "(" params() ")" "{")
         func=deffun() { decls.funcs().add(func); }
     |   LOOKAHEAD(type() defvar() ("," defvar())*/*["&"] ("*")* name()*/) defvar=defvars()
         {
@@ -296,16 +297,27 @@ Variable defvar(Type type):{
 Function deffun():
 {
     //String modif = null;
+    
+    MemorizeNode memorize = null;
     Type ret;
     String name;
     Params ps = null;
     BlockNode body;
 }
 {
-    ret=type_with_suffix() name=name() "(" ps=params() ")" body=block()
+    [memorize=memorize()] ret=type_with_suffix() name=name() "(" ps=params() ")" body=block()
         {
-            return new Function(ret, name, ps, body);
+            return new Function(ret, name, ps, body, memorize);
         }
+}
+
+MemorizeNode memorize():
+{    Token t;
+    ExprNode hash, max, init;
+}
+{    t=<MEMORIZE> "(" hash=expr() "," max=expr() "," init=expr() ")"
+    {        return new MemorizeNode(location(t), hash, max, init);
+    }
 }
 
 Function def_extendfun():

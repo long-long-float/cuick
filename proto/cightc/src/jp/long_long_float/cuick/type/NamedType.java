@@ -16,6 +16,10 @@ public class NamedType extends Type {
         if(name.equals("tuple")) Table.getInstance().entryTuple(this);
     }
     
+    public NamedType(String name) {
+        this(name, null);
+    }
+
     @Override
     public String typeString() {
         return name;

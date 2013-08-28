@@ -45,7 +45,7 @@ abstract public class Node implements Dumpable, Acceptable{
     abstract public Location location();
     
     public void dump() {
-        //dump(System.out);
+        dump(System.out);
     }
     
     public void dump(PrintStream ps) {

@@ -26,7 +26,6 @@ public class OutputPipe implements AutoCloseable{
     @Override
     public void close() throws Exception {
         bufferedWriter.close();
-        bufferedWriter.close();
     }
 
 }

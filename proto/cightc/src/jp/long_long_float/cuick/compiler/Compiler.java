@@ -1,12 +1,19 @@
 package jp.long_long_float.cuick.compiler;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import jp.long_long_float.cuick.ast.AST;
@@ -19,7 +26,7 @@ import jp.long_long_float.cuick.exception.SyntaxException;
 import jp.long_long_float.cuick.parser.Parser;
 import jp.long_long_float.cuick.utility.ErrorHandler;
 import jp.long_long_float.cuick.utility.FileUtils;
-import jp.long_long_float.cuick.utility.InputStream;
+import jp.long_long_float.cuick.utility.InputThread;
 import jp.long_long_float.cuick.utility.Pair;
 
 import org.apache.commons.lang3.StringUtils;
@@ -89,7 +96,7 @@ public class Compiler {
         System.exit(0);
     }
     
-    private Tuple3<String, String, Integer> exec(String[] args, String input) {
+    private Tuple3<String, String, Integer> exec(String[] commands, String input) {
         //StringBuilder stdout = new StringBuilder(), stderr = new StringBuilder();
         
         //DefaultExecutor exec = new DefaultExecutor();
@@ -197,35 +204,103 @@ public class Compiler {
         //return new Tuple3<String, String, Integer>(stdout.toString(), stderr.toString(), code);
         //return new Tuple3<String, String, Integer>(out, err, code);
         
-        ProcessBuilder pb = new ProcessBuilder(args);
+        ProcessBuilder pb = new ProcessBuilder(commands);
         
-        String out = "", err = "";
-        int code;
+        Process process = null;
         try {
-            Process process = pb.start();
-            if(input != null) {
-                OutputStream pos = process.getOutputStream();
-                pos.write(input.getBytes());
-            }
-            process.waitFor();
-            try (InputStream stdout = new InputStream(process.getInputStream());
-                    InputStream stderr = new InputStream(process.getErrorStream())) {
-                String sepa = System.getProperty("line.separator");
-                out = StringUtils.join(stdout, sepa);
-                err = StringUtils.join(stderr, sepa);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-            code = process.exitValue();
-        } catch (IOException e) {
+            process = pb.start();
+        } catch(IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        
+        OutputStream pos = process.getOutputStream();
+        PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(pos)));
+        
+        InputThread outThread = new InputThread(process.getInputStream());
+        InputThread errThread = new InputThread(process.getErrorStream());
+        outThread.start();
+        errThread.start();
+        
+        if(input != null) {
+            pw.println(input);
+            pw.close();
+        }
+        /*
+        try (InputStream stdout = new InputStream(process.getInputStream());
+                InputStream stderr = new InputStream(process.getErrorStream())) {
+            String sepa = System.getProperty("line.separator");
+            out = StringUtils.join(stdout, sepa);
+            err = StringUtils.join(stderr, sepa);
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+        */
+        try {
+            process.waitFor();
+            outThread.join();
+            errThread.join();
         } catch (InterruptedException e) {
             errorHandler.error("interrupted!");
             return null;
-        } 
+        }
+        
+        String sepa = System.getProperty("line.separator");
+        String out = StringUtils.join(outThread.getBuffer(), sepa);
+        String err = StringUtils.join(errThread.getBuffer(), sepa);
+        int code = process.exitValue();
         return new Tuple3<String, String, Integer>(out, err, code);
+    }
+    
+    public void sample() {
+
+        String command = "test.exe";
+
+        List<String> args = new LinkedList<String>();
+
+        args.add("1");
+        args.add("2");
+        args.add("0");
+
+        ProcessBuilder pb = new ProcessBuilder(command);
+        java.lang.Process process = null;
+
+        try {
+            process = pb.start();
+        } catch (IOException ex) {
+            //--
+        }
+        OutputStream os = process.getOutputStream();
+        PrintWriter pw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)));
+
+        final InputStream is = process.getInputStream();
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        System.out.println(line);
+                    }
+                } catch (java.io.IOException e) {
+                }
+            }
+        }).start();
+
+        for (String arg : args) {
+            pw.println(arg);
+        }
+
+        pw.close();
+
+        int returnCode = -1;
+        try {
+            returnCode = process.waitFor();
+        } catch (InterruptedException ex) {
+            //--
+        }
+        System.out.println(returnCode);
     }
     
     private void build(String sourceFile, Options opts, ConfigLoader cl) throws CompileException {
@@ -264,10 +339,12 @@ public class Compiler {
                     e.printStackTrace();
                     continue;
                 }
-                Tuple3<String, String, Integer> ret = exec(new String[] {config.test.exefile, "<", testCase.getFirst().fileName()}, null);
+                Tuple3<String, String, Integer> ret = exec(new String[] {config.test.exefile}, input);
                 if(ret == null) continue;
                 
-                System.out.println(ret._1());
+                System.out.println("stdout => " + ret._1());
+                System.err.println("stderr => " + ret._2());
+                System.err.println("exit value => " + ret._3());
             }
         }
     }

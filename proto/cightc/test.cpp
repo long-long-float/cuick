@@ -6,7 +6,6 @@
 int main(int argc, char** argv){
     int n;
     while(true){
-        std::cout << "a" << std::endl;
         {
             std::cin >> n;
             if(!n) break;;

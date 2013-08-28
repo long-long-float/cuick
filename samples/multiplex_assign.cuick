@@ -1,19 +1,4 @@
-int a = 1, b = 2;
-a, b = b, a;
-print a, b; //2 1
-
-int x, y, pos[2] = {3, 4};
-x, y = pos;
-print x, y; //3 4
-
-/*
-//c++
-int a = 1, b = 2;
-int _tmp[2] = {b, a};
-a = _tmp[0], b = _tmp[1], _tmp;
-cout << a << ' ' << b << endl;
-
-int x, y, pos[2] = {3, 4};
-x = pos[0], y = pos[1], pos;
-cout << x << ' ' << y << endl;
-*/
+int x = 1, y = 2;
+print(x, y);
+x, y = y, x;
+print(x, y);

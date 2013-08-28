@@ -222,9 +222,9 @@ AST compilation_unit():
         t = getToken(1);
     }
     (
-        LOOKAHEAD(<EXTEND>/* type_with_suffix() type_with_suffix()*/)
+        LOOKAHEAD([template()] <EXTEND>/* type_with_suffix() type_with_suffix()*/)
         func=def_extendfun() { decls.funcs().add(func); }
-    |   LOOKAHEAD([<MEMORIZE> "(" expr() "," expr() "," expr() ")"] type_with_suffix() name() "(" params() ")" "{")
+    |   LOOKAHEAD([template()] [memorize()] type_with_suffix() name() "(" params() ")" "{")
         func=deffun() { decls.funcs().add(func); }
     |   LOOKAHEAD(type() defvar() ("," defvar())*/*["&"] ("*")* name()*/) defvar=defvars()
         {
@@ -310,7 +310,8 @@ Variable defvar(Type type):{
 Function deffun():
 {
     //String modif = null;
-    
+
+    TemplateNode template = null;
     MemorizeNode memorize = null;
     Type ret;
     String name;
@@ -318,9 +319,9 @@ Function deffun():
     BlockNode body;
 }
 {
-    [memorize=memorize()] ret=type_with_suffix() name=name() "(" ps=params() ")" body=block()
+    [template=template()] [memorize=memorize()] ret=type_with_suffix() name=name() "(" ps=params() ")" body=block()
         {
-            return new Function(ret, name, ps, body, memorize);
+            return new Function(ret, name, ps, body, memorize, template);
         }
 }
 
@@ -335,6 +336,7 @@ MemorizeNode memorize():
 
 Function def_extendfun():
 {
+    TemplateNode template = null;
     Token t;
     Type ret;
     Type receiver;
@@ -343,11 +345,21 @@ Function def_extendfun():
     BlockNode body;
 }
 {
-    t=<EXTEND> ret=type_with_suffix() receiver=type_with_suffix() "." name=name() "(" ps=params() ")" body=block()
+    [template=template()] t=<EXTEND> ret=type_with_suffix() receiver=type_with_suffix() "." name=name() "(" ps=params() ")" body=block()
         {
-            return new Function(location(t), ret, receiver, name, ps, body);
+            return new Function(location(t), ret, receiver, name, ps, body, template);
         }
 }
+
+TemplateNode template():
+{    Token t;
+    List<Pair<String, String>> args = new ArrayList<Pair<String, String>>();
+    Token type;
+    String name;
+}
+{    t=<TEMPLATE> "<" ((type=<CLASS> | type=<TYPENAME>) name=name() { args.add(new Pair<String, String>(type.image, name)); } )+ ">"
+    {        return new TemplateNode(location(t), args);
+    }}
 
 Params params():
 {

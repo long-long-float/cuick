@@ -78,7 +78,7 @@ public class ASTTranslator extends ASTVisitor<Node> {
             body.variables().addAll(ast.vars());
             updateParents(body);
             
-            Function main = new Function(new CInt(), "main", params, body, null);
+            Function main = new Function(new CInt(), "main", params, body, null, null);
             //new TypeResolver(errorHandler).visit(main.body());
             ast.addFunction(main);
         }

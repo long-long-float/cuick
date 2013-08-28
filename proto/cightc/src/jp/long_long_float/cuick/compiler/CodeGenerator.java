@@ -46,6 +46,7 @@ import jp.long_long_float.cuick.ast.StmtNode;
 import jp.long_long_float.cuick.ast.StringLiteralNode;
 import jp.long_long_float.cuick.ast.SuffixOpNode;
 import jp.long_long_float.cuick.ast.SwitchNode;
+import jp.long_long_float.cuick.ast.TemplateNode;
 import jp.long_long_float.cuick.ast.UnaryOpNode;
 import jp.long_long_float.cuick.ast.VariableNode;
 import jp.long_long_float.cuick.ast.WhileNode;
@@ -182,7 +183,8 @@ public class CodeGenerator extends ASTVisitor<String> {
         cb.addLine(ent.body().accept(this));
         return cb.toString();
         */
-        return ent.type() + " " + ent.name() + "(" + join(ent.parameters(), ", ") + ")" + ent.body().accept(this);
+        TemplateNode temp = ent.template();
+        return (temp != null ? temp.accept(this) : "") + ent.type() + " " + ent.name() + "(" + join(ent.parameters(), ", ") + ")" + ent.body().accept(this);
     }
     
     public String visit(Variable ent) {
@@ -208,6 +210,12 @@ public class CodeGenerator extends ASTVisitor<String> {
     
     public String visit(Parameter ent) {
         return ent.type() + " " + ent.name();
+    }
+    
+    //other
+    
+    public String visit(TemplateNode node) {
+        return "template<" + StringUtils.join(node.getArgs(), ", ") + ">";
     }
     
     //statements

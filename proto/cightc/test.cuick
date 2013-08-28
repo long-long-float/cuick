@@ -19,4 +19,8 @@ extend void $CONT.sort() {
     sort(this.begin(), this.end());
 }
 */
-puts(0b10010100);
+template<class T> int gets() {
+    int ret;
+    cin >> ret;
+    ret;
+}

@@ -1,0 +1,4 @@
+memorize(n, 1000, -1) int fact(int n){
+    n > 0 ? n * fact(n - 1) : 1;
+}
+puts(fact(10));

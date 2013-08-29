@@ -6,10 +6,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import jp.long_long_float.cuick.ast.AtTestCase;
+import jp.long_long_float.cuick.ast.AtTestNode;
 import jp.long_long_float.cuick.ast.BuiltInCodeStmt;
 import jp.long_long_float.cuick.ast.Location;
+import jp.long_long_float.cuick.ast.RangeNode;
 import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.Pair;
+import lombok.Getter;
+import lombok.Setter;
 
 //https://sites.google.com/site/leihcrev/java/validsingleton
 
@@ -28,8 +32,9 @@ public final class Table {
     
     private List<Type> tuples = new ArrayList<Type>();
     private List<BuiltInCodeStmt> builtInCodes = new ArrayList<BuiltInCodeStmt>();
-    private Pair<List<AtTestCase>, List<AtTestCase>> testCases = new Pair<List<AtTestCase>, List<AtTestCase>>(new ArrayList<AtTestCase>(), new ArrayList<AtTestCase>());
-    private Location testCaseLocation;
+    @Getter @Setter private AtTestNode atTestNode;
+    //private Pair<List<AtTestCase>, List<AtTestCase>> testCases = new Pair<List<AtTestCase>, List<AtTestCase>>(new ArrayList<AtTestCase>(), new ArrayList<AtTestCase>());
+    //private Location testCaseLocation;
     
     public void entryTuple(Type tuple) {
         //この時点では完全な型ではないので(templateがない)
@@ -64,29 +69,20 @@ public final class Table {
     public List<BuiltInCodeStmt> getBuiltInCodeStmt() {
         return builtInCodes;
     }
-
-    public void setTestCases(Location loc, List<AtTestCase> inCases, List<AtTestCase> outCases) {
-        testCaseLocation = loc;
-        testCases = new Pair<List<AtTestCase>, List<AtTestCase>>(inCases, outCases);
-    }
     
     public boolean equalsInCasesAndOutCases() {
-        return testCases.getFirst().size() == testCases.getSecond().size();
+        return atTestNode.getInCases().size() == atTestNode.getOutCases().size();
     }
 
     public boolean isEnabledTest() {
-        return testCases != null;
-    }
-    
-    public Location getTestCaseLocation() {
-        return testCaseLocation;
+        return atTestNode != null;
     }
     
     public List<Pair<AtTestCase, AtTestCase>> getTestCases() {
         if(!equalsInCasesAndOutCases()) return null;
         
-        List<Pair<AtTestCase, AtTestCase>> ret = new ArrayList<Pair<AtTestCase,AtTestCase>>(testCases.getFirst().size());
-        Iterator<AtTestCase> inItr = testCases.getFirst().iterator(), outItr = testCases.getSecond().iterator();
+        List<Pair<AtTestCase, AtTestCase>> ret = new ArrayList<Pair<AtTestCase,AtTestCase>>(atTestNode.getInCases().size());
+        Iterator<AtTestCase> inItr = atTestNode.getInCases().iterator(), outItr = atTestNode.getOutCases().iterator();
         while(inItr.hasNext()) {
             ret.add(new Pair<AtTestCase, AtTestCase>(inItr.next(), outItr.next()));
         }

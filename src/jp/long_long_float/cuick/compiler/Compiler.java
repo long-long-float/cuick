@@ -13,6 +13,7 @@ import java.util.Map;
 
 import jp.long_long_float.cuick.ast.AST;
 import jp.long_long_float.cuick.ast.AtTestCase;
+import jp.long_long_float.cuick.ast.IntegerRangeNode;
 import jp.long_long_float.cuick.exception.CompileException;
 import jp.long_long_float.cuick.exception.ConfigException;
 import jp.long_long_float.cuick.exception.FileException;
@@ -136,6 +137,15 @@ public class Compiler {
         return new Tuple3<String, String, Integer>(out, err, code);
     }
     
+    public boolean isEmpty(String str) {
+    	for(char c : str.toCharArray()) {
+    		if(c != '\r' && c != '\n' && c != ' ') {
+    			return false;
+    		}
+    	}
+    	return true;
+    }
+    
     private void build(String sourceFile, Options opts, ConfigLoader cl) throws CompileException {
         String destFile = sourceFile.replaceFirst(".cuick$", ".cpp");
         if(opts.getOutputFile() != null) {
@@ -153,8 +163,8 @@ public class Compiler {
         if(opts.isWithCompileFlag()) {
             Tuple3<String, String, Integer> ret = exec(config.compiler, null);
             if(ret == null) return;
-            if(!ret.get_1().isEmpty()) System.out.println(ret.get_1());
-            if(!ret.get_2().isEmpty()) System.err.println(ret.get_2());
+            if(!isEmpty(ret.get_1())) System.out.println(ret.get_1());
+            if(!isEmpty(ret.get_2())) System.err.println(ret.get_2());
             if(ret.get_3() != 0) {
                 errorHandler.error(config.compiler[0] + " returned " + ret.get_3());
                 return;
@@ -164,29 +174,43 @@ public class Compiler {
         //auto test
         Table table = Table.getInstance();
         if(table.isEnabledTest()) {
+        	IntegerRangeNode range = table.getAtTestNode().getRange();
             int id = 1;
             for(Pair<AtTestCase, AtTestCase> testCase : table.getTestCases()) {
-                String input = "", output = "";
-                try {
-                    input = FileUtils.readFromFile(testCase.getFirst().fileName());
-                    output = FileUtils.readFromFile(testCase.getSecond().fileName());
-                } catch (IOException e) {
-                    // TODO 自動生成された catch ブロック
-                    e.printStackTrace();
-                    continue;
+                int begin = 0, end = 0;
+                if(range != null) {
+                	begin = range.getBegin();
+                	end = range.getEnd();
+                  }
+                for(int i = begin;i <= end;i++) {
+	                String input = "", output = "";
+	                try {
+	                		String inFile = testCase.getFirst().fileName();
+	                		String outFile = testCase.getSecond().fileName();
+	                		if(range != null) {
+	                			inFile = inFile.replace("@{id}", Integer.toString(i));
+	                			outFile = outFile.replace("@{id}", Integer.toString(i));
+	                		}
+	                    input = FileUtils.readFromFile(inFile);
+	                    output = FileUtils.readFromFile(outFile);
+	                } catch (IOException e) {
+	                    // TODO 自動生成された catch ブロック
+	                    e.printStackTrace();
+	                    continue;
+	                }
+	                Tuple3<String, String, Integer> ret = exec(new String[] {config.test.exefile}, input);
+	                if(ret == null) continue;
+	                if(ret.get_1().equals(output)) {
+	                    System.out.println("test case" + id + ": ok!");
+	                }
+	                else {
+	                    System.err.println("test case" + id + ": fail! expected");
+	                    System.err.println(output);
+	                    System.err.println("but");
+	                    System.err.println(ret.get_1());
+	                }
+	                id++;
                 }
-                Tuple3<String, String, Integer> ret = exec(new String[] {config.test.exefile}, input);
-                if(ret == null) continue;
-                if(ret.get_1().equals(output)) {
-                    System.out.println("test case" + id + ": ok!");
-                }
-                else {
-                    System.err.println("test case" + id + ": fail! expected");
-                    System.err.println(output);
-                    System.err.println("but");
-                    System.err.println(ret.get_1());
-                }
-                id++;
             }
         }
     }
@@ -212,7 +236,7 @@ public class Compiler {
         ast.dump();*/
         //System.out.println("===============rename================");
         ast = rename(ast, opts);
-        //ast.dump();
+        ast.dump();
         
         
         writeFile(destPath, ast, opts);

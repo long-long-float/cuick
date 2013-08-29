@@ -29,7 +29,7 @@ public class LocalResolver extends Visitor {
         scopeStack.add(toplevel);
         
         if(!Table.getInstance().equalsInCasesAndOutCases()) {
-            error(Table.getInstance().getTestCaseLocation(), "Number of in-case and out-case are diffirent!");
+            error(Table.getInstance().getAtTestNode().location(), "Number of in-case and out-case are diffirent!");
         }
         
         for(Entity ent : ast.definitions()) {

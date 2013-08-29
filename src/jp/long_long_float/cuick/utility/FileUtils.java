@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class FileUtils {
     public static String readFromFile(String path) throws IOException {
         FileInputStream fis = null;
@@ -13,6 +15,9 @@ public class FileUtils {
             fis = new FileInputStream(file);
             byte[] buf = new byte[(int) file.length()];
             fis.read(buf);
+            System.out.print(path + " ");
+            for(byte b : buf) System.out.print(Integer.toHexString(b) + " ");
+            System.out.println();
             ret = new String(buf);
         }
         finally {

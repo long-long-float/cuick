@@ -1,10 +1,8 @@
 //入力を二乗して出力するプログラム
 
-@test {
-    in: "in.txt"
-    out: "out.txt"
-    in: "in2.txt"
-    out: "out2.txt"
+@test(1..2){
+    in: "in@{id}.txt"
+    out: "out@{id}.txt"
 }
 int n;
 while(true)

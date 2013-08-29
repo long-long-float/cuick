@@ -1116,6 +1116,21 @@ RangeNode range():
         }
 }
 
+IntegerRangeNode integer_range():
+{  	Token lexpr, rexpr;
+  	String r;
+}
+{  	(
+  	  LOOKAHEAD(2) lexpr=<INTEGER> (".."  { r = ".."; } | "..." { r = "..."; } ) rexpr=<INTEGER>
+        {
+            return new IntegerRangeNode(location(lexpr), Integer.parseInt(parseInteger(lexpr.image)), r, Integer.parseInt(parseInteger(rexpr.image)));
+        }
+      | rexpr=<INTEGER>
+      	{      	  	return new IntegerRangeNode(location(rexpr), 0, "...", Integer.parseInt(parseInteger(rexpr.image)));
+      	}
+     )
+}
+
 AtCommandNode at_command():
 {
     AtCommandNode atCommand;
@@ -1183,13 +1198,16 @@ AtWhileNode at_while():
 
 AtTestNode at_test():
 {    Token t, t2;
+
+	IntegerRangeNode range = null;
+    
     Token file_name;
     String line;
     List<String> lines = new ArrayList<String>();
     List<AtTestCase> inCases = new ArrayList<AtTestCase>();
     List<AtTestCase> outCases = new ArrayList<AtTestCase>();
 }
-{    t="@test" "{"
+{    t="@test" ["(" range=integer_range() ")"] "{"
 	    (
 	        t2="in:" file_name=<STRING>
 	        {	           inCases.add(new AtTestCase(location(t2), trim(file_name.image)));
@@ -1200,6 +1218,6 @@ AtTestNode at_test():
             }
          )*
     "}"
-    {        return new AtTestNode(location(t), inCases, outCases);
+    {        return new AtTestNode(location(t), range, inCases, outCases);
     }
 }

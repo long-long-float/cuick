@@ -85,7 +85,7 @@ foreach.cuick
 
     for(i : ary){
         for(j : ary){
-            puts(i * j, "");       //入れ子も可能
+            print(i * j, "");       //入れ子も可能
         }
         puts();
     }
@@ -110,7 +110,7 @@ at-input.cuick
     @input{ n x[n] }
     int sum = 0;
     for(i : x:n) sum += i;
-    puts(i);
+    puts(sum);
 
 ###@test
 
@@ -120,10 +120,12 @@ at-test.cuick
 
     //入力の2乗を出力するプログラム
     @test(0..20){
-        in: "in@{i}.txt"
-        out: "in@{i}.txt"
+        in: "in@{id}.txt"
+        out: "out@{id}.txt"
     }
-    puts(gets<int>() ** 2);
+    int n;
+    @input{n}
+    puts(n ** 2);
 
 ###演習
 

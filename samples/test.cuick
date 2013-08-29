@@ -1,5 +1,6 @@
 //入力を二乗して出力するプログラム
 
+@debug
 @test(1..2){
     in: "in@{id}.txt"
     out: "out@{id}.txt"

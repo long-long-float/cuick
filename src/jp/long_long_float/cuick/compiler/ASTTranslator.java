@@ -361,6 +361,8 @@ public class ASTTranslator extends ASTVisitor<Node> {
                 return newNode;
             }
             case "var_dump": {
+                if(!Table.getInstance().isDebugMode()) return new BuiltInCode(null, "");
+                
                 ExprNode newNode = new StaticMemberNode(std, "cout");
                 for(ExprNode arg : node.args()) {
                     if(arg instanceof VariableNode) {

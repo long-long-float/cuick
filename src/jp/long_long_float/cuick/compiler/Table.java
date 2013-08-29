@@ -8,8 +8,6 @@ import java.util.List;
 import jp.long_long_float.cuick.ast.AtTestCase;
 import jp.long_long_float.cuick.ast.AtTestNode;
 import jp.long_long_float.cuick.ast.BuiltInCodeStmt;
-import jp.long_long_float.cuick.ast.Location;
-import jp.long_long_float.cuick.ast.RangeNode;
 import jp.long_long_float.cuick.type.Type;
 import jp.long_long_float.cuick.utility.Pair;
 import lombok.Getter;
@@ -33,8 +31,7 @@ public final class Table {
     private List<Type> tuples = new ArrayList<Type>();
     private List<BuiltInCodeStmt> builtInCodes = new ArrayList<BuiltInCodeStmt>();
     @Getter @Setter private AtTestNode atTestNode;
-    //private Pair<List<AtTestCase>, List<AtTestCase>> testCases = new Pair<List<AtTestCase>, List<AtTestCase>>(new ArrayList<AtTestCase>(), new ArrayList<AtTestCase>());
-    //private Location testCaseLocation;
+    @Getter @Setter private boolean debugMode = false;
     
     public void entryTuple(Type tuple) {
         //この時点では完全な型ではないので(templateがない)

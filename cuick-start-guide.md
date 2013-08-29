@@ -98,3 +98,37 @@ foreach.cuick
     vec.push_back(20);
     vec.push_back(30);
     for(itr : vec) puts(itr);       //vectorもok
+
+###@input
+
+競技プログラミングでは、標準入力からの入力が必ずと言っていいほどあり、しかも毎回ほぼ決まった形です。@inputは簡単な入力の定義を書くだけで入力ができてしまいます。例えば整数nに続いて、長さnの数列xを入力する場合、`@input{ n x[n] }`だけで入力ができます。定義の詳細はcuick-doc.mdを参照してください。
+
+at-input.cuick
+
+    //xの合計を出力するプログラム
+    int n, x[1000];
+    @input{ n x[n] }
+    int sum = 0;
+    for(i : x:n) sum += i;
+    puts(i);
+
+###@test
+
+プログラムを書いたらテストをしたい時があります。ただ、素のC++ではそのための機構がなく少々面倒です。@testは入力ファイル、出力ファイルを指定するだけでcuickcが自動でテストをしてくれます。
+
+at-test.cuick
+
+    //入力の2乗を出力するプログラム
+    @test(0..20){
+        in: "in@{i}.txt"
+        out: "in@{i}.txt"
+    }
+    puts(gets<int>() ** 2);
+
+###演習
+
+実際に問題を解いてみましょう。
+
+###終わりに
+
+以上でCuickスタートガイドは終わりです。まだまだCuickには魅力的な機能があるので、cuick-doc.mdを参照してください。

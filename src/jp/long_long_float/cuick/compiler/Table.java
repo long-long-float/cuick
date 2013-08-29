@@ -71,7 +71,7 @@ public final class Table {
     }
     
     public boolean equalsInCasesAndOutCases() {
-        return atTestNode.getInCases().size() == atTestNode.getOutCases().size();
+        return atTestNode == null || (atTestNode != null && atTestNode.getInCases().size() == atTestNode.getOutCases().size());
     }
 
     public boolean isEnabledTest() {

@@ -4,7 +4,12 @@
 #include<algorithm>
 #include<cmath>
 int main(int argc, char **argv){
-    std::cout << "hello cuick!" << std::endl;
+    int n;
+    {
+        std::cin >> n;
+    }
+
+    std::cout << std::pow(n, 2) << std::endl;
     return 0;
 }
 

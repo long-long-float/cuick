@@ -15,9 +15,6 @@ public class FileUtils {
             fis = new FileInputStream(file);
             byte[] buf = new byte[(int) file.length()];
             fis.read(buf);
-            System.out.print(path + " ");
-            for(byte b : buf) System.out.print(Integer.toHexString(b) + " ");
-            System.out.println();
             ret = new String(buf);
         }
         finally {

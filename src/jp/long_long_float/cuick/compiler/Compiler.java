@@ -236,7 +236,7 @@ public class Compiler {
         ast.dump();*/
         //System.out.println("===============rename================");
         ast = rename(ast, opts);
-        ast.dump();
+        //ast.dump();
         
         
         writeFile(destPath, ast, opts);

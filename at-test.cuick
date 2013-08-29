@@ -1,0 +1,8 @@
+//入力の2乗を出力するプログラム
+@test(1..2){
+    in: "in@{id}.txt"
+    out: "out@{id}.txt"
+}
+int n;
+@input{n}
+puts(n ** 2);

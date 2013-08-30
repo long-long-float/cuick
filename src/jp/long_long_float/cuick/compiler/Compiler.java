@@ -1,10 +1,12 @@
 package jp.long_long_float.cuick.compiler;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -65,7 +67,7 @@ public class Compiler {
             System.exit(0);
         }
         
-        if(opts.getSourceFiles().isEmpty()) {
+        if(opts.getSourceFiles().isEmpty() && !opts.isStdinFlag()) {
             errorHandler.error("source file is empty!");
             System.exit(1);
         }
@@ -81,6 +83,14 @@ public class Compiler {
             throw new FileException("file error");
         }
         
+        if(opts.isStdinFlag()) {
+        	try {
+				build("out.cuick", opts, cl);
+			} catch (CompileException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+        }
         for(String sourceFile : opts.getSourceFiles()) {
             try {
                 build(sourceFile, opts, cl);
@@ -248,8 +258,12 @@ public class Compiler {
             writer = new BufferedWriter(new FileWriter(new File(path)));
             try {
                 //writer.write(cb.toString());
-                //System.out.println(codeGenerate(ast, opts));
-                writer.write(codeGenerate(ast, opts));
+            	  if(opts.isStdoutFlag()) {
+            		  System.out.println(codeGenerate(ast, opts));
+            	  }
+            	  else {
+                    writer.write(codeGenerate(ast, opts));
+            	  }
             }
             finally {
                 writer.close();
@@ -266,7 +280,12 @@ public class Compiler {
     }
     
     public AST parseFile(String path, Options opts) throws SyntaxException, FileException {
-        return Parser.parseFile(new File(path), errorHandler);
+    	if(opts.isStdinFlag()) {
+    		return new Parser(new BufferedReader(new InputStreamReader(System.in)), "stdin", errorHandler).parse();
+    	}
+    	else {
+    		return Parser.parseFile(new File(path), errorHandler);
+    	}
     }
     
     public AST localResolve(AST ast, /*TypeTable types, */Options opts) throws SemanticException {

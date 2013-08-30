@@ -26,6 +26,12 @@ public class Options {
     @Option(name="-w", aliases="--with-compile", usage="compile use c++ compiler")
     private boolean withCompileFlag;
     
+    @Option(name="--stdin", usage="read from stdin source")
+    private boolean stdinFlag;
+    
+    @Option(name="--stdout", usage="write to stdout source")
+    private boolean stdoutFlag;
+    
     @Argument(metaVar="source", usage="source file")
     private List<String> sourceFiles = new ArrayList<>();
     

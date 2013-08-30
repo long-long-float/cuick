@@ -1,6 +1,6 @@
 options {
 	STATIC = false;
-	DEBUG_PARSER = true;
+	DEBUG_PARSER = false;
 	UNICODE_INPUT = true;
 }
 

@@ -183,7 +183,7 @@ public class Compiler {
         
         //auto test
         Table table = Table.getInstance();
-        if(table.isEnabledTest()) {
+        if(table.isEnabledTest() && table.isDebugMode()) {
         	IntegerRangeNode range = table.getAtTestNode().getRange();
             int id = 1;
             for(Pair<AtTestCase, AtTestCase> testCase : table.getTestCases()) {

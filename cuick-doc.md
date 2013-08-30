@@ -105,13 +105,13 @@ example
 
 ##@degug
 
-debugモードを有効にします。debugモードが無効だと、
+debugモードを有効にします。debugモードが有効だと、
 
 - dump_var
 
 - @test
 
-が無効になります。
+が使えるようになります。デフォルトではdebugモードは無効で、@debugと書くことによってはじめて上の機能が使えるようになります。
 
 ##@test
 
@@ -205,3 +205,29 @@ C++のコードを埋め込みたい時に使います。最後のセミコロ�
 - block
 
     関数呼び出し時にブロックを渡すことができる。
+
+
+#config.yamlについて
+
+C++からコンパイルするためのコマンドラインや、自動テストのための設定をここに記述します。@{XXX}と書くことでコンパイル時に展開されます。
+
+##config.yamlの設定例
+
+    !!jp.long_long_float.cuick.compiler.Config
+    compiler: [g++, -o, @{FILE_BASENAME}.exe, @{DEST_FILE}]
+    test:
+        exefile: @{FILE_BASENAME}.exe
+
+compiler : C++からコンパイルするためのコマンドラインを配列で指定してください
+
+test.exefile : 自動テスト時に呼ばれる実行ファイル名を指定してください
+
+##config.yamlの定数一覧
+
+- FILE_BASENAME
+
+    ファイル名から拡張子を除いた部分
+
+- DEST_FILE
+
+    cuickcが生成するC++ファイル。デフォルトでは@{FILE_BASENAME}.cpp

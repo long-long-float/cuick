@@ -39,16 +39,6 @@ config.yamlの設定例
 
 同じディレクトリに実行可能ファイルができているはずです。
 
-###config.yamlの定数一覧
-
-- FILE_BASENAME
-
-    ファイル名から拡張子を除いた部分
-
-- DEST_FILE
-
-    cuickcが生成するC++ファイル。デフォルトでは@{FILE_BASENAME}.cpp
-
 ###for-each文
 
 cuickの中心的な機能の1つです。配列はもちろん、std::vectorに代表されるコンテナを巡回できます。さらに型が特定されている場合は省略できます(型が特定できない場合はエラーが出ます)。
@@ -119,6 +109,7 @@ at-input.cuick
 at-test.cuick
 
     //入力の2乗を出力するプログラム
+    @debug
     @test(0..20){
         in: "in@{id}.txt"
         out: "out@{id}.txt"
@@ -126,10 +117,6 @@ at-test.cuick
     int n;
     @input{n}
     puts(n ** 2);
-
-###演習
-
-実際に問題を解いてみましょう。
 
 ###終わりに
 

@@ -88,10 +88,9 @@ public final class Table {
 
     public boolean isDefinedWord(String name) {
         return Arrays.asList(
-                "true",
-                "false",
-                "puts",
-                "print"
+                "true", "false",
+                "puts", "print",
+                "var_dump"
                 ).contains(name);
     }
 }

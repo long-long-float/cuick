@@ -164,7 +164,7 @@ public class Compiler {
         
         compile(sourceFile, destFile, opts);
         
-        Map<String, String> constants = new HashMap<>();
+        Map<String, String> constants = new HashMap<String, String>();
         constants.put("FILE_BASENAME", sourceFile.replaceFirst(".cuick$", ""));
         constants.put("DEST_FILE", sourceFile.replaceFirst(".cuick$", ".cpp"));
         

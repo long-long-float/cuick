@@ -146,7 +146,10 @@ public class ASTTranslator extends ASTVisitor<Node> {
                         field.set(node, newList);
                     }
                 }
-            } catch (IllegalArgumentException | IllegalAccessException e) {
+            } catch (IllegalArgumentException e) {
+                // TODO 自動生成された catch ブロック
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
                 // TODO 自動生成された catch ブロック
                 e.printStackTrace();
             }
@@ -334,9 +337,7 @@ public class ASTTranslator extends ASTVisitor<Node> {
             VariableNode std = new VariableNode(null, "std");
             ExprNode endl = new StaticMemberNode(std, "endl");
             
-            switch(name) {
-            case "print":
-            case "puts": {
+            if(name.equals("print") || name.equals("puts")) {
                 boolean isPuts = name.equals("puts");
                 ExprNode newNode = new StaticMemberNode(std, "cout");
                 int i = 0;
@@ -360,7 +361,7 @@ public class ASTTranslator extends ASTVisitor<Node> {
                 }
                 return newNode;
             }
-            case "var_dump": {
+            else if(name.equals("var_dump")) {
                 if(!Table.getInstance().isDebugMode()) return new BuiltInCode(null, "");
                 
                 ExprNode newNode = new StaticMemberNode(std, "cout");
@@ -374,7 +375,7 @@ public class ASTTranslator extends ASTVisitor<Node> {
                 }
                 return newNode;
             }
-            default:
+            else {
                     return visitDefault(node);
             }
         }

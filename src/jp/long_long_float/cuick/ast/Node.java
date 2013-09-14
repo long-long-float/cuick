@@ -27,7 +27,10 @@ abstract public class Node implements Dumpable, Acceptable{
                         ((Node)item).setParent(this);
                     }
                 }
-            } catch (IllegalArgumentException | IllegalAccessException e) {
+            } catch (IllegalArgumentException e) {
+                // TODO 自動生成された catch ブロック
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
                 // TODO 自動生成された catch ブロック
                 e.printStackTrace();
             }

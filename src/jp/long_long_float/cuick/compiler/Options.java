@@ -33,7 +33,7 @@ public class Options {
     private boolean stdoutFlag;
     
     @Argument(metaVar="source", usage="source file")
-    private List<String> sourceFiles = new ArrayList<>();
+    private List<String> sourceFiles = new ArrayList<String>();
     
     private CmdLineParser parser;
     

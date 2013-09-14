@@ -8,7 +8,7 @@ import lombok.Getter;
 public class InputThread extends Thread {
 
     @Getter
-    private List<String> buffer = new ArrayList<>();
+    private List<String> buffer = new ArrayList<String>();
     private java.io.InputStream inputStream;
     
     public InputThread(java.io.InputStream inputStream) {
@@ -17,10 +17,9 @@ public class InputThread extends Thread {
     
     @Override
     public void run() {
-        try (InputStream is = new InputStream(inputStream)) {
-            /*for(String line : is) {
-                buffer.add(line);
-            }*/
+        InputStream is = null;
+        try {
+            is = new InputStream(inputStream);
             while(true) {
                 String line = is.getBufferedReader().readLine();
                 if(line == null) break;
@@ -28,6 +27,11 @@ public class InputThread extends Thread {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                if(is != null) is.close();
+            } catch (Exception e) {
+            }
         }
     }
 

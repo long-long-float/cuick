@@ -184,13 +184,14 @@ public class ASTTranslator extends ASTVisitor<Node> {
     //at commands
     
     public Node visit(AtWhileNode node) {
+        
         BlockNode body = new BlockNode(null, null, null);
         List<StmtNode> stmts = node.parentBlockNode(0).stmts();
         int atWhilePos = stmts.indexOf(node);
         for(int i = atWhilePos + 1;i < stmts.size();i++) {
             body.stmts().add((StmtNode)stmts.get(i).accept(this));
         }
-        for(int i = atWhilePos;i < stmts.size();i++) stmts.remove(atWhilePos);
+        stmts.subList(atWhilePos, stmts.size()).clear();
         WhileNode whileNode = new WhileNode(null, node.cond(), body);
         return whileNode;
     }

@@ -223,7 +223,7 @@ public class CodeGenerator extends ASTVisitor<String> {
     //statements
     
     public String visit(SharpIncludeNode node) {
-        return "#include" + node.name();
+        return "#include " + node.name();
     }
     
     public String visit(BuiltInCodeStmt node) {
@@ -235,7 +235,7 @@ public class CodeGenerator extends ASTVisitor<String> {
     }
     
     public String visit(ExprStmtNode node) {
-        return node.expr().accept(this) + ";";
+        return node.expr().accept(this) + ";" + CodeBuilder.SEPARATOR;
     }
     
     public String visit(BlockNode node) {
@@ -249,7 +249,7 @@ public class CodeGenerator extends ASTVisitor<String> {
     }
     
     public String visit(ForNode node) {
-        String ret = "for(" + node.var().type() + " " + node.var().accept(this) + ";" + node.cond().accept(this) + ";" + node.incr().accept(this) + ")" + node.body().accept(this);
+        String ret = "for(" + node.var().type() + " " + node.var().accept(this) + ";" + node.cond().accept(this) + ";" + node.incr().accept(this) + ") " + node.body().accept(this);
         return ret;
     }
 
@@ -258,9 +258,9 @@ public class CodeGenerator extends ASTVisitor<String> {
     }
     
     public String visit(IfNode n) {
-        String ret = "if" + "(" + n.cond().accept(this) + ")" + n.thenBody().accept(this);
+        String ret = "if" + "(" + n.cond().accept(this) + ") " + n.thenBody().accept(this);
         if(n.elseBody() != null) {
-            ret += "else" + n.elseBody().accept(this);
+            ret += "else " + n.elseBody().accept(this);
         }
         return ret;
     }
@@ -284,7 +284,7 @@ public class CodeGenerator extends ASTVisitor<String> {
     }
 
     public String visit(WhileNode n) {
-        return "while" + "(" + n.cond().accept(this) + ")" + n.body().accept(this);
+        return "while" + "(" + n.cond().accept(this) + ") " + n.body().accept(this);
     }
 
     public String visit(DoWhileNode n) {

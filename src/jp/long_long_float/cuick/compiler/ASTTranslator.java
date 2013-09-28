@@ -31,6 +31,7 @@ import jp.long_long_float.cuick.ast.MemberNode;
 import jp.long_long_float.cuick.ast.MemorizeNode;
 import jp.long_long_float.cuick.ast.MultiplexAssignNode;
 import jp.long_long_float.cuick.ast.Node;
+import jp.long_long_float.cuick.ast.OpAssignNode;
 import jp.long_long_float.cuick.ast.PowerOpNode;
 import jp.long_long_float.cuick.ast.RangeNode;
 import jp.long_long_float.cuick.ast.ReturnNode;
@@ -184,7 +185,6 @@ public class ASTTranslator extends ASTVisitor<Node> {
     //at commands
     
     public Node visit(AtWhileNode node) {
-        
         BlockNode body = new BlockNode(null, null, null);
         List<StmtNode> stmts = node.parentBlockNode(0).stmts();
         int atWhilePos = stmts.indexOf(node);
@@ -409,7 +409,17 @@ public class ASTTranslator extends ASTVisitor<Node> {
         //return null;
     }
     
+    public Node visit(OpAssignNode node) {
+        if(node.getOperator().equals("**")) {
+            AssignNode newNode = new AssignNode(node.getLhs(), new PowerOpNode(node.getLhs(), node.getRhs()));
+            newNode.setParents();
+            newNode.setParent(node.parent());
+            return visitDefault(newNode);
+        }
+        return visitDefault(node);
+    }
+    
     public Node visit(PowerOpNode node) {
-        return new FuncallNode(new StaticMemberNode(new VariableNode(null, "std"), "pow"), null, ListUtils.asList(node.left(), node.right()), null);
+        return new FuncallNode(new StaticMemberNode(new VariableNode(null, "std"), "pow"), null, ListUtils.asList(node.left(), node.right()), null).accept(this);
     }
 }

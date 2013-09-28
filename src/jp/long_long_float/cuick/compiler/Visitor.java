@@ -236,14 +236,14 @@ public class Visitor extends ASTVisitor<Void> {
     */
 
     public Void visit(AssignNode n) {
-        visitExpr(n.lhs());
-        visitExpr(n.rhs());
+        visitExpr(n.getLhs());
+        visitExpr(n.getRhs());
         return null;
     }
 
     public Void visit(OpAssignNode n) {
-        visitExpr(n.lhs());
-        visitExpr(n.rhs());
+        visitExpr(n.getLhs());
+        visitExpr(n.getRhs());
         return null;
     }
 

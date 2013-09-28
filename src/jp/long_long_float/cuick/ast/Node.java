@@ -12,6 +12,9 @@ abstract public class Node implements Dumpable, Acceptable{
     public Node(){
     }
     
+    /**
+     * 自分のすべての子のsetParent(this)を呼ぶ
+     */
     public void setParents() {
         for(Field field : getClass().getDeclaredFields()) {
             try {
@@ -41,6 +44,10 @@ abstract public class Node implements Dumpable, Acceptable{
         return parent;
     }
     
+    /**
+     * 親を設定する
+     * @param parent 親
+     */
     public void setParent(Node parent) {
         this.parent = parent;
     }
@@ -62,6 +69,21 @@ abstract public class Node implements Dumpable, Acceptable{
     }
     
     abstract protected void _dump(Dumper d);
+    
+    protected void _dumpDefault(Dumper d) {
+        for(Field field : this.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                d.printMember(field.getName(), field.get(this));
+            } catch (IllegalArgumentException e) {
+                // TODO 自動生成された catch ブロック
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                // TODO 自動生成された catch ブロック
+                e.printStackTrace();
+            }
+        }
+    }
     
     public <T> T accept(ASTVisitor<T> visitor) {
         return visitor.visit(this);

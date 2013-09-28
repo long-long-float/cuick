@@ -227,7 +227,7 @@ public class Compiler {
 
     private void compile(String srcPath, String destPath, Options opts) throws CompileException{
         AST ast = parseFile(srcPath, opts);
-        //ast.dump();
+        ast.dump();
         //System.out.println("===============localResolve================");
         ast = localResolve(ast, opts);
         //ast.dump();

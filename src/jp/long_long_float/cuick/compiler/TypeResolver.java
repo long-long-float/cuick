@@ -66,15 +66,15 @@ public class TypeResolver extends Visitor {
 
     public Void visit(AssignNode n) {
         super.visit(n);
-        typeEqualCheck(n, n.lhs(), n.rhs());
-        n.setType(n.lhs().type());
+        typeEqualCheck(n, n.getLhs(), n.getRhs());
+        n.setType(n.getLhs().type());
         return null;
     }
 
     public Void visit(OpAssignNode n) {
         super.visit(n);
-        typeEqualCheck(n, n.lhs(), n.rhs());
-        n.setType(selectType(n.lhs(), n.rhs()));
+        typeEqualCheck(n, n.getLhs(), n.getRhs());
+        n.setType(selectType(n.getLhs(), n.getRhs()));
         return null;
     }
 

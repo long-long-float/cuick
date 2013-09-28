@@ -1,14 +1,23 @@
 package jp.long_long_float.cuick.ast;
 
-public class OpAssignNode extends AbstractAssignNode {
-    protected String operator;
-    
-    public OpAssignNode(ExprNode lhs, String op, ExprNode rhs) {
-        super(lhs, rhs);
-        this.operator = op;
-    }
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-    public String operator() {
-        return operator;
+@Getter
+@AllArgsConstructor
+public class OpAssignNode extends AbstractAssignNode {
+    
+    private ExprNode lhs;
+    private String operator;
+    private ExprNode rhs;
+    
+    @Override
+    public Location location() {
+        return lhs.location();
+    }
+    
+    @Override
+    protected void _dump(Dumper d) {
+        _dumpDefault(d);
     }
 }

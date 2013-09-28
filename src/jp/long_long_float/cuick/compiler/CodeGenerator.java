@@ -338,11 +338,11 @@ public class CodeGenerator extends ASTVisitor<String> {
     }
     
     public String visit(AssignNode n) {
-        return n.lhs().accept(this) + " = " + n.rhs().accept(this);
+        return n.getLhs().accept(this) + " = " + n.getRhs().accept(this);
     }
 
     public String visit(OpAssignNode n) {
-        return n.lhs().accept(this) + " " + n.operator() + "=" + " " + n.rhs().accept(this);
+        return n.getLhs().accept(this) + " " + n.getOperator() + "=" + " " + n.getRhs().accept(this);
     }
 
     public String visit(UnaryOpNode node) {

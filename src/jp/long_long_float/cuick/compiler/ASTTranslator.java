@@ -353,12 +353,7 @@ public class ASTTranslator extends ASTVisitor<Node> {
                     }
                     i++;
                 }
-                if(isPuts) {
-                    newNode = new BinaryOpNode(newNode, "<<", endl);
-                }
-                if(!isPuts) {
-                    //newNode = new BinaryOpNode(newNode, "<<", endl);
-                }
+                newNode = new BinaryOpNode(newNode, "<<", endl);
                 return newNode;
             }
             else if(name.equals("var_dump")) {

@@ -200,11 +200,11 @@ public class CodeGenerator extends ASTVisitor<String> {
         List<ExprNode> init = ent.init();
         if(!init.isEmpty()) {
             ret += " = ";
-            if(init.size() == 1) {
-                ret += init.get(0).accept(this);
+            if(init.size() > 1 || ent.isArray()) {
+                ret += "{" + join(init, ", ") + "}";
             }
             else {
-                ret += "{" + join(init, ", ") + "}";
+                ret += init.get(0).accept(this);
             }
         }
         return ret;
